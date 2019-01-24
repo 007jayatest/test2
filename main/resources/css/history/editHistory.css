@@ -1,0 +1,510 @@
+/*
+    Created on : Sep 16, 2016, 1:52:14 PM
+    Author     : vikashkumar
+*/
+.eui-show-version-button {
+    position: absolute;
+    margin-right: 0px;
+    cursor: pointer;
+    top: 6px;
+    font-size: 16px;
+    font-weight: normal;
+    right: 42px;
+    color: rgb(53, 73, 93);
+}
+
+.eui-version-topBar{
+    height: 40px;
+    background-color: #52b052;
+    color:white;
+}
+.eui-version-menu-close{
+    color: white;
+    background-color:#15673a;
+    cursor: pointer;
+    background: none;
+    line-height: 1.5;
+    font-size: 20px;
+    margin-left: 12px;
+    margin-top: 12px;
+    position: absolute;
+    font-weight: normal;
+}
+/* -----------------------------------------------------------------------------
+
+  ROOT ELEMENTS
+
+----------------------------------------------------------------------------- */
+
+nav#euiMenuPushRight {
+    color: #6d6d6d;
+    background-color: #fff;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.8;
+    z-index:999999999;
+}
+
+nav#euiMenuPushRight.is-active{
+    border-left: 3px solid grey;
+}
+
+nav a{
+    text-decoration: none;
+}
+
+
+/* -----------------------------------------------------------------------------
+
+  WRAPPER OBJECT
+
+----------------------------------------------------------------------------- */
+.eui-wrapper {
+    -webkit-transition: -webkit-transform 0.3s;
+    transition: transform 0.3s;
+}
+
+/* -----------------------------------------------------------------------------
+
+  SLIDE AND PUSH MENUS COMPONENT
+
+----------------------------------------------------------------------------- */
+/**
+ * Menu overview.
+ */
+.eui-menu {
+    position: fixed;
+    z-index: 200;
+    background-color: white;
+    -webkit-transition: -webkit-transform 0.3s;
+    transition: transform 0.3s;
+}
+
+.eui-version-menu-items {
+    list-style: none;
+    margin-top: 40px;
+    padding: 0;
+}
+
+.eui-version-menu-item.active{
+    background-color: #15673a;
+}
+.eui-version-menu-item.active .eui-version-item-link{
+    color: #FFFFFF;
+}
+/**
+ * Left and right menus
+ *
+ * Slide and push menus coming in from the left and right inherit a lot of
+ * common styles. We'll start each of them off by doing up the common styles
+ * for each version, followed by individual styles.
+ *
+ * The various versions are governed by modifier classes.
+ */
+/**
+ * Common modifiers for left/right menus.
+ */
+.eui-menu-slide-left,
+.eui-menu-slide-right,
+.eui-menu-push-left,
+.eui-menu-push-right {
+    width: 100%;
+    height: 100%;
+    overflow-y: scroll;
+    -webkit-transition: opacity 0.3s;
+    transition: opacity 0.3s;
+}
+@media all and (min-width: 320px) {
+    .eui-menu-slide-left,
+    .eui-menu-slide-right,
+    .eui-menu-push-left,
+    .eui-menu-push-right {
+        width: 300px;
+    }
+}
+
+.eui-menu-slide-left .eui-version-menu-item,
+.eui-menu-slide-right .eui-version-menu-item,
+.eui-menu-push-left .eui-version-menu-item,
+.eui-menu-push-right .eui-version-menu-item {
+    display: block;
+    /*text-align: center;*/
+    /*border-top: solid 1px dark;*/
+    border-bottom: solid 2px #15673a;
+}
+.eui-menu-slide-left .eui-version-menu-item:first-child,
+.eui-menu-slide-right .eui-version-menu-item:first-child,
+.eui-menu-push-left .eui-version-menu-item:first-child,
+.eui-menu-push-right .eui-version-menu-item:first-child {
+    border-top: none;
+}
+.eui-menu-slide-left .eui-version-menu-item:last-child,
+.eui-menu-slide-right .eui-version-menu-item:last-child,
+.eui-menu-push-left .eui-version-menu-item:last-child,
+.eui-menu-push-right .eui-version-menu-item:last-child {
+    border-bottom: none;
+}
+
+.eui-menu-slide-left .eui-version-item-link,
+.eui-menu-slide-right .eui-version-item-link,
+.eui-menu-push-left .eui-version-item-link,
+.eui-menu-push-right .eui-version-item-link {
+    display: block;
+    padding: 12px 24px;
+    color: #333;
+}
+
+.eui-menu-slide-left .eui-version-menu-bar,
+.eui-menu-slide-right .eui-version-menu-bar,
+.eui-menu-push-left .eui-version-menu-bar,
+.eui-menu-push-right .eui-version-menu-bar {
+    display: block;
+    width: 100%;
+}
+
+/**
+ * Slide/Push Menu Left.
+ */
+.eui-menu-slide-left,
+.eui-menu-push-left {
+    top: 0;
+    left: 0;
+    -webkit-transform: translateX(-100%);
+    -ms-transform: translateX(-100%);
+    transform: translateX(-100%);
+}
+@media all and (min-width: 320px) {
+    .eui-menu-slide-left,
+    .eui-menu-push-left {
+        -webkit-transform: translateX(-300px);
+        -ms-transform: translateX(-300px);
+        transform: translateX(-300px);
+    }
+}
+
+.eui-menu-slide-left.is-active,
+.eui-menu-push-left.is-active {
+    -webkit-transform: translateX(0);
+    -ms-transform: translateX(0);
+    transform: translateX(0);
+}
+
+/**
+ * Slide/Push Menu Right.
+ */
+.eui-menu-slide-right,
+.eui-menu-push-right {
+    top: 0;
+    right: 0;
+    -webkit-transform: translateX(100%);
+    -ms-transform: translateX(100%);
+    transform: translateX(100%);
+}
+@media all and (min-width: 320px) {
+    .eui-menu-slide-right,
+    .eui-menu-push-right {
+        -webkit-transform: translateX(300px);
+        -ms-transform: translateX(300px);
+        transform: translateX(300px);
+    }
+}
+
+.eui-menu-slide-right.is-active,
+.eui-menu-push-right.is-active {
+    -webkit-transform: translateX(0);
+    -ms-transform: translateX(0);
+    transform: translateX(0);
+}
+
+/**
+ * Top and bottom menus
+ *
+ * Slide and push menus coming in from the top and bottom inherit a lot of
+ * common styles. We'll start each of them off by doing up the common styles
+ * for each version, followed by individual styles.
+ *
+ * The various versions are governed by modifier classes.
+
+/**
+ * Common modifiers for top/bottom menus
+ */
+.eui-menu-slide-top,
+.eui-menu-slide-bottom,
+.eui-menu-push-top,
+.eui-menu-push-bottom {
+    vertical-align: middle;
+    width: 100%;
+    height: 60px;
+    text-align: center;
+    overflow-x: scroll;
+}
+
+.eui-menu-slide-top .eui-version-menu-items,
+.eui-menu-slide-bottom .eui-version-menu-items,
+.eui-menu-push-top .eui-version-menu-items,
+.eui-menu-push-bottom .eui-version-menu-items {
+    display: inline-block;
+    text-align: center;
+}
+
+.eui-menu-slide-top .eui-version-menu-item,
+.eui-menu-slide-bottom .eui-version-menu-item,
+.eui-menu-push-top .eui-version-menu-item,
+.eui-menu-push-bottom .eui-version-menu-item {
+    display: inline-block;
+    line-height: 60px;
+}
+
+.eui-menu-slide-top .eui-version-item-link,
+.eui-menu-slide-bottom .eui-version-item-link,
+.eui-menu-push-top .eui-version-item-link,
+.eui-menu-push-bottom .eui-version-item-link {
+    display: block;
+    padding: 0 4px;
+    color: #fff;
+}
+
+.eui-version-menu-bar{
+    background-color: #52b052;
+    display: inline-block;
+    margin-right: 12px;
+    padding: 0 24px;
+    height: 40px;
+    line-height: 40px;
+}
+#euiVersionMenuBarHeaderIcon {
+    padding-right: 14px;
+    font-size:11pt;
+    position: relative;
+    top: 1px;
+}
+
+/**
+ * Slide/Push Menu Top.
+ */
+.eui-menu-slide-top,
+.eui-menu-push-top {
+    top: 0;
+    left: 0;
+    -webkit-transform: translateY(-60px);
+    -ms-transform: translateY(-60px);
+    transform: translateY(-60px);
+}
+
+.eui-menu-slide-top.is-active,
+.eui-menu-push-top.is-active {
+    -webkit-transform: translateY(0);
+    -ms-transform: translateY(0);
+    transform: translateY(0);
+}
+
+/**
+ * Slide/Push Menu Bottom.
+ */
+.eui-menu-slide-bottom,
+.eui-menu-push-bottom {
+    bottom: 0;
+    left: 0;
+    -webkit-transform: translateY(60px);
+    -ms-transform: translateY(60px);
+    transform: translateY(60px);
+}
+
+.eui-menu-slide-bottom.is-active,
+.eui-menu-push-bottom.is-active {
+    -webkit-transform: translateY(0);
+    -ms-transform: translateY(0);
+    transform: translateY(0);
+}
+
+/**
+ * Wrapper states.
+ *
+ * Various wrapper states occur depending on if a menu is pushing into view, in
+ * which case, the wrapper has to be pushed by the respective distance.
+ */
+.eui-wrapper.has-push-left {
+    -webkit-transform: translateX(100%);
+    -ms-transform: translateX(100%);
+    transform: translateX(100%);
+}
+@media all and (min-width: 320px) {
+    .eui-wrapper.has-push-left {
+        -webkit-transform: translateX(300px);
+        -ms-transform: translateX(300px);
+        transform: translateX(300px);
+    }
+}
+
+.eui-wrapper.has-push-right {
+    -webkit-transform: translateX(-100%);
+    -ms-transform: translateX(-100%);
+    transform: translateX(-100%);
+}
+@media all and (min-width: 320px) {
+    .eui-wrapper.has-push-right {
+        -webkit-transform: translateX(-300px);
+        -ms-transform: translateX(-300px);
+        transform: translateX(-300px);
+    }
+}
+
+.eui-wrapper.has-push-top {
+    -webkit-transform: translateY(60px);
+    -ms-transform: translateY(60px);
+    transform: translateY(60px);
+}
+
+.eui-wrapper.has-push-bottom {
+    -webkit-transform: translateY(-60px);
+    -ms-transform: translateY(-60px);
+    transform: translateY(-60px);
+}
+
+/**
+ * Body states.
+ *
+ * When a menu is active, we want to hide the overflows on the body to prevent
+ * awkward document scrolling.
+ */
+body.has-active-menu {
+    overflow: hidden;
+}
+
+/**
+ * Close button resets.
+ */
+.eui-version-menu-bar {
+    color: #fff;
+    background-color: #52b052;
+    font-size: 16px;
+    border: none;
+    box-shadow: none;
+    border-radius: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.eui-version-menu-bar:focus {
+    outline: none;
+}
+
+/* -----------------------------------------------------------------------------
+
+  MASK COMPONENT
+
+----------------------------------------------------------------------------- */
+.eui-version-mask {
+  position: fixed;
+  z-index: 3600;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  width: 0;
+  height: 0;
+  background-color: white;
+  /*opacity: 0; */
+  -webkit-transition: opacity 0.3s;
+          transition: opacity 0.3s;
+}
+
+.eui-version-mask.is-active {
+    width: calc(100% - 300px);
+    height: 100%;
+    /*opacity: 0.7; */
+    -webkit-transition: opacity 0.3s;
+    transition: opacity 0.3s;
+}
+
+#euiVersionSpread{
+    height:94%;
+}
+/* -----------------------------------------------------------------------------
+
+  BUTTONS
+
+----------------------------------------------------------------------------- */
+.c-buttons {
+    margin-bottom: 48px;
+    text-align: center;
+}
+
+.eui-version-author-avatar{
+    display:inline-block;
+    height:35px;
+    vertical-align:middle;
+}
+
+.eui-version-author-name{
+    display: inline-block;
+}
+.eui-version-item-link{
+    text-decoration: none !important;
+    cursor: pointer;
+}
+.eui-version-item-link:hover {
+    background:#52b052;
+    color:white;
+    text-decoration: none;
+}
+.version-history {
+    width: 95%;
+    height:20px;
+    position:absolute;
+    top:0;
+    left:0;
+    z-index:200;
+}
+.eui-version-header {
+    width: 100%;
+}
+.eui-version-history-container {
+    position: absolute;
+    width:100%;
+    height: 94%;
+    overflow-y:auto;
+    z-index:200;
+}
+.eui-restore-version {
+    float: right;
+    color: white !important;
+    cursor: pointer;
+    display: none;
+
+}
+.eui-restore-version:hover {
+    text-decoration: underline;
+}
+.eui-view-more {
+    text-align: center;
+}
+.eui-version-menu-item:not(:first-child):hover .eui-restore-version {
+    display: inline-block;
+}
+@keyframes eui-spin-rotate {
+    0% {
+        transform: rotate(0);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+.eui-spin {
+    display: inline-block;
+    animation: eui-spin-rotate 2s infinite linear;
+}
+
+.icon-spinner3.eui-spin{
+    font-size: 100px !important;
+}
+
+.eui-view-more-version-history,.eui-restore-version {
+    cursor: pointer;
+    color:blue;
+    text-decoration:none;
+}
+
+.eui-view-more-version-history,.eui-restore-version:hover {
+     text-decoration:underline;
+}

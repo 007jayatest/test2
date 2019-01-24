@@ -1,0 +1,44 @@
+<html>
+    <head>
+        <title>$i18n.getText("com.addteq.confluence.plugin.excellentable.collaborativeEdit.configForm.title")</title>
+        <meta name="decorator" content="atl.admin" />
+        <meta name="admin.active.section" content="system.admin/excellentable" >
+        <meta name="ajs-is-excellentable-multiedit-enabled" content="$action.getStatus()" />
+    </head>
+    <body>
+        <content tag="selectedWebItem">excellentable-admin-web-item</content>
+        #if ($action.getLicenseErrorStatus())
+            <div id="aui-message-bar"></div>
+            <div class="field-group">
+                <aui-label for="euiIsMultieditEnabled" style="width:auto;">
+                    $i18n.getText("com.addteq.confluence.plugin.excellentable.collaborativeEdit.configForm.text")
+                </aui-label>
+                <aui-toggle id="euiIsMultieditEnabled" style="margin-left: 10px" 
+                    label="$i18n.getText("com.addteq.confluence.plugin.excellentable.collaborativeEdit.configForm.text")"
+                    tooltip-on="Collaborative Editing Enabled" 
+                    tooltip-off="Collaborative Editing Disabled">
+                </aui-toggle>
+            </div>            
+        #else
+            <div class="aui-message warning">
+                 <p class="title">
+                    <span class="aui-icon icon-warning"></span>
+                    <strong>$action.getLicenseError()</strong>
+                 </p>
+            </div>
+        #end
+        
+        </br> 
+        <div class="aui-message aui-message-warning eui-aui-msg-warning">
+            <p class="title">
+                <strong>Hey there, don't forget that Collaborative Editing is a BETA feature.</strong>
+            </p>
+            <p>
+                Some of the functionalities are not optimized and may seem sluggish. Our team is hard at 
+work to optimize all of the functions you use while in collaborative editing mode. 
+Your <a href="https://jira.addteq.com/servicedesk/customer/portal/17/create/103" target="_blank">feedback</a>
+helps us prioritize the features effectively.
+            </p>
+        </div>
+    </body>
+</html>

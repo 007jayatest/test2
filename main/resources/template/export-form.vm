@@ -1,0 +1,58 @@
+#set($exportText = $i18n.getText("com.addteq.confluence.plugin.excellentable.export"))
+#set($xlsxText = $i18n.getText("com.addteq.confluence.plugin.excellentable.xlsx"))
+#set($csvText = $i18n.getText("com.addteq.confluence.plugin.excellentable.csv"))
+#set($pdfText = $i18n.getText("com.addteq.confluence.plugin.excellentable.pdf"))
+#set($htmlText = $i18n.getText("com.addteq.confluence.plugin.excellentable.html"))
+
+#set($exportXlsxText =  $i18n.getText("com.addteq.confluence.plugin.excellentable.export.xlsx"))
+#set($exportCsvText =  $i18n.getText("com.addteq.confluence.plugin.excellentable.export.csv"))
+#set($exportHTMLText =  $i18n.getText("com.addteq.confluence.plugin.excellentable.export.html"))
+#set($comingSoonText =  $i18n.getText("com.addteq.confluence.plugin.excellentable.comingsoon"))
+#set($excellentable =  $i18n.getText("com.addteq.confluence.plugin.excellentable.excellentable"))
+
+<form id="euiExport" action ="$contextPath/rest/excellentable/1.0/export" class="aui" method ="post" enctype="multipart/form-data">
+    <input type="hidden" id="euiExportType" name="exportType"/>
+    <input type="hidden" id="euiDataVal" name="data"/>
+    <input type="hidden" id="euiExportFileNameVal" name="exportFileName"/>
+    <!-- Trigger -->
+    <a href="#" aria-owns="exportExcellentable-$excellentableId" aria-haspopup="true" class="aui-button aui-style-default aui-dropdown2-trigger" title="$exportText" data-gravity="w">
+        <p style="display:inline"> 
+            <span  class="aui-icon aui-icon-small aui-iconfont-export"></span>
+        </p>
+    </a>
+    <!-- Dropdown -->
+    <div id="exportExcellentable-$excellentableId" class="aui-style-default aui-dropdown2 eui-export-view-mode" excellentable-id="$excellentableId">
+        <ul class="aui-list-truncate">
+            <li class="eui-list-item" aria-disabled="true" data-value="xlsx">
+                <a href="#" title="$exportXlsxText" data-gravity="w">
+                    <span class="icon-icomoon icon-windows8">&nbsp;</span>
+                    $xlsxText
+                </a>
+            </li>
+            <li class="eui-list-item" aria-disabled="true" data-value="csv">
+                <a href="#" title="$exportCsvText" data-gravity="w">
+                    <span class="icon-icomoon icon-file-text2">&nbsp;</span> 
+                    $csvText
+                </a>
+            </li>
+            <li class="eui-list-item" aria-disabled="true" data-value="html" style="display: none;">
+                <a href="#" title="$exportHTMLText" data-gravity="w">
+                    <span class="icon-icomoon icon-html-five">&nbsp;</span>
+                    $htmlText
+                </a>
+            </li>
+            <li class="eui-list-item" aria-disabled="true" data-value="pdf" style="display: none">
+                <a href="#" title="$comingSoonText" data-gravity="w">
+                    <span class="icon-icomoon icon-file-pdf-eui">&nbsp;</span>
+                    $pdfText
+                </a>
+            </li>
+            <li class="eui-list-item" aria-disabled="true" data-value="excellentable" style="display: none">
+                <a href="#" title="$comingSoonText" data-gravity="w">
+                    <img class ="pdf" src="$contextPath/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/addteq-plugin-icon-140by140.png" style="height:25px; vertical-align:middle;"/>
+                    &nbsp;$excellentable
+                </a>
+            </li>
+        </ul>
+    </div>
+</form>

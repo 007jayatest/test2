@@ -1,0 +1,394 @@
+{namespace Confluence.Templates.Excellentable}
+
+/******************************************
+ *  Edit Excellentable Dialog Template.
+ *  @param excellentableDialogId
+ *  @param contentEntityId
+ *  @param width
+ *  @param height
+*******************************************/
+{template .EditETDialog}
+<section id="{$excellentableDialogId}" content-entity-id="{$contentEntityId}" class="hidden" style="width:{$width};height:{$height}">
+
+    <!-- Main dialog content -->
+    <div class="eui-dialog2-content">
+        <div id="euiAuiMsgContainer" class="eui-aui-msg-container"></div>
+        <div id="euiTextArea" style="visibility:hidden"></div>
+        <div id="euiUserImageArea"></div>
+    </div>
+</section>
+{/template}
+
+
+/******************************************
+ *  Excellentable Import Sheet template.
+ *
+*******************************************/
+{template .ImportSheet}
+
+<section role="dialog" id="euiImportDialog" class="aui-layer aui-dialog2" aria-hidden="true" style="margin-top:120px;width:350px;height:250px">
+
+    <!-- Dialog header -->
+    <header class="aui-dialog2-header">
+        <!-- The dialog's title -->
+        <h2 class="aui-dialog2-header-main"> {getText('com.addteq.confluence.plugin.excellentable.import.sheet')} </h2>
+    </header>
+
+    <!-- Main dialog content -->
+    <div class="aui-dialog2-content">
+        <div class="radio">
+            <input class="radio" type="radio" checked="checked"
+                name="radiobuttons" id="euiReplaceExistingDocument">
+            <label for="radioButtonOne">
+                {getText('com.addteq.confluence.plugin.excellentable.import.replace')}
+            </label>
+        </div>
+        <div class="radio">
+            <input class="radio" type="radio"
+                name="radiobuttons" id="euiMergeExistingDocument">
+            <label for="radioButtonTwo">
+                {getText('com.addteq.confluence.plugin.excellentable.import.merge')}
+            </label>
+        </div>
+    </div>
+
+    <!-- Dialog footer -->
+    <footer class="aui-dialog2-footer">
+        <!-- Actions to render on the right of the footer -->
+        <div class="aui-dialog2-footer-actions">
+            <button id="euiImportSheetDialogSubmitButton" class="aui-button aui-button-primary">
+                {getText('com.addteq.confluence.plugin.excellentable.import.dialog.button.import')}
+            </button>
+            <button id="euiImportSheetDialogCloseButton" class="aui-button aui-button-link">
+                {getText('com.addteq.confluence.plugin.excellentable.import.dialog.button.cancel')}
+            </button>
+        </div>
+    </footer>
+</section>
+
+{/template}
+
+/******************************************
+ *   Excellentable Custom Dialog template.
+ *   @param dialogId
+ *   @param msg
+*******************************************/
+{template .CustomDialog}
+<section role="dialog" id="{$dialogId}" class="aui-layer aui-dialog2 aui-dialog2-small" aria-hidden="true" style="width:400px;z-index:3005">
+    <!-- Dialog header -->
+    <header class="aui-dialog2-header">
+        <!-- The dialog's title -->
+        <h2 class="aui-dialog2-header-main"> {getText('com.addteq.confluence.plugin.excellentable.confirm')} </h2>
+
+        <!-- Close icon -->
+        <a class="aui-dialog2-header-close">
+            <span class="aui-icon aui-icon-small aui-iconfont-close-dialog">Close</span>
+        </a>
+    </header>
+
+    <!-- Main dialog content -->
+    <div class="aui-dialog2-content">
+        <p>{$msg}</p>
+    </div>
+
+    <!-- Dialog footer -->
+    <footer class="aui-dialog2-footer">
+        <!-- Actions to render on the right of the footer -->
+        <div class="aui-dialog2-footer-actions">
+            <button id="euiSaveChangesBeforeExportButton" class="aui-button aui-button-primary">
+                {getText('com.addteq.confluence.plugin.excellentable.ok')}
+            </button>
+            <button id="euiUnsaveChangesBeforeExportButton" class="aui-button aui-button-link">
+                {getText('com.addteq.confluence.plugin.excellentable.cancel')}
+            </button>
+        </div>
+    </footer>
+</section>
+{/template}
+
+
+/****************************************
+ *   Excellentable Sort Range Dialog template.
+ *   @param columns
+*******************************************/
+{template .SortRangeDialog}
+<section role="dialog" id="euiSortRangeDialog" class="aui-layer aui-dialog2 aui-dialog2-small" style="z-index: 3104;">
+
+    <!-- Dialog header -->
+    <header class="aui-dialog2-header">
+        <!-- The dialog's title -->
+        <h2 class="aui-dialog2-header-main">
+            {getText('com.addteq.confluence.plugin.excellentable.sort.range')}
+        </h2>
+    </header>
+    <!-- Main dialog content -->
+    <div class="aui-dialog2-content">
+        <div>
+            <input type="checkbox" name="hasHeader" />
+            {getText('com.addteq.confluence.plugin.excellentable.data.has.header.row')}
+        </div>
+        <div id="euiSrTables">
+            {let $label} {getText('com.addteq.confluence.plugin.excellentable.sort.by')}{/let}
+            {call Confluence.Templates.Excellentable.SortRangeDialogSRTable}
+                {param label : $label/}
+                {param srTableCnt : 0 /}
+                {param columns : $columns /}
+            {/call}
+        </div>
+        <div>
+            <a id="euiSrAddCol" href="#">+
+                {getText('com.addteq.confluence.plugin.excellentable.add.sort.column')}
+            </a>
+        </div>
+    </div>
+    <!-- Dialog footer -->
+    <footer class="aui-dialog2-footer">
+        <!-- Actions to render on the right of the footer -->
+        <div class="aui-dialog2-footer-actions">
+            <button id="euiDialogSaveChangesOkButton" class="aui-button aui-button-primary">
+                {getText('com.addteq.confluence.plugin.excellentable.save')}
+            </button>
+            <button id="euiDialogSaveChangesCancelButton" class="aui-button aui-button-link">
+                {getText('com.addteq.confluence.plugin.excellentable.cancel')}
+            </button>
+        </div>
+    </footer>
+</section>
+{/template}
+
+
+/****************************************
+ *   Excellentable Sort Range Table of Sort Range Dialog template.
+ *   @param label
+ *   @param srTableCnt
+ *   @param columns
+*******************************************/
+{template .SortRangeDialogSRTable}
+
+<table class="eui-sr-table">
+    <tbody>
+        <tr>
+            <td>
+                {$label|noAutoescape} :
+            </td>
+            <td>
+                <select class="eui-sort-index aui-button">
+                    {foreach $key in keys($columns)}
+                        <option class="opt" value="{$key}">
+                            {getText('com.addteq.confluence.plugin.excellentable.sortrange.column')} {$columns[$key]}
+                        </option>
+                    {/foreach}
+                </select>
+            </td>
+            <td>
+                <div>
+                    <input class="eui-sort-type-asc" type="radio" name="sortType{$srTableCnt}" value="1" checked id="euiSortTypeAz">
+                    {getText('com.addteq.confluence.plugin.excellentable.sortrange.atoz')}
+                </div>
+                <div>
+                    <input type="radio" name="sortType{$srTableCnt}" value="0">
+                    {getText('com.addteq.confluence.plugin.excellentable.sortrange.ztoa')}
+                </div>
+            </td>
+        </tr>
+    </tbody>
+</table>
+{/template}
+
+/****************************************
+ *   Excellentable Share Filter Dialog template.
+*******************************************/
+{template .ShareFilter}
+
+<form action="#" method="post" class="aui eui-share-filter-popup eui-share-content-popup">
+    <div class="eui-field-group">
+        <div class="autocomplete-user-target">
+            <input class="text autocomplete-sharefilter" id="euiUsers" data-max="10" data-dropdown-target=".autocomplete-user-target"
+                data-none-message="{getText('com.addteq.confluence.plugin.excellentable.share.filter.no.matches')}"
+                placeholder="{getText('com.addteq.confluence.plugin.excellentable.share.filter.search.placeholder')}"/>
+        </div>
+        <ol class="eui-recipients"></ol>
+    </div>
+    <div class="eui-field-group">
+        <textarea class="textarea" id="euiNote" placeholder="{getText('com.addteq.confluence.plugin.excellentable.share.filter.add.optional.note')}"/>
+    </div>
+    <div class="eui-field-group eui-button-panel">
+        <div class="eui-progress-messages-icon"></div>
+        <div class="eui-progress-messages"></div>
+        <input class="button submit" type="submit" value="{getText('com.addteq.confluence.plugin.excellentable.share')}" disabled/>
+        <a class="eui-close-dialog" href="#">{getText('com.addteq.confluence.plugin.excellentable.cancel')}</a>
+    </div>
+</form>
+{/template}
+
+/************************************************
+ * Excellentable import warning dialog
+ ***********************************************/
+{template .importErrorDialog autoescape="false"}
+{@param errHtml: html}
+                <!-- Render the dialog -->
+                <section role="dialog" id="euiImportErrorDialog" class="aui-layer aui-dialog2 aui-dialog2-medium aui-dialog2-warning" aria-hidden="true" data-aui-modal="true">
+                    <!-- Dialog header -->
+                    <header class="aui-dialog2-header">
+                        <!-- The dialog's title -->
+                        <h2 class="aui-dialog2-header-main">{getText('com.addteq.confluence.plugin.excellentable.import.dialog.header.message1')}</h2>
+                        <!-- Actions to render on the right of the header -->
+
+                        <!-- Close icon -->
+                        <a class="aui-dialog2-header-close">
+                            <span class="aui-icon aui-icon-small aui-iconfont-close-dialog">Close</span>
+                        </a>
+                    </header>
+                    <!-- Main dialog content -->
+                    <div class="aui-dialog2-content">
+                     <h4>{getText('com.addteq.confluence.plugin.excellentable.import.dialog.header.message3')}</h4>
+                      <ul>{$errHtml|changeNewlineToBr}</ul>
+
+                    </div>
+                    <!-- Dialog footer -->
+                    <footer class="aui-dialog2-footer">
+                        <!-- Actions to render on the right of the footer -->
+                        <div class="aui-dialog2-footer-actions">
+                            <button id="euiUnsaveChangesBeforeExportButton" class="aui-button aui-button-link">{getText('com.addteq.confluence.plugin.excellentable.import.dialog.close.button')}</button>
+                        </div>
+
+                    </footer>
+                </section>
+{/template}
+
+/******************************************
+   Attachment Preview
+   @param excellentableDialogId
+   @param contentEntityId
+   @param width
+   @param height
+*******************************************/
+{template .AttachmentPreview}
+<section role="dialog" id="{$excellentableDialogId}" content-entity-id="{$contentEntityId}" class="aui-dialog2 aui-layer"
+    data-aui-modal="true" aria-hidden="true" style="width:{$width}px;height:{$height}px;top:0px;visibility:visible;">
+    <!-- Main dialog content -->
+    <div class="eui-attachment-menu-container">
+        <a class="eui-logo" original-title=""></a>
+        <div id="euiButtonContainer">
+            <button type="button" id="euiCreateNewPage" class="eui-button-attachment aui-button"
+                    title="Create new Confluence page using this file"
+                    aria-label="Create new Confluence page using this file">
+                <span class="aui-icon aui-icon-small aui-iconfont-edit">Create Icon</span> &nbsp;
+                Create
+            </button>
+            <button type="button" id="euiSave" class="eui-button-attachment aui-button" aria-label="Save"
+                    title="Save">
+                <span class="icon-icomoon icon-floppy-disk"></span> &nbsp;
+                Save
+            </button>
+            <a href="" id="euiDownload" class="eui-button-attachment aui-button" aria-label="Download"
+               title="Download">
+                <span class="icon-icomoon icon-cloud-download"></span> &nbsp;
+                Download
+            </a>
+            <button type="button" class="eui-close aui-button" aria-label="Close">
+                <span aria-hidden="true">×</span>
+            </button>
+        </div>
+        <div id="euiAuiMsgContainer" class="eui-aui-msg-container"></div>
+    </div>
+</section>
+{/template}
+
+
+/******************************************
+   Fullscreen View Mode
+   @param excellentableDialogId
+   @param excellentableId
+   @param contentEntityId
+   @param width
+   @param height
+   @param hasEditPermission
+   @param contextPath
+*******************************************/
+{template .FullscreenView}
+<section role="dialog" id="{$excellentableDialogId}" content-entity-id="{$contentEntityId}" class="aui-dialog2 aui-layer eui-fullscreen"
+    data-aui-modal="true" aria-hidden="true" style="width:{$width}px;height:{$height}px;top:0px;visibility:visible;">
+    <!-- Main dialog content -->
+    <div class="eui-fullscreen-menubar">
+        <a class="eui-logo" original-title=""></a>
+        <div id="euiButtonContainer">
+            {if $hasEditPermission}
+                <button id="euiFullscreenEditExcellentable" class="aui-button aui-button-subtle" title="{getText('com.addteq.confluence.plugin.excellentable.edit')}">
+                    <span class="aui-icon aui-icon-small aui-iconfont-edit"></span>
+                </button>
+            {/if}
+            {call .ExportForm data="all" /}
+            <input id="euiFilterString" class="eui-live-search" placeholder="{getText('com.addteq.confluence.plugin.excellentable.search.placeholder')}" type="text">
+            <button class="eui-share-filter aui-button aui-button-subtle" title="{getText('com.addteq.confluence.plugin.excellentable.search.share')}">
+                <span class="aui-icon aui-icon-small aui-iconfont-share"></span>
+            </button>
+            <button name="help" class="aui-button aui-button-subtle eui-help" original-title="{getText('com.addteq.confluence.plugin.excellentable.help')}">
+                <span class="aui-icon aui-icon-small aui-iconfont-help"></span>
+            </button>
+            <button type="button" class="eui-close aui-button" aria-label="Close">
+                <span aria-hidden="true">×</span>
+            </button>
+        </div>
+        <div id="euiAuiMsgContainer" class="eui-aui-msg-container"></div>
+    </div>
+    <div class="eui-view-spread-container">
+        <div class="eui-view-spread"></div>
+    </div>
+</section>
+{/template}
+
+/******************************************
+   Export Dropdown Form
+   @param excellentableId
+   @param contextPath
+*******************************************/
+{template .ExportForm}
+<form id="euiExport" action ="{$contextPath}/rest/excellentable/1.0/export" class="aui" method ="post" enctype="multipart/form-data">
+    <input type="hidden" id="euiExportType" name="exportType"/>
+    <input type="hidden" id="euiDataVal" name="data"/>
+    <input type="hidden" id="euiExportFileNameVal" name="exportFileName"/>
+    <!-- Trigger -->
+    <a href="#" aria-owns="exportExcellentable-{$excellentableId}-fs" aria-haspopup="true" class="aui-button aui-style-default aui-dropdown2-trigger" title="{getText('com.addteq.confluence.plugin.excellentable.export')}" data-gravity="w">
+        <p style="display:inline"> 
+            <span  class="aui-icon aui-icon-small aui-iconfont-export"></span>
+        </p>
+    </a>
+    <!-- Dropdown -->
+    <div id="exportExcellentable-{$excellentableId}-fs" class="aui-style-default aui-dropdown2 eui-export-view-mode" excellentable-id="{$excellentableId}">
+        <ul class="aui-list-truncate">
+            <li class="eui-list-item" aria-disabled="true" data-value="xlsx">
+                <a href="#" title="{getText('com.addteq.confluence.plugin.excellentable.export.xlsx')}" data-gravity="w">
+                    <span class="icon-icomoon icon-windows8">&nbsp;</span>
+                    {getText('com.addteq.confluence.plugin.excellentable.xlsx')}
+                </a>
+            </li>
+            <li class="eui-list-item" aria-disabled="true" data-value="csv">
+                <a href="#" title="{getText('com.addteq.confluence.plugin.excellentable.export.csv')}" data-gravity="w">
+                    <span class="icon-icomoon icon-file-text2">&nbsp;</span> 
+                    {getText('com.addteq.confluence.plugin.excellentable.csv')}
+                </a>
+            </li>
+            <li class="eui-list-item" aria-disabled="true" data-value="html" style="display: none;">
+                <a href="#" title="{getText('com.addteq.confluence.plugin.excellentable.export.html')}" data-gravity="w">
+                    <span class="icon-icomoon icon-html-five">&nbsp;</span>
+                    {getText('com.addteq.confluence.plugin.excellentable.html')}
+                </a>
+            </li>
+            <li class="eui-list-item" aria-disabled="true" data-value="pdf" style="display: none">
+                <a href="#" title="{getText('com.addteq.confluence.plugin.excellentable.comingsoon')}" data-gravity="w">
+                    <span class="icon-icomoon icon-file-pdf-eui">&nbsp;</span>
+                    {getText('com.addteq.confluence.plugin.excellentable.pdf')}
+                </a>
+            </li>
+            <li class="eui-list-item" aria-disabled="true" data-value="excellentable" style="display: none">
+                <a href="#" title="{getText('com.addteq.confluence.plugin.excellentable.comingsoon')}" data-gravity="w">
+                    <img class ="pdf" src="{$contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/addteq-plugin-icon-140by140.png" style="height:25px; vertical-align:middle;"/>
+                    &nbsp;{getText('com.addteq.confluence.plugin.excellentable.excellentable')}
+                </a>
+            </li>
+        </ul>
+    </div>
+</form>
+
+{/template}

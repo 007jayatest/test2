@@ -1,0 +1,1842 @@
+#wraptextDropdown a, #justifyDropdown a{
+    display:inline-block !important;
+}
+
+.hidden{
+    display : none;
+}
+
+.invisible{
+    visibility: hidden;
+}
+
+#euiUnsavedChangesDialog #euiDialogSaveChangesOkButton{
+    background-color: #d14836;
+    background-image: -webkit-linear-gradient(top,#dd4b39,#d14836);
+}
+#euiDialogCloseButton{
+    position: absolute;
+    right: 12px;
+    cursor: pointer;
+    top: 6px;
+    background: none;
+    font-size: 20px;
+    font-weight: normal;
+}
+#euiColorSample{
+    display: none;
+}
+
+.eui-print-img, .eui-print{
+    display:none !important;
+}
+
+#wraptextDropdown{
+    width:144px;
+}
+
+#justifyDropdown{
+    width:150px;
+}
+#euiMenuBar {
+    display: block;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+#euiMenuBar .aui-icon.aui-iconfont-editor-align-right{
+    margin-top: 0px;
+}
+#euiFormulaBar, #euiDialog,
+#euiMenuBar,
+#euiMenuBar .tabs-pane ul ,
+#euiMenuBar .tabs-pane li{
+	background:white;
+    z-index: 11;
+}
+
+.two-row-menubar{
+    min-height:72px;
+    height:72px;
+}
+.one-row-menubar{
+    min-height:40px;
+    height:40px;
+}
+
+#euiMenuBar .eui-logo{
+
+    background-repeat: no-repeat;
+    background-image: url("images/exc-sq-icon.png");
+    background-size: 40px;
+    min-height:40px;
+    max-height:40px;
+    height:100%;
+    padding-left:50px;
+    padding-top: 3px;
+    display: block;
+    position: absolute;
+}
+
+#euiMenuBar .eui-logo-next{
+  margin-left: 45px !important;
+}
+
+#euiMenuBar .tabs-menu .menu-item{
+	height:inherit;
+}
+
+#euiMenuBar .tabs-menu .menu-item a{
+	height:70%;
+}
+
+#euiDialog #euiFormulaBox{
+    width:98%;
+    height: 16px;
+    resize:none;
+    overflow-y: auto;
+}
+
+#euiFormulaBar textarea, #euiFormulaBar input{
+  border: 1px solid #e5e5e5;
+  outline: none;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  border-radius: 4px 4px 4px 4px;
+  -moz-border-radius: 4px 4px 4px 4px;
+  -webkit-border-radius: 4px 4px 4px 4px;
+}
+
+#euiMenuBar span {
+    margin: 2px;
+}
+
+.menu-file { margin-left: 0px !important; }
+
+@media print{
+
+    .eui-print-img{
+        display: block !important;
+        -webkit-print-color-adjust: exact;
+    }
+
+    .eui-exc-container,#euiMenuBar, #euiFormulaBar {
+        display: none !important;
+    }
+}
+.eui-exc-container[excellentable-id] .eui-aui-msg-container .eui-message-body, #euiDialog .eui-aui-msg-container .eui-message-body{
+    max-height: 150px;
+    overflow: auto;
+}
+.eui-aui-msg{
+    position: fixed;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    max-width : 330px;
+    top: 10%;
+    z-index: 3010;
+}
+#euiOverlay .msg{
+    font-size: 30px;
+    color: white;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    -moz-transform: translate(-50%, -50%);
+    transform: translate(-60%, -50%);
+}
+#euiOverlay .fa-circle-o-notch{
+    margin-top: 15% !important;
+}
+#euiOverlay {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width:100%;
+    height: 100%;
+    background: #000;
+    opacity: 0.7;
+    filter: alpha(opacity=80);
+    z-index:3006;
+}
+
+.eui-menu-bar{
+    display: block !important;
+}
+div.eui-exc-container[excellentable-id] .excellentable-image{
+    display: none;
+}
+#euiExport{
+    display:inline !important;
+}
+.view-template .eui-menu-bar{
+    display: none !important;
+}
+.view-template .exportToExcel{
+    display: none;
+}
+.view-template #euiEditExcellentable{
+    display: none;
+}
+.view-template #euiFilterString{
+    display: none;
+}
+div.eui-exc-container[excellentable-id]{
+    position: relative;
+    width:auto;
+    max-width: 95%;
+    max-height:700px;
+    padding-bottom: 4%;
+}
+.eui-exc-container[excellentable-id].mediumDiv{
+    min-width: 530px !important;
+}
+.eui-menu-bar{
+    background-color: transparent;
+    border-radius: 9px 9px 0px 0px;
+    float: left;
+    padding-bottom: 5px !important;
+}
+
+.eui-menu-bar .eui-export-json:after, .eui-fullscreen-menubar .eui-export-json:after{
+    content:"ExportJson";
+}
+.eui-fullscreen-menubar .select2-container.eui-live-search{margin-left: 10px;}
+.eui-fullscreen-menubar button{margin-right: 10px;}
+
+.eui-exc-container[excellentable-id] .eui-live-search, .eui-fullscreen .eui-live-search{
+    -webkit-box-shadow: 0 2px 7px rgba(0,0,0,0.2) inset;
+    -moz-box-shadow: 0 2px 7px rgba(0,0,0,0.2) inset;
+    box-shadow: 0 2px 7px rgba(0,0,0,0.2) inset;
+    line-height: 1.9;
+    border: 1px solid #cccccc !important;
+    border-radius: 3.01px;
+    box-sizing: border-box;
+    font-size: inherit;
+    margin: 0;
+    vertical-align: bottom;
+    min-width:170px !important;
+}
+
+#euiControlPanel{
+    position: relative !important;
+    top : 0px !important;
+    width: 100% !important;
+}
+
+#euiDialog .dialog-panel-body{
+    padding: 0px 4px !important;
+}
+div.eui-view-spread-container{
+    min-width: 403px;
+}
+.eui-view-spread{
+    width:100% !important;
+    min-height: 52px;
+    max-width:100%;
+    max-height:700px;
+    border:1px solid transparent;
+}
+.eui-fullscreen .eui-view-spread{
+    max-height: none;
+}
+.loadingDiv{
+    /*    background: url('images/csv.png');
+        background-repeat: no-repeat;
+        background-size: contain;
+        height: 200px;
+        margin-top: 4%;
+        margin-left: 40%;*/
+}
+.eui-dialog2-content{
+    max-height: 100%;
+}
+#euiDialog{
+    z-index: 3000 !important;
+    top: 0px !important;
+    height:100%!important;
+    width: 100% !important;
+    position: fixed !important;
+}
+#euiDialog .eui-dialog2-content{
+    padding: 0px !important;
+    overflow: hidden !important;
+    background-color:white !important;
+    height: 100%;
+}
+.dragafile {
+    background:#e3e3e3;
+    z-index: 9000000;
+    opacity: 0.5;
+    padding-right: 10px;
+    border: 5px dashed rgba(0, 0, 0, 1);
+}
+
+div.comingsoon_overlay {
+    position: fixed;
+    top: 30;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    background-color: rgba(0,0,0,0.5); /*dim the background*/
+}
+
+div.comingsoon_overlay>div{
+    top: 50%;
+    left: 50%;
+    position: fixed;
+    border-radius: 10px;
+    background-color: steelblue;
+    margin: -100px 0 0 -150px;
+    width: 400px;
+}
+
+div.comingsoon_overlay>div>h1{
+    color:white;
+    font-size: 40px;
+    padding:10px;
+}
+
+.eui-top-level-menu{
+    background: transparent !important;
+}
+
+.eui-top-level-menu>li a {
+    padding-top: 3px !important;
+    padding-bottom: 3px !important;
+}
+.eui-top-level-menu>li a>img{
+    height:25px;
+}
+canvas#vp_vp{
+    /*border-top: 1px solid lightgray;
+    border-left: 1px solid lightgray;
+    border-radius: 4px 4px 4px 4px;
+    -moz-border-radius: 4px 4px 4px 4px;
+    -webkit-border-radius: 4px 4px 4px 4px;*/
+}
+
+.eui-edit-spread .ui-state-highlight, .eui-view-spread .ui-state-highlight{
+    background: #2ecc71 !important;
+    color:white;
+}
+
+.eui-formatting-dialog .aui-button.ui-state-hover{
+    background: #e9e9e9 !important;
+}
+
+li#clipboardgroup{
+    height:57px !important;
+}
+
+.addteq-paste, .addteq-picture {
+    background-size: contain;
+    height:50px;
+    width: 50px;
+    display:block;
+}
+
+table#euiStatusBar{
+  display:none;
+}
+
+
+.search-outer-div.container-default-header.eui-widget-header.eui-corner-all.eui-multiselect-header.eui-helper-clearfix
+{
+    background-image:none;
+    background-color:#F2FAF8;
+    background: #F2FAF8;
+    border-color: #F0F3F4;
+}
+
+#filterOK.filter-button.container-default-state.eui-button.eui-state-default.eui-corner-all.btn.btn-default
+{
+    background-image:none;
+    background: #52B052;
+    border-color: #F0F3F4;
+    color:white;
+}
+#filterCancel.filter-button.container-default-state.eui-button.eui-state-default.eui-corner-all.btn.btn-default
+{
+    background-image:none;
+    background-color:#e74c3c;
+    background: #e74c3c;
+    border-color: #F0F3F4;
+    color:white;
+}
+
+.eui-dragndrop-overlay{
+    visibility: visible;
+    z-index:5500;
+    background:green;
+    opacity:0.7;
+    width:100%;
+    height:100%;
+    position:fixed;
+    left:0;
+    top:0;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 70%;
+    background-image: url("images/dragdropallnew.png");
+}
+
+.noshow{
+    display:none
+}
+
+.aui-blanket-index{
+    z-index:5000 !important;
+}
+#euiDialog .icon-icomoon.icon-text-color{
+    font-size: 16px;
+}
+#euiDialog .activate{
+    position: absolute;
+    margin-left: -17px;
+    width: 20px;
+    height: 5px;
+    margin-top: 19px;
+}
+#euiDialog footer, #euiMenuBar{
+	position:relative !important;
+}
+#euiDialog footer{height:52px;}
+
+#euiPrintArea{
+    position:absolute;
+    height: 100%;
+    top: 0px;
+    width: 100%;
+    background:#525659;
+    left:640px !important;
+    display:none;
+
+}
+#euiAuiMsgContainer{
+    position: fixed;
+    top: 15%;
+    left:50%;
+    transform: translate(-50%, -50%);
+    width: auto;
+    z-index: 3610;
+}
+.eui-formatting-dialog{
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%,-50%) !important;
+    border: 1px solid #aaaaaa !important;
+    background-color : #ffffff !important;
+    padding: .2em !important;
+    color: #222222 !important;
+    font-family: Arial,sans-serif !important;
+    font-size: 14px !important;
+    line-height: 1.42857142857143 !important;
+}
+
+#euiMenuBar .aui-button{
+    outline : none !important;
+}
+#euiMenuBar .aui-button.active span{
+    /*background: #52B052 !important;
+    color: white !important;*/
+}
+#euiMenuBar .aui-button.active{
+    background: none;
+    background-color: #cecece;
+    box-shadow: none;
+    border-color: #cecece;
+}
+#euiMenuBar .tabs-pane ul{
+    white-space: nowrap;
+    padding: 0.2%;
+}
+#euiMenuBar .tabs-pane li{
+    display: block;
+    float: left;
+    border-right: solid 1px #b2b7bd;
+    padding: 0.2%;
+}
+#euiMenuBar button,
+#euiMenuBar .aui-icon{
+    color: RGB(52,73,94);
+    margin-left: 0px !important;
+}
+#euiMenuBar .big-button{
+    height: auto;
+    margin: 18%;
+}
+
+.aui-style-default a.active{
+    background-color: transparent !important;
+    border-color: transparent ! important;
+    box-shadow:none !important;
+}
+
+#euiMenuBar button:hover,
+.aui-style-default a:hover span{
+    border-color: transparent ! important;
+}
+
+#euiMenuBar #euiFormatHome button:hover {
+    background-color: #dedede;
+    box-shadow: none;
+}
+
+#euiMenuBar.aui-tabs{
+    margin-top: 0px !important;
+}
+#euiMenuBar .aui-dropdown2{
+    position: absolute !important;
+}
+#euiMenuBar .eui-font-color-highlight,
+#euiMenuBar .eui-back-color-highlight{
+    position: absolute;
+    margin-left: -18px;
+    width: 17px;
+    height: 5px;
+    margin-top: 18px;
+    border-radius: 5px;
+}
+#euiMenuBar .eui-back-color-highlight{
+    padding-left: 2px;
+}
+#euiFormatHome .aui-button.aui-dropdown2-trigger{
+    background-color: rgba(9, 30, 66, 0.04);
+}
+#euiFormatHome .aui-icon.aui-iconfont-table-merge, #euiFormatHome .aui-icon.aui-iconfont-table-split{
+    margin-top: 0px;
+}
+
+#verticalAlignDropdown a{
+    display:inline-block !important;
+}
+.eui-formatting-dialog .ui-dialog-titlebar-close {
+    position: absolute !important;
+    right: .3em !important;
+    top: 50% !important;
+    width: 15px !important;
+    margin: -10px 0 0 0 !important;
+    padding: 1px !important;
+    height: 18px !important;
+    color: black !important;
+    background-position: -96px -128px !important;
+    text-indent: 100%;
+    overflow: hidden;
+}
+.eui-formatting-dialog .ui-dialog-titlebar-close:focus,.eui-formatting-dialog .ui-dialog-titlebar-close:hover{
+    border: none !important;
+    background-color: white !important;
+}
+.eui-formatting-dialog .ui-dialog-titlebar {
+    padding: .4em 1em;
+    position: relative;
+}
+.eui-formatting-dialog .ui-dialog-content {
+    position: relative !important;
+    border: 0 !important;
+    padding-left: 0.4em !important;
+    background: none !important;
+    overflow: auto !important;
+    zoom: 1 !important;
+}
+.eui-formatting-dialog .ui-dialog-buttonpane {
+    text-align: left;
+    border: 1px solid #aaaaaa;
+    border-width: 1px 0 0 0;
+    background-image: none;
+    margin: .5em 0 0 0;
+    padding: .3em 1em .5em .4em;
+}
+.eui-formatting-dialog .ui-dialog-buttonpane button {
+    margin: .5em .4em .5em 0;
+    cursor: pointer;
+}
+.eui-formatting-dialog .ui-dialog-buttonpane .aui-button-text{
+    padding: .4em 1em;
+}
+.filter-button.eui-state-hover{
+    border-radius: 3px !important;
+}
+.filter-button.aui-button:focus{
+    background: #e9e9e9 none repeat scroll 0% 0%;
+    color: #000;
+    text-decoration: none;
+    border-color: #999;
+    outline: 1px dotted #333;
+    outline-offset: 1px;
+}
+#filterCancel{
+    position: absolute;
+}
+.eui-formatting-dialog .ui-icon-close {
+    background-position: -80px -128px;
+}
+.eui-formatting-dialog .ui-icon-closethick {
+    background-position: -96px -128px;
+}
+
+.eui-formatting-dialog .ui-dialog-buttonset{
+    float: right;
+}
+
+#euiSpreadContextMenu{
+    position: fixed;
+    z-index:3010 !important;
+    cursor: pointer;
+    width: 150px;
+    list-style: none;
+    padding: 0px !important;
+    margin: 0px !important;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    background-color: white;
+    box-shadow: none;
+}
+#euiPasteSpecial{
+    border-radius: 4px;
+    background-color: white;
+    box-shadow: none;
+    border: 1px solid #aaa;
+    padding: 0px;
+}
+#euiSpreadContextMenu aui-item-link.eui-first-item:hover, #euiPasteSpecial aui-item-link.eui-first-item:hover{
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+}
+#euiSpreadContextMenu aui-item-link.eui-last-item:hover, #euiPasteSpecial aui-item-link.eui-last-item:hover{
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+#euiSpreadContextMenu aui-item-link, #euiPasteSpecial aui-item-link {
+    display: block;
+    padding: 6px;
+    outline: none;
+}
+#euiSpreadContextMenu .context-menu-trigger{padding: 0px;}
+#euiSpreadContextMenu .context-menu-trigger a{padding: 6px; outline:none;}
+#euiSpreadContextMenu aui-item-link:hover, #euiPasteSpecial aui-item-link:hover {
+    background-color: #52b052;
+}
+#euiSpreadContextMenu aui-item-link:hover a, #euiPasteSpecial aui-item-link:hover a{
+    background-color: #52b052;
+    color: #FFFFFF;
+}
+#euiSpreadContextMenu a, #euiPasteSpecial a {
+    padding: 0px;
+    text-decoration: none;
+    color: #34495e;
+}
+#euiSpreadContextMenu .aui-dropdown2-sub-trigger.active::after{
+    border-left-color: #FFF;
+}
+#euiSpreadContextMenu .aui-dropdown2-sub-trigger::after{
+    border-left-color: #34495e;
+}
+#euiSpreadContextMenu a.aui-dropdown2-active{
+    background-color: #52b052 !important;
+    color: #FFFFFF;
+}
+#euiSpreadContextMenu .eui-divider {
+    height: 1px;
+    margin: 0;
+    overflow: hidden;
+    background-color: #e6e6e6;
+    border:1px solid #e6e6e6;
+    padding: 0;
+    white-space: nowrap;
+    box-sizing: border-box;
+}
+#euiSpreadContextMenu .disabled-action, #euiSpreadContextMenu .disabled-action a{
+	color:gray;
+	pointer-events: none;
+}
+.eui-help{
+    margin-left: -11px !important;
+}
+.eui-tool-tip-div{
+    position: fixed;
+    border: 1px #C0C0C0 solid;
+    box-shadow: 1px 2px 5px rgba(0,0,0,0.4);
+    font: 9pt Arial;
+    background: black;
+    color: white;
+    padding: 5px;
+    display: none;
+    z-index: 100;
+}
+.eui-edit-spread textarea{
+    border: 2px solid #52B052 !important;
+}
+.eui-icon {
+    display: block;
+    text-indent: -99999px;
+    overflow: hidden;
+    background-repeat: no-repeat;
+}
+
+#euiPasteSpecial:hover ul{
+    display: block;
+}
+#euiPasteSpecial ul {
+    position: absolute;
+    background: white;
+    width: 200px;
+    margin: 0;
+    padding: 0px;
+    display: none;
+    margin-left: 144px;
+    margin-top: -24px;
+    list-style: none;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+}
+#euiPasteSpecial ul a {
+    text-decoration: none;
+    color: #000;
+    display: block;
+    text-align: left;
+    width: 100%;
+}
+.gcsj-func-ac-popup{
+    z-index: 3005 !important;
+}
+.gcsj-func-help-popup{
+    z-index: 3005 !important;
+}
+
+/* Sort Range */
+.eui-sort-index {
+    -webkit-appearance: menulist !important;
+}
+.eui-sr-table {
+    width: 100%;
+    border-bottom: 1px solid #cccccc;
+    padding-bottom: 10px;
+    margin-bottom:5px
+}
+.eui-sr-table td{
+    width: 33%;
+}
+
+/*Share Filter Dialog */
+
+#inline-dialog-shareContentPopup .contents {
+    overflow: visible;
+}
+
+.eui-share-filter-popup .eui-button-panel {
+    text-align: right;
+}
+
+.eui-share-filter-popup .eui-button-panel input:disabled {
+    color: graytext;
+}
+
+.eui-share-filter-popup .eui-button-panel .eui-close-dialog {
+    padding-left: 5px;
+}
+
+form.eui-share-filter-popup .textarea {
+    height: 100px;
+    padding-left: 3px;
+    padding-right: 3px;
+    max-height: 260px;
+    width: 250px;
+}
+
+.eui-share-filter-popup ol.eui-recipients {
+    margin: 7px 0 7px 0px;
+    padding: 0;
+    list-style-type: none;
+}
+
+.eui-share-filter-popup ol.eui-recipients li {
+    margin: 5px 0;
+    line-height: 24px;
+    /* this overrides a AUI rule */
+    word-wrap: normal;
+}
+
+.eui-share-filter-popup ol.eui-recipients li .title{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 185px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.eui-share-filter-popup ol.eui-recipients li img {
+    height: 24px;
+    width: 24px;
+    vertical-align: middle;
+    border-radius: 3px;
+    margin-right: 5px;
+}
+
+#inline-dialog-shareFilter{
+    z-index: 3004;
+}
+#inline-dialog-shareFilter .eui-progress-messages {
+    position: absolute;
+    left: 0;
+    max-width: 110px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: left;
+    height: 30px;
+}
+
+.eui-share-filter-popup .autocomplete li.active a span {
+    color: white;
+}
+
+.eui-share-filter-popup .remove-recipient {
+    float: right;
+    color: #707070;
+    line-height: 24px;
+    cursor: pointer;
+}
+
+.eui-share-filter-popup .aui-dd-parent,
+#com-atlassian-confluence .eui-share-filter-popup .aui-dd-parent .aui-dropdown {
+    width: 250px;
+}
+
+form.eui-share-filter-popup .eui-field-group {
+    padding-left: 0;
+}
+
+form.eui-share-filter-popup .eui-field-group.eui-button-panel {
+    padding-bottom: 0;
+    margin-bottom: 0;
+    line-height: 30px
+}
+
+.aui-inline-dialog .contents .eui-share-filter-popup .submit {
+    text-align: center;
+}
+
+.filter-check-outerDiv .check-uncheck-all.icon-cross{
+    background-image: none !important;
+}
+.filter-check-outerDiv .check-uncheck-all{
+    margin-top: 2px;
+}
+.filter-item .checkbox{
+    float: left;
+}
+.filter-sort:not(:hover),.filter-check:not(:hover){
+    color:black !important;
+}
+#filterSearch{
+    padding-top: 5px !important;
+    padding-bottom: 5px !important;
+    padding-left: 5px !important;
+    height: auto !important;
+    width:191px;
+    border: 1px solid #cccccc;
+}
+/*applied this style to fix the hyper link dialog element misbehave for Japanese and German language.*/
+/*
+#euiAddHyperlinkDialog{
+    min-width: 400px;
+    /*applied this style to fix the hyper link dialog element misbehave for Japanese and German language.*/
+    /*height: 77px!important;
+}*/
+.eui-linkItem{
+    padding: 4px 0px 1px 14px !important;
+}
+#euiInsertlinkOkButton:disabled{
+    opacity:0.5;
+}
+#euiGenerateDataDialog{
+    min-width: 468px !important;
+    min-height: 108px !important;
+}
+.eui-rows-columns,.eui-data-types{
+    padding: 4px 0px 1px 14px !important;
+}
+.eui-rows-columns{
+    margin-top: -111px;
+    margin-left: 140px;
+}
+
+.eui-clear-filter{
+    margin-left: -7px !important;
+    color:#707070 !important;
+}
+.eui-menu-bar .eui-share-filter.aui-button, .eui-fullscreen-menubar .eui-share-filter.aui-button{
+    margin-left: 0px !important;
+}
+.eui-live-search.aui-select2-container .select2-search-choice{
+    margin : 5px 2px 1px 3px !important;
+}
+.eui-exc-container[excellentable-id] .select2-choices, .eui-fullscreen .select2-choices{
+    border : 0px solid #cccccc !important;
+    min-height: 28px !important;
+    background: initial !important;
+    padding-left: 4px !important;
+}
+.eui-exc-container[excellentable-id] ul.select2-choices, .eui-fullscreen ul.select2-choices{
+    padding-bottom: 0px !important;
+}
+.eui-select2-dropdown{
+    display: none !important;
+}
+.eui-exc-container[excellentable-id] .select2-container-active.select2-dropdown-open, .eui-fullscreen .select2-container-active.select2-dropdown-open{
+    border: 1px solid #5897fb !important;
+}
+.eui-exc-container[excellentable-id] div.select2-container, .eui-fullscreen div.select2-container{
+    width: auto;
+    height:auto;
+    max-width:600px !important;
+    max-height: 53px !important;
+    overflow-y: auto;
+}
+
+.eui-license-eval{
+    color:#707070;
+    display: block;
+    width: 585px;
+    margin: auto;
+}
+.eui-formatting-dialog #euiPictureDialog,.eui-formatting-dialog #euiCommentDialog{
+    overflow: hidden !important;
+}
+
+#euiCommentDialog #euiTxtText {
+    -moz-box-shadow: inset 0 0 4px rgba(0,0,0,0.2);
+    -webkit-box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.2);
+    box-shadow: inner 0 0 4px rgba(0, 0, 0, 0.2);
+    border:solid 1px #ccc;
+    font-size:1.2em;
+}
+#euiCommentDialog #euiTxtText:focus {
+    outline: none !important;
+}
+.filter-dialog-style
+{
+    /*applied this style to fixed filterDialog UI misbehave bug which come during internationalisation.*/
+    width: auto!important;
+}
+
+/* Selected Cells Border Color */
+.gc-selection{
+    border-color: #52B052;
+}
+.sheetTabEditor{
+    z-index: 3005 !important;
+}
+#euiSheetTabContextMenu{
+    -webkit-border-radius: 4px 4px 0 0;
+    border-radius: 4px 4px 0 0;
+    font-size: 15px;
+}
+/*vertical scroll bar for font family dropdown*/
+#euiFontNameArea{
+    height: 265px;
+    overflow-y: scroll;
+}
+#euiFontNameBox{
+    width: 155px;
+}
+/*Import Error Dialog*/
+#euiImportErrorDialog {
+    width: 768px;
+    line-height: 1;
+}
+#euiImportErrorDialog > ul {
+    counter-reset: foo;
+    display: table;
+}
+
+#euiImportErrorDialog > ul > li {
+    counter-increment: foo;
+    display: table-row;
+}
+
+#euiImportErrorDialog > ul > li::before {
+    content: counter(foo) ".";
+    display: table-cell;
+    text-align: right;
+}
+
+button.eui-dropdown{
+    border:transparent;
+    background: transparent;
+    padding-bottom: 5px;
+    margin-top:5px;
+    margin-bottom: 5px;
+}
+button.eui-dropdown::after{
+    /*display: none;*/
+}
+
+button.eui-dropdown:hover{
+    border-radius: 0%;
+}
+
+button.eui-dropdown:active, button.eui-dropdown.active {
+    box-shadow: none;
+    background: transparent !important;
+    border-radius: 0%;
+    color: #3FB64E !important;
+}
+
+.eui-dropdownmenu a {
+    padding-top: 5px !important;
+    padding-bottom: 5px !important;
+}
+
+.eui-dropdownmenu a:hover, .eui-dropdownmenu a.active, #euiFontSizeArea a:hover, #euiFontNameArea a:hover, #wraptextDropdown a:hover, #justifyDropdown a:hover, #verticalAlignDropdown a:hover
+{
+    background: #52b052  !important;
+    color:white !important;
+    outline : none;
+}
+
+#justifyDropdown a:hover span{
+    color:white;
+}
+
+#euiFileDropdown, #euiEditDropdown, #euiViewDropdown, #euiInsertDropdown, #euiFormat2Dropdown, #euiDataDropdown, #euiHelpDropdown, #euiFormulaFunctions, #euiIndentSubmenu, #euiJustifySubmenu, #euinumberSubmenu
+{
+    border-radius: 4px 4px 4px 4px;
+    -moz-border-radius: 4px 4px 4px 4px;
+    -webkit-border-radius: 4px 4px 4px 4px;
+    overflow: hidden;
+}
+
+#euiFormatHome>ul{
+  padding:0px;
+  height: 37px;
+  background:#eeeeee !important;
+  display: table;
+  width: 100%;
+}
+
+.icon-number123:before{
+    content:"123";
+    font-family:Verdana;
+    font-weight: 600;
+}
+
+.icon-coin-dollar:before{
+    content:"$";
+    font-family:Verdana;
+    font-weight: 600;
+}
+
+#euiMenuBar .tabs-pane li{
+  background:transparent;
+}
+
+.eui-menu-bar button:focus, .eui-fullscreen-menubar button:focus {
+  outline: none;
+}
+#euiFormatHome {
+  border-top: 1px solid #cccccc;
+  border-bottom: 1px solid #cccccc;
+  padding-left: 0px;
+  padding-right: 0px;
+  padding-top: 0px;
+}
+#euiAboutHeader .eui-about-head-img{
+    width:50px;
+}
+#euiAboutHeader {
+  display: table;
+}
+
+#euiAboutHeader .eui-about-head-img, #euiAboutHeader .eui-about-head-txt {
+    vertical-align: middle;
+    display: table-cell;
+}
+#euiAboutHeader .eui-about-head-txt{
+    padding-left: 16px;
+}
+#euiAboutDialog{
+    width:800px !important;
+}
+.eui-dialog-border{
+    width: 100px;
+    height: 30px;
+    margin: 10px;
+}
+.eui-cell-type-dialog-span{
+    width: 100px;
+    display: inline-block;
+    display: -moz-inline-box;
+}
+.eui-cell-type-dialog-input-txt{
+    margin-left: 10px;
+    width: 143px;
+}
+.eui-freeze-setting-dialog-span .eui-data-bar-dialog-label {
+    width: 160px;
+    display: inline-block;
+    display: -moz-inline-box;
+}
+.eui-cell-type-dialog-input-btn{
+    margin-left: 10px;
+    width: 147px;
+}
+#euiTxtButtonCellBackColor{
+    background: #707070;
+}
+#euiTxtHyperLinkCellLinkColor{
+    background: #0066CC;
+}
+#euiTxtHyperLinkCellVisitedLinkColor{
+    background: #3399ff;
+}
+.eui-conditional-format-dialog-span{
+    width: 30px;
+    display: inline-block;
+    display: -moz-inline-box;
+}
+.eui-conditional-format-dialog-input{
+    margin-left: 10px;
+    width: 96px;
+}
+.eui-subdiv{
+    margin-top: 10px;
+}
+.eui-conditional-format-dialog-color-scale{
+    margin-left: 10px;
+    width: 100px;
+}
+#euiMinColor{
+    background: #F8696B;
+}
+#euiMidColor{
+    background: #FFEB84;
+}
+#euiMaxColor{
+    background: #63BE7B
+}
+.eui-databar-dialog-subdiv{
+    margin-top: 8px;
+}
+.eui-menu-dialog-subdiv{
+    margin-left: 10px;
+    margin-top: 10px;
+}
+.eui-menu-dialog-subdiv-fontsize{
+    font-size: 12px;
+}
+.eui-txt-validator-value{
+    position: absolute;
+    left: 90px;
+}
+.eui-tab-validation-color{
+    background: #F0F0F0;
+    border:0
+}
+.eui-sparkline-dialog-lbl{
+    margin-left:4px;
+}
+.eui-data-validation-dialog-subdiv{
+    margin-left: 20px;
+    margin-top: 20px;
+}
+.eui-databar-dialog-span{
+    width: 130px;
+    display: inline-block;
+    display: -moz-inline-box;
+}
+.eui-dropdown-shortcutkeys{
+    float: right;
+}
+.eui-list-item {
+    border: 1px solid white;
+    border-radius: 5px;
+}
+.eui-list-item a:hover{
+    background-color: #52b052 !important;
+    color: white !important;
+}
+.aui-button, .aui-dialog2-content a{
+    outline : none !important;
+}
+
+aui-item-link span.eui-info{
+  float:right;
+  opacity: 0.5;
+  font-size: smaller;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+aui-dropdown-menu#euinumberSubmenu{
+  min-width: 250px;
+}
+
+.aui-dialog2.aui-layer[aria-hidden=false]{
+    z-index: 3001 !important;
+}
+.aui-blanket[aria-hidden=false]{
+    z-index: 3000 !important;
+}
+
+section#euiTableformat, section#euiBorderFormat {
+  position: fixed;
+  top:0px;
+  left:auto;
+  height:100%;
+  margin-top: 0px;
+}
+
+section#euiTableformat.aui-dialog2 .aui-dialog2-header , section#euiBorderFormat.aui-dialog2 .aui-dialog2-header {
+  margin-top: 0px;
+}
+
+section#euiTableformat > div {
+    overflow-y: hidden;
+    max-height: 100%;
+}
+
+section#euiTableformat div.tableformatpreview {
+  display: block;
+  max-height: calc(100vh - 235px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    margin-top: 10px;
+}
+
+section#euiTableformat div.tableformatpreview img{
+  max-width: 300px;
+  padding:5px;
+  border: 2px solid transparent;
+}
+
+section#euiTableformat div.tableformatpreview img.noformatting{
+  border: 2px dashed #ebecf0;
+  border-radius: 4px 4px 4px 4px;
+  -moz-border-radius: 4px 4px 4px 4px;
+  -webkit-border-radius: 4px 4px 4px 4px;
+}
+
+section#euiTableformat div.tableformatpreview img:hover{
+  border: 2px solid #ebecf0;
+  border-radius: 4px 4px 4px 4px;
+  -moz-border-radius: 4px 4px 4px 4px;
+  -webkit-border-radius: 4px 4px 4px 4px;
+}
+
+section#euiTableformat div.tableformatpreview img.eui-active{
+  border: 2px solid #52b052;
+  border-radius: 4px 4px 4px 4px;
+  -moz-border-radius: 4px 4px 4px 4px;
+  -webkit-border-radius: 4px 4px 4px 4px;
+}
+
+section#euiTableformat div.tableformatpreview {
+    text-align:center;
+}
+
+section#euiTableformat #tableformatproperties{
+    border: 1px;
+    width: 100%;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-bottom: 10px;
+}
+
+section#euiBorderFormat table{
+  border-collapse: collapse;
+  left:auto;
+  right:auto;
+}
+section#euiBorderFormat button.aui-dropdown2-trigger{
+  border: 2px solid #ebecf0;
+}
+
+section#euiBorderFormat button.aui-dropdown2-trigger.active{
+  background:white;
+  color:inherit;
+  border: 2px solid #ebecf0;
+}
+
+section#euiBorderFormat hr{
+  width:40px;
+  border-style: solid;
+  border-width: 2px;
+  border-color: #172b4d;
+}
+
+/*************** Border Format Dialog Controls *************/
+#euiBorderFormat.aui-dialog2.aui-layer[aria-hidden="false"] .aui-dialog2-content{
+    overflow: visible;
+    height: 100%;
+}
+.eui-border .default, svg.eui-border.default{
+    stroke-width: 1px;
+    stroke: #d2d2d2 ! important;
+    stroke-dasharray: 0 ! important;
+}
+
+.eui-border .thin, svg.eui-border.thin{
+  stroke-width:1px;
+}
+
+.eui-border .medium, svg.eui-border.medium{
+  stroke-width: 4px;
+}
+
+.eui-border .dashed, svg.eui-border.dashed{
+    stroke-dasharray: 10,5;
+    stroke-width: 2px;
+}
+
+.eui-border .dotted, svg.eui-border.dotted{
+  stroke-dasharray: 1, 4;
+  stroke-linecap: round;
+  stroke-width: 2px !important;
+}
+
+.eui-border .thick, svg.eui-border.thick{
+  stroke-linecap: round;
+  stroke-width: 8px !important;
+}
+
+.eui-border .hair, svg.eui-border.hair{
+    stroke-dasharray:1, 2;
+	stroke-width:1px;
+}
+
+.eui-border .mediumDashed, svg.eui-border.mediumDashed{
+    stroke-dasharray: 10, 3;
+    stroke-width:4px;
+}
+
+.eui-border .dashDot, svg.eui-border.dashDot{
+    stroke-dasharray: 10, 2, 2, 2;
+	stroke-width:2px;
+}
+
+.eui-border .mediumDashDot, svg.eui-border.mediumDashDot{
+    stroke-dasharray: 10, 2, 2, 2;
+	stroke-width:4px;
+}
+
+.eui-border .dashDotDot, svg.eui-border.dashDotDot{
+    stroke-dasharray: 10, 4, 4, 4, 4, 4;
+	stroke-width:2px;
+  stroke-linecap: round;
+}
+
+.eui-border .mediumDashDotDot, svg.eui-border.mediumDashDotDot{
+    stroke-dasharray: 10, 4, 4, 4, 4, 4;
+	stroke-width:4px;
+}
+
+svg line.eui-background {
+    stroke-width:10px;
+    cursor: pointer;
+    stroke-dasharray:0;
+    stroke:rgba(0,0,0,0);
+}
+
+button#euiLineStyle {
+    background: white;
+}
+
+button#euiLineStyle svg{
+    width:100px;
+    height:20px;
+    stroke: #d2d2d2;
+}
+
+aui-item-link.eui-border-type a{
+    outline: none;
+    cursor: pointer;
+}
+
+aui-item-link.eui-border-type svg.eui-border{
+    height:20px;
+    width:200px;
+}
+section#euiBorderFormat #euisvgtable{
+  margin-left:auto;
+  margin-right:auto;
+  width:210px;
+  height:110px;
+  display:block;
+}
+
+section#euiBorderFormat .tablecontainer {
+  display:block;
+  position:relative;
+  padding-top:20px;
+}
+
+section#euiBorderFormat #euisvgtable line, .eui-border-type line{
+  cursor: pointer;
+}
+
+section#euiBorderFormat #euisvgtable line:hover{
+  stroke:rgba(71, 181, 77,0.5);
+  stroke-linecap: round;
+}
+
+table.eui-border.borderoptions{
+  margin-top: 20px;
+}
+table.eui-border.borderoptions, table.eui-border.borderoptions td{
+    border: none;
+    width:100%;
+    padding-bottom: 10px;
+}
+table.eui-border.borderoptions tr td:first-child {
+    text-align:right;
+    width: 70px;
+}
+section#euiBorderFormat .sp-dd.aui-icon-small:before{
+    background-color: #f5f6f8;
+    z-index: 10;
+}
+section#euiBorderFormat .sp-dd.aui-icon-small::after {
+    border: 4px solid transparent;
+    content: "";
+    height: 0;
+    left: 100%;
+    margin-left: -14px;
+    margin-top: 0px;
+    opacity: .8;
+    position: absolute;
+    top: 50%;
+    width: 0;
+    border-top-color: #333;
+}
+/************ End of Border Format Dialog Controls *******/
+
+/************ Start of comment dialog fixes *********/
+section#eui-comment-dialog{
+    border: 1px solid #ffab00;
+}
+
+.eui-comment-textarea{
+    margin: 0px;
+    width: 95%;
+    height: 199px;
+    resize: none;
+    border: 2px solid #ebecf0;
+    padding:5px;
+    font-size:14px;
+    outline:none;
+}
+
+.gc-spread-floatBlockCanvas-container, .comment-layoutPanel.no-user-select, .gc-spread-lineCanvas-container, .gc-spread-host.no-user-select, .gc-spread-host-container, .gc-spread-floatBlockCanvas{
+    display:none;
+}
+
+/* This is required to maintain cross compatibility in view for LTS and latest confluence versions */
+.eui-note-footer {
+    background-color: transparent;
+}
+/************ End of comment dialog fixes *********/
+
+
+/*************** Tabstrip ********************/
+#eui-tab-context-menu{
+    bottom: 36px;
+    top: auto !important;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
+    cursor: pointer;
+}
+#eui-tab-context-menu .eui-dropdownmenu aui-item-link:first-of-type a:hover{
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
+}
+#eui-tab-strip{
+    bottom:0px;
+    width:100%;
+    position: absolute;
+    border-top: 1px solid #ccc;
+    background: #eeeeee;
+}
+.eui-tab-strip-container{
+    position: relative;
+}
+.eui-tab-strip-controls{
+    width: 10%;
+    float: left;
+    margin-left: 20px;
+    display: block;
+}
+.eui-tab-strip-container .eui-tab-strip-scrollbar{
+    position: relative;
+    width: 100%;
+    float: left;
+    height: 15px;
+    border-bottom: 1px solid #ccc;
+}
+.eui-tab-strip-container .scroll-container{
+    height: 15px !important;
+    width:100% !important;
+}
+#eui-tab-strip .eui-tab-strip-tabs{
+    float: left;
+    padding-left: 0px;
+    width: 80%;
+    list-style-type: none;
+    position: relative;
+}
+#eui-tab-strip .eui-tab-strip-tabs.overflow{
+    box-shadow: 5px 0 5px -5px #333;
+}
+.eui-scrolloptions{
+    position: relative;
+    float:left;
+    margin-top: 5px;
+    margin-left: 20px;
+}
+@media (max-width: 1500px) { 
+    .eui-tab-strip-controls{
+        width: 15%;
+    }
+    #eui-tab-strip .eui-tab-strip-tabs{
+        width: 75%;
+    }
+}
+@media (max-width: 1000px) { 
+    .eui-tab-strip-controls{
+        width: 20%;
+    }
+    #eui-tab-strip .eui-tab-strip-tabs{
+        width: 70%;
+    }
+}
+@media (max-width: 599px) { 
+    .eui-tab-strip-controls{
+        width: 30%;
+    }
+    #eui-tab-strip .eui-tab-strip-tabs{
+        width: 60%;
+    }
+}
+
+.eui-tab-strip-tabs .menu-item .menu-item-container{
+    padding: 4px 10px 5px 10px;
+    border-right: 1px solid #d4d4d4;
+    border-bottom: 2px solid #EEE;
+    margin-top: -1px;
+}
+.eui-tab-strip-tabs .menu-item.active-tab .menu-item-container{
+    border-bottom: 2px solid #15673a;
+    background-color: #FFF;
+    margin-top: -1px;
+}
+.eui-tab-strip-tabs .menu-item.active-tab.protected .menu-item-container{
+    border-bottom: 2px solid #c0392b;
+}
+.eui-tab-strip-tabs .menu-item.active-tab.protected-cell .menu-item-container{
+    border-bottom: 2px solid #ffab00;
+}
+.eui-tab-strip-tabs .menu-item:first-child .menu-item-container{
+    border-left: 1px solid #d4d4d4;
+}
+.eui-tab-strip-tabs .aui-tabs.horizontal-tabs > .tabs-menu{
+    flex-flow: row nowrap;
+    overflow-x: hidden;
+    height: 33px;
+}
+.eui-tab-strip-tabs .aui-tabs.horizontal-tabs > .tabs-menu > .menu-item{
+    cursor: pointer;
+    position: relative;
+    border-bottom: 2px solid #eee;
+}
+.eui-tab-strip-container .eui-tab-strip-tabs .sortable-placeholder:not(.menu-item){
+    background-color: #aaa;
+    margin: 6px 10px;
+    position: relative;
+    width: 47px;
+    height: 20px;
+    display: inline-block;
+}
+
+.eui-tab-strip-container .eui-tab-strip-dd .sortable-placeholder:not(.menu-item){
+    background-color: #aaa;
+    margin: 6px auto;
+    position: relative;
+    width: 80%;
+    height: 20px;
+}
+
+.eui-tab-strip-container .menu-item.sortable-placeholder{
+    opacity: 0.7;
+}
+.eui-tab-strip-controls .eui-tab-strip-icon{
+    color: #34495e;
+    margin: 5px 15px;
+    display: inline-block;
+}
+.eui-tab-strip-controls #euiTabstripOptions::before{
+    content: "\f105";
+}
+.eui-tab-strip-controls .eui-tab-strip-icon:hover{
+    cursor: pointer;
+}
+#eui-tab-strip .active-tab p,.eui-tab-strip .active-tab p:hover{
+    color: #15673a !important;
+
+}
+#eui-tab-strip .active-tab.protected p,#eui-tab-strip .active-tab.protected p:hover,#eui-tab-strip .protected p,#eui-tab-strip .protected p:hover {
+    color:#c0392b !important;
+}
+#eui-tab-strip .active-tab.protected-cell p,#eui-tab-strip .active-tab.protected-cell p:hover,#eui-tab-strip .protected-cell p,#eui-tab-strip .protected-cell p:hover {
+    color:#ffab00 !important;
+}
+#eui-tab-strip .menu-item .icon-placeholder{
+    display: none;
+}
+#eui-tab-strip .menu-item.protected .icon-placeholder, #eui-tab-strip .menu-item.protected-cell .icon-placeholder{
+    display: inline-block;;
+}
+#eui-tab-strip p:hover{
+    text-decoration: none;
+    color: #15673a !important;
+}
+
+#eui-tab-strip .active-tab p:after{
+    background: none !important;
+}
+
+#eui-tab-strip p{
+    color: #34495e;
+    padding: 0px 0px !important;
+    white-space: pre;
+}
+
+.eui-tab-strip-tabs .eui-rename-tab{
+    width: 50px;
+    position: absolute;
+    top: 0px;
+    z-index: 1000000;
+}
+.eui-tab-strip-tabs .eui-rename-tab input{
+    height: 18px;
+    width: 100%;
+}
+
+.eui-tab-strip-dd .eui-rename-tab{
+    width: 50px;
+    position: absolute;
+    top: 3px;
+    z-index: 1000000;
+}
+.eui-tab-strip-dd .eui-rename-tab input{
+    height: 18px;
+    width: 100%;
+}
+
+.eui-tab-strip-dd{
+    position: absolute;
+    background-color: #eee;
+    border: 1px solid #d4d4d4;
+    bottom: -14px;
+    left: 50px;
+    display: block;
+    z-index: 3000;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+.eui-tab-strip-dd .eui-menu-list{
+    list-style: none;
+    padding-left: 0px;
+    overflow-y: auto;
+    max-height: 350px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+.eui-tab-strip-dd .eui-menu-list .menu-item{
+    padding: 5px 15px;
+    border-top: 1px solid #d4d4d4;
+    cursor: pointer;
+    position: relative;
+}
+.eui-tab-strip-dd .eui-menu-list .menu-item:first-child{
+    border-top: none;
+}
+
+.eui-tab-strip-dd .eui-menu-list .menu-item.active-tab{
+    background-color: #FFF;
+    border-bottom: 2px solid #15673a;
+}
+#euiScrollLeft{
+    margin-right:20px;
+}
+#euiScrollLeft, #euiScrollRight{
+    cursor: pointer;
+}
+#euiScrollLeft::before, #euiScrollRight::before{
+    font-size: 22px;
+}
+/** End of tab strip **/
+
+/**** Image Editing Dialogs *******/
+#euiPictureEditDialogUpdateButton{
+    margin-top: 40px;
+}
+.aui-dialog2-content h4 label{
+    color:#172B4D;
+    font-size: 16px;
+    margin-right: 15px;
+}
+#euipictureDropdown{
+    border-radius: 5px;
+    border: 1px solid #AAA;
+    box-shadow: none;
+}
+#euipictureDropdown.aui-dropdown2.aui-style-default:hover a{
+    background-color: unset;
+}
+section#euiPictureEditDialog {
+    position: fixed;
+    top:0px;
+    left:auto;
+    height:100%;
+    display: flex;
+    flex-direction: column;
+}
+section#euiPictureEditDialog .aui-dialog2-header{
+    margin-top: 0px;
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+}
+section#euiPictureEditDialog .aui-dialog2-content{
+    flex: 1;
+}
+section#euiPictureEditDialog .sp-dd.aui-icon-small::before{
+    background-color: #f5f6f8;
+    z-index: 10;
+}
+section#euiPictureEditDialog .sp-dd.aui-icon-small::after{
+    border: 4px solid transparent;
+    content: "";
+    height: 0;
+    left: 100%;
+    margin-left: -14px;
+    margin-top: 0px;
+    opacity: .8;
+    position: absolute;
+    top: 50%;
+    width: 0;
+    border-top-color: #333;
+}
+.floatingobject-container{
+    z-index:10 !important;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+}
+.eui-view-spread-container .floatingobject-container{
+    overflow: hidden;
+}
+
+button.eui-picture-control.aui-button {
+    position: absolute;
+    cursor: pointer;
+    top: 0px;
+    right: 18px;
+    z-index: 1002;
+    border-radius: 5px;
+    width: 30px;
+}
+.eui-picture-control.aui-icon-small:before {
+    margin-top: -10px;
+    font-size: 20px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+.floatingobject-content-container{
+    border: none !important;
+}
+.floatingobject-selected {
+    border: none;
+}
+
+.eui-picture-resize-indicator{
+    border-left: 2px solid #52b052;
+    border-top: 2px solid #52b052;
+    background-color: transparent;
+    top: 4px;
+    left: 4px;
+    right: 4px;
+    bottom: 4px;
+    position: absolute;
+}
+
+.eui-picture-resize-indicator.locked{
+    cursor: not-allowed;
+}
+
+.ui-resizable-handle.ui-resizable-se, .ui-resizable-handle.ui-resizable-sw, .ui-resizable-handle.ui-resizable-ne, .ui-resizable-handle.ui-resizable-nw {
+    background-color: #FFF;
+    border: 1px solid rgb(69, 180, 79);
+    width: 9px;
+    height: 9px;
+    z-index: 1001 !important;
+}
+
+.ui-resizable-handle.ui-resizable-se {
+    cursor: nwse-resize;
+    bottom: -3px;
+    right: -3px;
+    width: 9px;
+    height: 9px;
+}
+.ui-resizable-handle.ui-resizable-sw {
+    bottom: -3px;
+    left: -3px;
+}
+.ui-resizable-handle.ui-resizable-ne {
+    top: -3px;
+    right: -3px;
+}
+.ui-resizable-handle.ui-resizable-nw {
+    top: -3px;
+    left: -3px;
+}
+.ui-resizable-handle.ui-resizable-n{
+    top: 0px;
+}
+.ui-resizable-handle.ui-resizable-s{
+    bottom: 0px;
+}
+.ui-resizable-handle.ui-resizable-e{
+    cursor: e-resize;
+    right: 0px;
+}
+.ui-resizable-handle.ui-resizable-w{
+    cursor: w-resize;
+    left: 0px;
+}
+
+.ui-resizable-s, .ui-resizable-w, .ui-resizable-e, .ui-resizable-n{
+    background-color: rgb(69, 180, 79);
+}
+
+.ui-resizable-handle.ui-resizable-s, .ui-resizable-handle.ui-resizable-n{
+    height: 2px;
+}
+
+.ui-resizable-handle.ui-resizable-w, .ui-resizable-handle.ui-resizable-e{
+    width: 2px;
+}
+/******* End of Image Editing Dialogs *****/

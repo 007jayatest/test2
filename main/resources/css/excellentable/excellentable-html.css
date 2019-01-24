@@ -1,0 +1,328 @@
+/*HTML table */
+
+.eui-table-html{position:relative;}
+
+.eui-table-html table{
+   table-layout:auto !important;
+   width: auto !important;
+   border-collapse: collapse;
+}
+.eui-table-html .relative-position{
+    position: relative;
+}
+.eui-table-html .td-header-data{
+    text-indent: 0px;
+    padding: 0px!important;
+    min-width:30px;
+    width:30px;
+}
+
+.eui-table-html td div{overflow:hidden;}
+
+.eui-table-html th, .eui-table-html .td-header-data, .eui-license-eval{
+	background-color: #F1F1F1;
+	text-align: center;
+}
+
+.eui-license-eval{
+
+	color:#707070;
+
+}
+
+.eui-table-html td, .eui-table-html th{ 
+border-left-color: #ddd;
+border-right-color:#ddd;
+border-left-style:solid;
+border-right-style:solid;
+border-left-width:1px;
+border-right-width:1px;
+
+border-top-color: #ddd;
+border-bottom-color:#ddd;
+border-top-style:solid;
+border-bottom-style:solid;
+border-top-width:1px;
+border-bottom-width:1px;
+font-size:13px;
+padding: 0px 8px 0px 8px !important;
+font-family: "Verdana";} 
+
+.eui-table-html .hCenter{text-align:center!important;}
+.eui-table-html .hRight{text-align:right!important;}
+
+.eui-table-html .bold {font-weight:bold!important;}
+.eui-table-html .italic {font-style:italic}
+
+
+.eui-table-html .alegreya{font-family: "Alegreya" !important;}
+.eui-table-html .amatic_sc{font-family: "Amatic SC" !important;}
+.eui-table-html .amatic_sc_bold{font-family: "Amatic SC Bold" !important;}
+.eui-table-html .arial{font-family: "Arial" !important;}
+.eui-table-html .arial_black{font-family: "Arial Black" !important;}
+.eui-table-html .bree_serif{font-family: "Bree Serif" !important;}
+.eui-table-html .calibri{font-family: "Calibri" !important;}
+.eui-table-html .cambria{font-family: "Cambria" !important;}
+.eui-table-html .century{font-family: "Century" !important;}
+.eui-table-html .comic_sans_ms{font-family: "Comic Sans MS" !important;}
+.eui-table-html .courier_new{font-family: "Courier New" !important;}
+.eui-table-html .garamond{font-family: "Garamond" !important;}
+.eui-table-html .georgia{font-family: "Georgia" !important;}
+.eui-table-html .impact{font-family: "Impact" !important;}
+.eui-table-html .merriweather{font-family: "Merriweather" !important;}
+.eui-table-html .permanent_marker{font-family: "Permanent Marker" !important;}
+.eui-table-html .pinyon_script{font-family: "Pinyon Script" !important;}
+.eui-table-html .playfair_display{font-family: "Playfair Display" !important;}
+.eui-table-html .roboto{font-family: "Roboto" !important;}
+.eui-table-html .roboto_mono{font-family: "Roboto Mono" !important;}
+.eui-table-html .tahoma{font-family: "Tahoma" !important;}
+.eui-table-html .times_new_roman{font-family: "Times New Roman" !important;}
+.eui-table-html .trebuchet_ms{font-family: "Trebuchet MS" !important;}
+.eui-table-html .ultra{font-family: "Ultra" !important;}
+.eui-table-html .varela_round{font-family: "Varela Round" !important;}
+.eui-table-html .verdana{font-family: "Verdana" !important;}
+
+
+.eui-table-html .underline{text-decoration: underline!important;}
+.eui-table-html .strike{text-decoration:line-through!important;}
+
+.eui-table-html .vTop{
+	vertical-align: text-top;
+	vertical-align: top!important;}
+.eui-table-html .vBottom{
+    vertical-align: text-bottom;
+	vertical-align:bottom!important;}
+
+.eui-table-html .thinTop {border-top-width:thin!important;}
+.eui-table-html .thinBottom {border-bottom-width:thin!important;}
+.eui-table-html .thinRight {border-right-width:thin!important;}
+.eui-table-html .thinLeft {border-left-width:thin!important;}
+
+.eui-table-html .mediumTop{border-top-width:medium!important;}
+.eui-table-html .mediumBottom{border-bottom-width:medium!important;}
+.eui-table-html .mediumRight{border-right-width:medium!important;}
+.eui-table-html .mediumLeft{border-left-width:medium!important;}
+
+.eui-table-html .thickTop{border-top-width:thick!important;}
+.eui-table-html .thickBottom{border-bottom-width:thick!important;}
+.eui-table-html .thickRight{border-right-width:thick!important;}
+.eui-table-html .thickLeft{border-left-width:thick!important;}
+
+.eui-table-html .doubleTop{border-top-style:double!important;}
+.eui-table-html .doubleBottom{border-bottom-style:double!important;}
+.eui-table-html .doubleRight{border-right-style:double!important;}
+.eui-table-html .doubleLeft{border-left-style:double!important;}
+ 
+.eui-table-html .dashedTop{border-top-style:dashed!important;}
+.eui-table-html .dashedBottom{border-bottom-style:dashed!important;}
+.eui-table-html .dashedRight{border-right-style:dashed!important;}
+.eui-table-html .dashedLeft{border-left-style:dashed!important;}
+
+.eui-table-html .dashDotTop{border-top-style:dashed dotted!important;}
+.eui-table-html .dashDotBottom{border-bottom-style:dashed dotted!important;}
+.eui-table-html .dashDotRight{border-right-style:dashed dotted!important;}
+.eui-table-html .dashDotLeft{border-left-style:dashed dotted!important;}
+
+.eui-table-html .dashDotDotTop{border-top-style:dashed dotted dotted!important;}
+.eui-table-html .dashDotDotBottom{border-bottom-style:dashed dotted dotted!important;}
+.eui-table-html .dashDotDotRight{border-right-style:dashed dotted dotted!important;}
+.eui-table-html .dashDotDotLeft{border-left-style:dashed dotted dotted!important;}
+
+.eui-table-html .dottedTop{border-top-style:dotted!important;}
+.eui-table-html .dottedBottom{border-bottom-style:dotted!important;}
+.eui-table-html .dottedRight{border-right-style:dotted!important;}
+.eui-table-html .dottedLeft{border-left-style:dotted!important;}
+
+.eui-table-html .solidTop{border-top-style:solid!important;}
+.eui-table-html .solidBottom{border-bottom-style:solid!important;}
+.eui-table-html .solidRight{border-right-style:solid!important;}
+.eui-table-html .solidLeft{border-left-style:solid!important;}
+ 
+.eui-table-html .odd.Light1,
+.eui-table-html .odd.Light15,
+.eui-table-html .odd.Medium1,
+.eui-table-html .even.Medium8,
+.eui-table-html .odd.Medium15,
+.eui-table-html .odd.Medium16,
+.eui-table-html .odd.Medium17,
+.eui-table-html .odd.Medium18,
+.eui-table-html .odd.Medium19,
+.eui-table-html .odd.Medium20,
+.eui-table-html .odd.Medium21,
+.eui-table-html .even.Medium22{background:#CCCCCC;}
+
+.eui-table-html .odd.Light2,
+.eui-table-html .odd.Light16,
+.eui-table-html .odd.Medium2,
+.eui-table-html .even.Medium9,
+.eui-table-html .even.Medium23{background:#DEEBF6;}
+.eui-table-html .odd.Light3,
+.eui-table-html .odd.Light17,
+.eui-table-html .odd.Medium3,
+.eui-table-html .even.Medium10,
+.eui-table-html .even.Medium24{background:#FBE6D7;}
+.eui-table-html .odd.Light4,
+.eui-table-html .odd.Light18,
+.eui-table-html .odd.Medium4,
+.eui-table-html .even.Medium11,
+.eui-table-html .even.Medium25{background:#ECECEC;}
+.eui-table-html .odd.Light5,
+.eui-table-html .odd.Light19,
+.eui-table-html .odd.Medium5,
+.eui-table-html .even.Medium12,
+.eui-table-html .even.Medium26{background:#FEF3CD;}
+.eui-table-html .odd.Light6,
+.eui-table-html .odd.Light20,
+.eui-table-html .odd.Medium6,
+.eui-table-html .even.Medium13,
+.eui-table-html .even.Medium27{background:#D9E3F2;}
+.eui-table-html .odd.Light7,
+.eui-table-html .odd.Light21,
+.eui-table-html .odd.Medium7,
+.eui-table-html .even.Medium14,
+.eui-table-html .even.Medium28{background:#E3EFDA;}
+
+.eui-table-html .odd.Medium8,
+.eui-table-html .odd.Medium22{background:#999999;}
+.eui-table-html .odd.Medium9,
+.eui-table-html .odd.Medium23{background:#BED7EE;}
+.eui-table-html .odd.Medium10,
+.eui-table-html .odd.Medium24{background:#F7CCAE;}
+.eui-table-html .odd.Medium11,
+.eui-table-html .odd.Medium25{background:#DADADA;}
+.eui-table-html .odd.Medium12,
+.eui-table-html .odd.Medium26{background:#FEE69A;}
+.eui-table-html .odd.Medium13,
+.eui-table-html .odd.Medium27{background:#B4C7E7;}
+.eui-table-html .odd.Medium14,
+.eui-table-html .odd.Medium28{background:#C7DFB4;}
+
+.eui-table-html .odd.Dark1{background:#3F3F3F;}
+.eui-table-html .odd.Dark2{background:#2E77B7;}
+.eui-table-html .odd.Dark3{background:#C85B11;}
+.eui-table-html .odd.Dark4{background:#7C7C7C;}
+.eui-table-html .odd.Dark5{background:#C09000;}
+.eui-table-html .odd.Dark6{background:#2F5697;}
+.eui-table-html .odd.Dark7{background:#578335;}
+
+.eui-table-html .Light1{color:#000000;}
+.eui-table-html .Light2{color:#5B9BD5;}
+.eui-table-html .Light3{color:#ED7D31;}
+.eui-table-html .Light4{color:#A5A5A5;}
+.eui-table-html .Light5{color:#FFC000;}
+.eui-table-html .Light6{color:#4472C4;}
+.eui-table-html .Light7{color:#70AD47;}
+
+.eui-table-html .last, .eui-table-html  .first{border-bottom-style:solid;}
+
+.eui-table-html .last.Light1, .eui-table-html  .first.Light1{border-bottom-color:#000000;}
+.eui-table-html .last.Light2, .eui-table-html  .first.Light2{border-bottom-color:#5B9BD5;}
+.eui-table-html .last.Light3, .eui-table-html  .first.Light3{border-bottom-color:#ED7D31;}
+.eui-table-html .last.Light4, .eui-table-html  .first.Light4{border-bottom-color:#A5A5A5;}
+.eui-table-html .last.Light5, .eui-table-html  .first.Light5{border-bottom-color:#FFC000;}
+.eui-table-html .last.Light6, .eui-table-html  .first.Light6{border-bottom-color:#4472C4;}
+.eui-table-html .last.Light7, .eui-table-html  .first.Light7{border-bottom-color:#70AD47;}
+ 
+.eui-table-html .first.head{font-weight:bold;} 
+.eui-table-html .first.head.Light1{border-top-color:#000000;}
+.eui-table-html .first.head.Light2{border-top-color:#5B9BD5;}
+.eui-table-html .first.head.Light3{border-top-color:#ED7D31;}
+.eui-table-html .first.head.Light4{border-top-color:#A5A5A5;}
+.eui-table-html .first.head.Light5{border-top-color:#FFC000;}
+.eui-table-html .first.head.Light6{border-top-color:#4472C4;}
+.eui-table-html .first.head.Light7{border-top-color:#70AD47;}
+ 
+.eui-table-html .Light8,
+.eui-table-html .Light15{border-top-color:#000000; border-bottom-color:#000000; }
+.eui-table-html .Light9,
+.eui-table-html .Light16{border-top-color:#5B9BD5; border-bottom-color:#5B9BD5;}
+.eui-table-html .Light10,
+.eui-table-html .Light17{border-top-color:#ED7D31; border-bottom-color:#ED7D31;}
+.eui-table-html .Light11,
+.eui-table-html .Light18{border-top-color:#A5A5A5; border-bottom-color:#A5A5A5;}
+.eui-table-html .Light12,
+.eui-table-html .Light19{border-top-color:#FFC000; border-bottom-color:#FFC000;}
+.eui-table-html .Light13,
+.eui-table-html .Light20{border-top-color:#4472C4; border-bottom-color:#4472C4;}
+.eui-table-html .Light14,
+.eui-table-html .Light21{border-top-color:#70AD47; border-bottom-color:#70AD47;}
+
+.eui-table-html .first.head.Light8,
+.eui-table-html .first.head.Medium1,
+.eui-table-html .first.head.Medium8,
+.eui-table-html .first.head.Medium15,
+.eui-table-html .odd .Dark1{background:#000000; }
+.eui-table-html .first.head.Light9,
+.eui-table-html .first.head.Medium2,
+.eui-table-html .first.head.Medium9,
+.eui-table-html .first.head.Medium16,
+.eui-table-html .odd .Dark2{background:#5B9BD5;}
+.eui-table-html .first.head.Light10,
+.eui-table-html .first.head.Medium3,
+.eui-table-html .first.head.Medium10,
+.eui-table-html .first.head.Medium17,
+.eui-table-html .odd .Dark3{background:#ED7D31;}
+.eui-table-html .first.head.Light11,
+.eui-table-html .first.head.Medium4,
+.eui-table-html .first.head.Medium11,
+.eui-table-html .first.head.Medium18,
+.eui-table-html .odd .Dark4{background:#A5A5A5;}
+.eui-table-html .first.head.Light12,
+.eui-table-html .first.head.Medium5,
+.eui-table-html .first.head.Medium12,
+.eui-table-html .first.head.Medium19,
+.eui-table-html .odd .Dark5{background:#FFC000;}
+.eui-table-html .first.head.Light13,
+.eui-table-html .first.head.Medium6,
+.eui-table-html .first.head.Medium13,
+.eui-table-html .first.head.Medium20,
+.eui-table-html .odd .Dark6{background:#4472C4;}
+.eui-table-html .first.head.Light14,
+.eui-table-html .first.head.Medium7,
+.eui-table-html .first.head.Medium14,
+.eui-table-html .first.head.Medium21,
+.eui-table-html .odd .Dark7{background:#70AD47;}
+
+
+.eui-table-html .first.head.Light8,
+.eui-table-html .first.head.Light9,
+.eui-table-html .first.head.Light10,
+.eui-table-html .first.head.Light11,
+.eui-table-html .first.head.Light12,
+.eui-table-html .first.head.Light13,
+.eui-table-html .first.head.Light14,
+.eui-table-html .first.head.Medium1,
+.eui-table-html .first.head.Medium2,
+.eui-table-html .first.head.Medium3,
+.eui-table-html .first.head.Medium4,
+.eui-table-html .first.head.Medium5,
+.eui-table-html .first.head.Medium6,
+.eui-table-html .first.head.Medium7{color:white;}
+
+.eui-table-html .Light8,
+.eui-table-html .Light9,
+.eui-table-html .Light10,
+.eui-table-html .Light11,
+.eui-table-html .Light12,
+.eui-table-html .Light13,
+.eui-table-html .Light14{border-style:solid; border-width:1px;}
+
+.eui-table-html .Light8:first-child,
+.eui-table-html .Light9,
+.eui-table-html .Light10,
+.eui-table-html .Light11,
+.eui-table-html .Light12,
+.eui-table-html .Light13,
+.eui-table-html .Light14{border-style:solid; border-width:1px;}
+
+.eui-hidden{display:none;}
+.eui-table-html table.no-grid td{border-color: transparent;}
+
+
+/* This is to ensure that the PDF exports add some gutter area */
+@media only print and (orientation: portrait) {
+    .eui-table-html {
+        max-width: 650px !important;
+        overflow: hidden;
+    }
+}

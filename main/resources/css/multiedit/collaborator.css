@@ -1,0 +1,58 @@
+.eui-multiedit-avatar-container {
+    height: 40px;
+    width: 40%;
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    right: 115px;
+    text-align: right;
+}
+
+.eui-multiedit-avatar-container > ul {
+    width: 100%;
+    padding-left: 0px;
+}
+
+.eui-multiedit-avatar-container > ul > li {
+    display: inline-block;
+}
+
+.eui-multiedit-avatar-container > ul > li > img, #euiAvatarDropdownContainer > ul > li > img {
+    border-width: medium;
+    border-style: inset;
+    height: 24px;
+    border-radius: 15%;
+    margin-right: 4px;
+    margin-top: 3px;
+}
+
+.eui-multiedit-avatar-container > ul > li > img:hover, #euiAvatarDropdownContainer > ul > li > img:hover {
+    border-style: solid;
+    height: 24px;
+    border-radius: 15%;
+    margin-right: 4px;
+    margin-top: 3px;
+}
+
+#euiAvatarDropdownButton {
+    position: fixed;
+    top: 5px;
+    border: transparent;
+    right: 72px;
+    background: white;
+}
+
+.eui-hide {
+    display: none!important;
+}
+
+.eui-multiedit-avatar-container-right {
+    right: 72px;
+}
+
+#euiAvatarDropdownContainer {
+    text-align: right;
+    background: none;
+    border: transparent;
+    box-shadow: none;
+}

@@ -1,0 +1,490 @@
+/***** Verdana *****/
+@font-face{
+    font-family:"Verdana";
+    src: 
+        local("Verdana"),
+        url("fonts/verdana.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face{
+    font-family:"Verdana";
+     src: 
+        local(Verdana Bold),
+        local(Verdana-Bold),
+        url("fonts/verdana-bold.ttf") format("truetype");
+    font-weight: bold;
+    font-style: normal;
+}
+@font-face{
+    font-family:"Verdana";
+    src:
+        local("Verdana Italic"),
+        local("Verdana-Italic"),
+        url("fonts/verdana-italic.ttf") format("truetype");
+    font-weight: normal;
+    font-style: italic;
+}
+
+/***** Alegreya *****/
+@font-face{
+    font-family:"Alegreya";
+    src: 
+        local("Alegreya"),
+        url("fonts/alegreya.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face{
+    font-family:"Alegreya";
+    src:
+        local("Alegreya Bold"),
+        local("Alegreya-Bold"),
+        url("fonts/alegreya-bold.ttf") format("truetype");
+    font-weight: bold;
+    font-style: normal;
+}
+@font-face{
+    font-family:"Alegreya";
+    src:
+        local("Alegreya Italic"),
+        local("Alegreya-Italic"),
+        url("fonts/alegreya-italic.ttf") format("truetype");
+    font-weight: normal;
+    font-style: italic;
+}
+
+/***** Amatic SC *****/
+@font-face{
+    font-family:"Amatic SC";
+    src: 
+        local("Amatic SC"),
+        url("fonts/amatic-sc.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face{
+    font-family:"Amatic SC";
+    src:
+        local("Amatic SC Bold"),
+        local("AmaticSC-Bold"),
+        url("fonts/amatic-sc-bold.ttf") format("truetype");
+    font-weight: bold;
+    font-style: normal;
+}
+
+/***** Arial Black *****/
+@font-face{
+    font-family:"Arial Black";
+    src: 
+        local("Arial Black"),
+        url("fonts/arial-black.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face{
+    font-family:"Arial Black";
+    src:
+        local("Arial Black Italic"),
+        local("ArialBlack-Italic"),
+        url("fonts/arial-black-italic.ttf") format("truetype");
+    font-weight: normal;
+    font-style: italic;
+}
+
+@font-face{
+    font-family:"Arial";
+    src:
+            local("Arial"),
+            url("fonts/arial.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+/***** Bree Serif *****/
+@font-face{
+    font-family:"Bree Serif";
+    src: 
+        local("Bree Serif"),
+        url("fonts/breeserif.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+/***** Calibri *****/
+@font-face{
+    font-family:"Calibri";
+    src: 
+        local("Calibri"),
+        url("fonts/calibri.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face{
+    font-family:"Calibri";
+    src:
+        local("Calibri Bold"),
+        local("Calibri-Bold"),
+        url("fonts/calibri-bold.ttf") format("truetype");
+    font-weight: bold;
+    font-style: normal;
+}
+@font-face{
+    font-family:"Calibri";
+    src:
+        local("Calibri Italic"),
+        local("Calibri-Italic"),
+        url("fonts/calibri-italic.ttf") format("truetype");
+    font-weight: normal;
+    font-style: italic;
+}
+
+/***** Cambria *****/
+@font-face{
+    font-family:"Cambria";
+    src: 
+        local("Cambria"),
+        url("fonts/cambria.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face{
+    font-family:"Cambria";
+    src:
+        local("Cambria Bold"),
+        local("Cambria-Bold"),
+        url("fonts/cambria-bold.ttf") format("truetype");
+    font-weight: bold;
+    font-style: normal;
+}
+@font-face{
+    font-family:"Cambria";
+    src:
+        local("Cambria Italic"),
+        local("Cambria-Italic"),
+        url("fonts/cambria-italic.ttf") format("truetype");
+    font-weight: normal;
+    font-style: italic;
+}
+
+/***** Century *****/
+@font-face{
+    font-family:"Century";
+    src: 
+        local("Century"),
+        url("fonts/century.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face{
+    font-family:"Century";
+    src:
+        local("Century Bold"),
+        local("Century-Bold"),
+        url("fonts/century-bold.ttf") format("truetype");
+    font-weight: bold;
+    font-style: normal;
+}
+@font-face{
+    font-family:"Century";
+    src:
+        local("Century Italic"),
+        local("Century-Italic"),
+        url("fonts/century-italic.ttf") format("truetype");
+    font-weight: normal;
+    font-style: italic;
+}
+
+/***** Comic Sans MS *****/
+@font-face{
+    font-family:"Comic Sans MS";
+    src: 
+        local("Comic Sans MS"),
+        url("fonts/comic-sans-ms.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face{
+    font-family:"Comic Sans MS";
+    src:
+        local("Comic Sans MS Bold"),
+        local("ComicSansMS-Bold"),
+        url("fonts/comic-sans-ms-bold.ttf") format("truetype");
+    font-weight: bold;
+    font-style: normal;
+}
+
+/***** Garamond *****/
+@font-face{
+    font-family:"Garamond";
+    src: 
+        local("Garamond"),
+        url("fonts/garamond.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face{
+    font-family:"Garamond";
+    src:
+        local("Garamond Bold"),
+        local("Garamond-Bold"),
+        url("fonts/garamond-bold.ttf") format("truetype");
+    font-weight: bold;
+    font-style: normal;
+}
+@font-face{
+    font-family:"Garamond";
+    src:
+        local("Garamond Italic"),
+        local("Garamond-Italic"),
+        url("fonts/garamond-italic.ttf") format("truetype");
+    font-weight: normal;
+    font-style: italic;
+}
+
+/***** Georgia *****/
+@font-face{
+    font-family:"Georgia";
+    src: 
+        local("Georgia"),
+        url("fonts/georgia.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face{
+    font-family:"Georgia";
+    src:
+        local("Georgia Bold"),
+        local("Georgia-Bold"),
+        url("fonts/georgia-bold.ttf") format("truetype");
+    font-weight: bold;
+    font-style: normal;
+}
+@font-face{
+    font-family:"Georgia";
+    src:
+        local("Georgia Italic"),
+        local("Georgia-Italic"),
+        url("fonts/georgia-italic.ttf") format("truetype");
+    font-weight: normal;
+    font-style: italic;
+}
+
+/***** Impact *****/
+@font-face{
+    font-family:"Impact";
+    src: 
+        local("Impact"),
+        url("fonts/impact.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+/***** Merriweather *****/
+@font-face{
+    font-family:"Merriweather";
+    src: 
+        local("Merriweather"),
+        url("fonts/merriweather.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face{
+    font-family:"Merriweather";
+    src:
+        local("Merriweather Bold"),
+        local("Merriweather-Bold"),
+        url("fonts/merriweather-bold.ttf") format("truetype");
+    font-weight: bold;
+    font-style: normal;
+}
+@font-face{
+    font-family:"Merriweather";
+    src:
+        local("Merriweather Italic"),
+        local("Merriweather-Italic"),
+        url("fonts/merriweather-italic.ttf") format("truetype");
+    font-weight: normal;
+    font-style: italic;
+}
+
+/***** Permanent Marker *****/
+@font-face{
+    font-family:"Permanent Marker";
+    src: 
+        local("Permanent Marker"),
+        url("fonts/permanentmarker.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+/***** Pinyon Script *****/
+@font-face{
+    font-family:"Pinyon Script";
+    src: 
+        local("Pinyon Script"),
+        url("fonts/pinyonscript.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+/***** Playfair Display *****/
+@font-face{
+    font-family:"Playfair Display";
+    src: 
+        local("Playfair Display"),
+        url("fonts/playfairdisplay.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face{
+    font-family:"Playfair Display";
+    src:
+        local("Playfair Display Bold"),
+        local("PlayfairDisplay-Bold"),
+        url("fonts/playfairdisplay-bold.ttf") format("truetype");
+    font-weight: bold;
+    font-style: normal;
+}
+@font-face{
+    font-family:"Playfair Display";
+    src:
+        local("Playfair Display Italic"),
+        local("PlayfairDisplay-Italic"),
+        url("fonts/playfairdisplay-italic.ttf") format("truetype");
+    font-weight: normal;
+    font-style: italic;
+}
+
+/***** Roboto *****/
+@font-face{
+    font-family:"Roboto";
+    src: 
+        local("Roboto"),
+        url("fonts/roboto.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face{
+    font-family:"Roboto";
+    src:
+        local("Roboto Bold"),
+        local("Roboto-Bold"),
+        url("fonts/roboto-bold.ttf") format("truetype");
+    font-weight: bold;
+    font-style: normal;
+}
+@font-face{
+    font-family:"Roboto";
+    src:
+        local("Roboto Italic"),
+        local("Roboto-Italic"),
+        url("fonts/roboto-italic.ttf") format("truetype");
+    font-weight: normal;
+    font-style: italic;
+}
+
+/***** Roboto Mono *****/
+@font-face{
+    font-family:"Roboto Mono";
+    src: 
+        local("Roboto Mono"),
+        url("fonts/robotomono.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face{
+    font-family:"Roboto Mono";
+    src:
+        local("Roboto Mono Bold"),
+        local("RobotoMono-Bold"),
+        url("fonts/robotomono-bold.ttf") format("truetype");
+    font-weight: bold;
+    font-style: normal;
+}
+@font-face{
+    font-family:"Roboto Mono";
+    src:
+        local("Roboto Mono Italic"),
+        local("RobotoMono-Italic"),
+        url("fonts/robotomono-italic.ttf") format("truetype");
+    font-weight: normal;
+    font-style: italic;
+}
+
+/***** Tahoma *****/
+@font-face{
+    font-family:"Tahoma";
+    src: 
+        local("Tahoma"),
+        url("fonts/tahoma.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face{
+    font-family:"Tahoma";
+    src:
+        local("Tahoma Bold"),
+        local("Tahoma-Bold"),
+        url("fonts/tahoma-bold.ttf") format("truetype");
+    font-weight: bold;
+    font-style: normal;
+}
+
+/***** Trebuchet MS *****/
+@font-face{
+    font-family:"Trebuchet MS";
+    src: 
+        local("Trebuchet MS"),
+        url("fonts/trebuchet-ms.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face{
+    font-family:"Trebuchet MS";
+    src:
+        local("Trebuchet MS Bold"),
+        local("TrebuchetMS-Bold"),
+        url("fonts/trebuchet-ms-bold.ttf") format("truetype");
+    font-weight: bold;
+    font-style: normal;
+}
+@font-face{
+    font-family:"Trebuchet MS";
+    src:
+        local("Trebuchet MS Italic"),
+        local("TrebuchetMS-Italic"),
+        url("fonts/trebuchet-ms-italic.ttf") format("truetype");
+    font-weight: normal;
+    font-style: italic;
+}
+
+/***** Ultra *****/
+@font-face{
+    font-family:"Ultra";
+    src: 
+        local("Ultra"),
+        url("fonts/ultra.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+/***** Varela Round *****/
+@font-face{
+    font-family:"Varela Round";
+    src: 
+        local("Varela Round"),
+        url("fonts/varelaround.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+/***** Wingdings *****/
+@font-face{
+    font-family:"Wingdings";
+    src: 
+        local("Wingdings"),
+        url("fonts/wingdings.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}

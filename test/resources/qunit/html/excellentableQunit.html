@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>Qunit For Excellentable</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://code.jquery.com/qunit/qunit-1.19.0.css">
+        <link rel="stylesheet" href="../css/qunit.css" />
+        <script src="http://code.jquery.com/qunit/qunit-1.19.0.js"></script>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+        <script src="../js/qunit-assert-classes.js"></script>
+        <script src="../js/qunit.js"></script>
+        <script src="../js/qunit.ExcCustomPlugins.js"></script>
+        <script src="../js/qunit.ExcDBOperations.js"></script> 
+        <script src="../js/qunit.ExcPageEditOperations.js"></script>
+        <script src="../js/qunit.Excellentable.js"></script>
+        <script src="../js/qunit.ExcVersionCompare.js"></script>
+        <script src="../../../../main/resources/excellentable/spreadjs/js/gcspread.sheets.all.8.40.20151.5.min.js"></script>
+        <script src="../../../../main/resources/excellentable/spreadjs/js/jquery-1.11.1.min.js"></script>
+        <script src="../../../../main/resources/excellentable/spreadjs/js/jquery-ui.min.js"></script>
+        <script src="../../../../main/resources/excellentable/spreadjs/js/jquery.wijmo-open.all.3.20143.59.min.js"></script>
+        <script src="../../../../main/resources/excellentable/spreadjs/js/jquery.wijmo-pro.all.3.20143.59.min.js"></script>
+        <script src="../../../../main/resources/excellentable/spreadjs/js/jquery.wijmo.wijspread.all.3.20151.16.min.js"></script>
+        <script src="../../../../main/resources/js/excellentable/menubarControls/menubarControls.js"></script>
+        <script src="../../../../main/resources/js/excellentable/edit/jQuery.ExcPageEditOperations.js"></script>
+        <script src="../../../../main/resources/excellentable/common/jQuery.ExcDBOperations.js"></script>
+        <script src="../../../../main/resources/excellentable/common/jQuery.ExcCustomPlugins.js"></script>
+        <script src="../../../../main/resources/excellentable/common/jQuery.Excellentable.js"></script>
+        <script src="../../../../main/resources/js/util/versionDiffUtil.js"></script>
+        <script src="../../../../main/resources/js/excellentable/view/loadExcellentable.js"></script>
+        <script type="text/javascript">
+            var AJS = jQuery;
+            jQuery(function () {
+                jQuery("#createpagefromtemplate").prepend("<iframe style='display:none' id='wysiwygTextarea_ifr' src='javascript:''' frameborder='0' allowtransparency='true' title='{#aria.rich_text_area}' style='width: 100%; height: 100%; display: block;' tabindex='100'>").find("iframe").contents().find("body").append("<body id='tinymce' class='mceContentBody aui-theme-default wiki-content fullsize template-editor' onload='window.parent.tinyMCE.get('wysiwygTextarea').onLoad.dispatch();' contenteditable='true' dir='ltr' style='padding-top: 89px;'><p><img class='editor-inline-macro with-chrome' style='background-image: url(https://localhost:1990/confluence/plugins/servlet/confluence/placeholder/macro-heading?definition=e2V4Y2VsbGVudGFibGU6ZXhjZWxsZW50YWJsZS1pZD0xfQ&amp&locale=en_GB&amp;version=2); background-repeat: no-repeat;' height='145' width='330' src='/confluence/download/resources/Addteq.Excellentable/images/addteq-plugin-icon.png' data-macro-name='excellentable' data-macro-id='14e2be0c-89a6-45c6-b925-b7cc73c82b0b' data-macro-parameters='excellentable-id=1' data-macro-schema-version='1' data-mce-src='https://localhost:1990/confluence/download/resources/Addteq.Excellentable/images/addteq-plugin-icon.png' data-mce-style='background-image: url('http://kriti-OptiPlex-7010:1990/confluence/plugins/servlet/confluence/placeholder/macro-heading?definition=e2V4Y2VsbGVudGFibGU6ZXhjZWxsZW50YWJsZS1pZD0xfQ&amp;locale=en_GB&amp;version=2'); background-repeat: no-repeat;'></img></p></body>");
+            });
+        </script>
+    </head>
+    <body>
+        <div id="qunit"></div>
+        <div id="qunit-fixture"></div>
+        <div id="createpagefromtemplate"></div>
+        <div class="eui-view-spread"></div>
+        <div class="eui-edit-spread"></div>
+    </body>
+</html>

@@ -1,0 +1,35 @@
+{namespace Confluence.Templates.Excellentable}
+
+/************************************************
+ * Excellentable User mini profile
+ *  @param userKey
+ *  @param userName
+ *  @param avatar
+ *  @param colorForUserImageBorder
+ ***********************************************/
+{template .userMiniProfile}
+
+    <li data-userkey="{$userKey}">
+        <img class="confluence-userlink" data-username="{$userName}" src="{$avatar}"
+             style="border-color:{$colorForUserImageBorder};"/>
+    </li>
+
+{/template}
+
+/************************************************
+ * Avatar template while live enabled
+ *  @param userNameWithSessionId    : userName+sessionId
+ *  @param userName                 : userName
+ *  @param avatar                   : avatar URL
+ *  @param colorForUserImageBorder  : border color for avatar
+ ***********************************************/
+{template .userMiniProfileUserName}
+
+    <li data-userName-sessionId="{$userNameWithSessionId}">
+        /* In case of collaborative editing make border-radius of the avatar as 50% */
+        <img class="confluence-userlink" data-userName="{$userName}" src="{$avatar}"
+             style="border-color:{$colorForUserImageBorder};border-radius: 50%;"/>
+    </li>
+
+{/template}
+

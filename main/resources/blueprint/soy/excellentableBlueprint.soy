@@ -1,0 +1,180 @@
+{namespace Confluence.Templates.Excellentable}
+
+/******************************************
+ *  Excellentable Blueprint Wizard Template.
+ * @param contextPath
+*******************************************/
+{template .BlueprintWizard}
+{let $resourcepath} {$contextPath}/download/resources/Addteq.Excellentable:excellentableBlueprintResources/images{/let}
+<form action="#" method="post" id="euiBlueprintForm" class="aui">
+    <div class='aui-tabs vertical-tabs eui-template-tabs'>
+        <ul class='tabs-menu'>
+            <li class='menu-item active-tab  eui-template-tab'>
+                <a href='#euiRecentlyUsedTemplateTab'>
+                    <p class='template-type'>
+                        <strong>{getText('com.addteq.confluence.plugin.excellentable.bp.recently.used')}</strong>
+                    </p>
+                </a>
+            </li>
+            <li class='menu-item  eui-template-tab'>
+                <a href='#euiPersonalTemplateTab'>
+                    <p class='template-type'>
+                        <strong>{getText('com.addteq.confluence.plugin.excellentable.bp.personal')}</strong>
+                    </p>
+                </a>
+            </li>
+            <li class='menu-item  eui-template-tab'>
+                <a href='#euiWorkTemplateTab'>
+                    <p class='template-type'>
+                        <strong>{getText('com.addteq.confluence.plugin.excellentable.bp.work')}</strong>
+                    </p>
+                </a>
+            </li>
+            <li class='menu-item  eui-template-tab'>
+                <a href='#euiEducationTemplateTab'>
+                    <p class='template-type'>
+                        <strong>{getText('com.addteq.confluence.plugin.excellentable.bp.education')}</strong>
+                    </p>
+                </a>
+            </li>
+        </ul>
+        <div class='tabs-pane active-pane' id='euiRecentlyUsedTemplateTab'>
+            <div class='template-category'>
+                {getText('com.addteq.confluence.plugin.excellentable.bp.recently.used')}
+            </div>
+            <div style="display:inline-block">
+                <label class="eui-template-element-container">
+                    <input type="radio" name="template" value="blank" checked="checked" />
+                    <img src="{$resourcepath}/sheetsBlank.png" />
+                    <div class='eui-template-title'>
+                        {getText('com.addteq.confluence.plugin.excellentable.bp.blank')}
+                    </div>
+                </label>
+            </div>
+            <div style="display:inline-block">
+                <label class="eui-template-element-container">
+                    <input type="radio" name="template" value="invoice" />
+                    <img src="{$resourcepath}/invoice.png" />
+                    <div class='eui-template-title'>
+                        {getText('com.addteq.confluence.plugin.excellentable.bp.invoice')}
+                    </div>
+                </label>
+            </div>
+            <div style="display:inline-block">
+                <label class="eui-template-element-container">
+                    <input type="radio" name="template" value="expense" />
+                    <img src="{$resourcepath}/expense.png" />
+                    <div class='eui-template-title'>
+                        {getText('com.addteq.confluence.plugin.excellentable.bp.expense.report')}   
+                    </div>
+                </label>
+            </div>          
+            <div style="display:inline-block">
+                <label class="eui-template-element-container">
+                    <input type="radio" name="template" value="todolist" />
+                    <img src="{$resourcepath}/todoList.png" />
+                    <div class='eui-template-title'>
+                        {getText('com.addteq.confluence.plugin.excellentable.bp.to.do')}
+                    </div>
+                </label>
+            </div>
+            <br/>
+            <div class="eui-coming-soon">
+                <div class="eui-overlay">
+                </div>
+            </div> <!--End of coming soon -->
+        </div>
+        <div class='tabs-pane' id='euiPersonalTemplateTab'>
+            <div class='template-category'>
+                {getText('com.addteq.confluence.plugin.excellentable.bp.personal')}
+            </div>
+            <div style="display:inline-block">
+                <label class="eui-template-element-container">
+                    <input type="radio" name="template" value="todolist" />
+                    <img src = "{$resourcepath}/todoList.png" />
+                    <div class='eui-template-title'>
+                        {getText('com.addteq.confluence.plugin.excellentable.bp.to.do')}
+                    </div>
+                </label>
+            </div>
+            <div style="display:inline-block">
+                <label class="eui-template-element-container">
+                    <input type="radio" name="template" value="travelPlanner" />
+                    <img src = "{$resourcepath}/travelPlaner.png" />
+                    <div class = 'eui-template-title'>
+                        {getText('com.addteq.confluence.plugin.excellentable.bp.travel.planner')}
+                    </div>
+                </label>
+            </div>
+            <div style="display:inline-block">
+                <label class="eui-template-element-container">
+                    <input type="radio" name="template" value="schedule" />
+                    <img src = "{$resourcepath}/schedule.png" />
+                    <div class = 'eui-template-title'>
+                        {getText('com.addteq.confluence.plugin.excellentable.bp.schedule')}
+                    </div>
+                </label>
+            </div>
+            <br/>
+            <div class="eui-coming-soon">
+                <div class="eui-overlay">
+                    <div class="eui-msg">
+                        {getText('com.addteq.confluence.plugin.excellentable.bp.coming.soon')}
+                    </div>
+                </div>
+            </div><!-- End of Coming Soon -->
+        </div>
+        <div class='tabs-pane' id='euiWorkTemplateTab'>
+            <div class='template-category'>
+                {getText('com.addteq.confluence.plugin.excellentable.bp.work')}
+            </div>
+            <div style="display:inline-block">
+                <label class="eui-template-element-container">
+                    <input type="radio" name="template" value="invoice" />
+                    <img src ="{$resourcepath}/invoice.png" />
+                    <div class = 'eui-template-title'>
+                        {getText('com.addteq.confluence.plugin.excellentable.bp.invoice')}
+                    </div>
+                </label>
+            </div>
+            <div style="display:inline-block">
+                <label class="eui-template-element-container">
+                    <input type="radio" name="template" value="expense" />
+                    <img src = "{$resourcepath}/expense.png" />
+                    <div class = 'eui-template-title'>
+                        {getText('com.addteq.confluence.plugin.excellentable.bp.expense.report')}
+                    </div>
+                </label>
+            </div>
+            <div style="display:inline-block">
+                <label class="eui-template-element-container">
+                    <input type="radio" name="template" value="purchaseOrder" />
+                    <img src ="{$resourcepath}/purchaseOrder.png" />
+                    <div class = 'eui-template-title'>
+                        {getText('com.addteq.confluence.plugin.excellentable.bp.purchase.order')}
+                    </div>
+                </label>
+            </div>
+            <br>
+            <div class="eui-coming-soon">
+                <div class="eui-overlay">
+                    <div class="eui-msg">
+                        {getText('com.addteq.confluence.plugin.excellentable.bp.coming.soon')}
+                    </div>
+                </div>
+            </div> <!-- End of Coming Soon -->
+        </div>
+        <div class='tabs-pane' id='euiEducationTemplateTab'>
+            <div class='template-category'>
+            </div>
+            <div class="eui-coming-soon">
+                <div class="eui-overlay">
+                    <div class="eui-msg" id="euiEducationTemplateMessage">
+                        {getText('com.addteq.confluence.plugin.excellentable.bp.coming.soon')}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{/template}

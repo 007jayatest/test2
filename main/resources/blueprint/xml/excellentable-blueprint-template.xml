@@ -1,0 +1,4 @@
+<ac:macro ac:name="excellentable">
+    <ac:parameter ac:name="excellentable-id"><at:var at:name="excellentable-id"/></ac:parameter>
+    <ac:parameter ac:name="source">blueprint</ac:parameter> <!--Set source from where excellentable is inserted.Here it is from "Excellentable Blueprint" -->
+</ac:macro>

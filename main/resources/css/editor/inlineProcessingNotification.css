@@ -1,0 +1,24 @@
+.eui-inline-notification {
+    position: absolute;
+    top: 10px;
+    left: 46%;
+}
+.eui-vertical-align {
+    vertical-align: middle;
+}
+
+.eui-announce-info {
+    color: #52b052 !important;
+}
+
+.eui-announce-success {
+    color: #52b052 !important;
+}
+
+.eui-announce-error {
+    color: red !important;
+}
+
+.eui-announce-warning {
+    color: orange !important;
+}

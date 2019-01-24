@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<atlassian-plugin key="${atlassian.plugin.key}" name="${project.name}" plugins-version="2">
+    <plugin-info>
+        <description>${project.description}</description>
+        <version>${project.version}</version>
+        <vendor name="${project.organization.name}" url="${project.organization.url}"/>
+        <param name="plugin-icon">images/addteq-plugin-icon.png</param>
+        <param name="plugin-logo">images/addteq-plugin-icon.png</param>
+        <param name="post.install.url">/admin/excellentable/multieditConfig.action</param>
+        <param name="atlassian-licensing-enabled">true</param>
+        <param name="atlassian-data-center-status">compatible</param>
+        <param name="atlassian-data-center-compatible">true</param>
+    </plugin-info>
+    <!-- add our i18n resource -->
+    <resource type="i18n" name="i18n" location="macro"/>
+    <resource type="download" name="images/" location="/images"/>
+    <web-resource key="attachment-web-resource" name="Attachment Web Resources">
+        <dependency>com.atlassian.auiplugin:dialog2</dependency>
+        <dependency>com.atlassian.auiplugin:ajs</dependency>
+        <resource type="download" name="attachment.css" location="/css/editor/attachment.css"/>
+        <resource type="download" name="images/editor/" location="/images/editor"/>
+        <resource type="download" name="attachmentView.js" location="/js/excellentable/attachmentView/attachmentView.js"/>
+        <context>viewattachments</context>
+        <context>viewcontent</context>
+    </web-resource>
+    <web-resource key="icon-editor" name="Icon Web Resources">
+        <dependency>com.atlassian.confluence.tinymceplugin:editor-resources</dependency>
+        <resource type="download" name="editor.css" location="/css/editor/editor.css"/>
+        <resource type="download" name="images/editor/" location="/images/editor"/>
+        <resource type="download" name="jQuery.ExcellentableMacroCopyPaste.js"
+                  location="/excellentable/common/jQuery.ExcellentableMacroCopyPaste.js"/>
+        <context>editor</context>
+    </web-resource>
+    <web-resource key="miscellaneous" name="Excellentable Miscellaneous Web Resources">
+        <resource type="download" name="jQuery.Miscellaneous.js" location="/excellentable/common/jQuery.Miscellaneous.js"/>
+        <context>page</context>
+        <context>blogpost</context>
+    </web-resource>
+    <web-resource key="spreadJSResourcesV1" name="SpreadJS Web Resources">
+        <dependency>com.atlassian.auiplugin:dialog2</dependency>
+        <dependency>com.atlassian.auiplugin:ajs</dependency>
+        <dependency>com.atlassian.auiplugin:jquery-ui-other</dependency>
+        <dependency>com.atlassian.auiplugin:aui-experimental-tooltips</dependency>
+        <dependency>com.atlassian.auiplugin:aui-experimental-iconfont</dependency>
+        <dependency>Addteq.Excellentable:com.addteq.confluence.plugin.whatsNew</dependency>
+        <transformation extension="js">
+            <transformer key="jsI18n"/>
+        </transformation>
+        <!-- transform Soy templates into JS -->
+        <transformation extension="soy">
+            <transformer key="soyTransformer">
+                <functions>com.atlassian.confluence.plugins.soy:soy-core-functions</functions>
+            </transformer>
+        </transformation>
+        <!--jQuery and spreadjs library-->
+        <resource type="download" name="jquery-eui-1.11.4.css" location="/css/external/jquery-eui-1.11.4.css"/>
+        <resource type="download" name="gcspread.sheets.excel2013lightGray.9.40.20161.5.css" location="/css/external/gcspread.sheets.excel2013lightGray.9.40.20161.5.css"/>
+        <resource type="download" name="spectrum.css" location="/css/external/spectrum.css"/>
+        <!-- CSS files -->
+
+        <resource type="download" name="gcspread.sheets.9.40.20161.5.js" location="/js/excellentable/spreadjs/gcspread.sheets.9.40.20161.5.js"/>
+        <resource type="download" name="gcspread.sheets.calc.functions.9.40.20161.5.js" location="/js/excellentable/spreadjs/gcspread.sheets.calc.functions.9.40.20161.5.js"/>
+        <resource type="download" name="jquery.dragster.min.js" location="/js/external/jquery.dragster.min.js"/>
+        <resource type="download" name="jquery.dd.js" location="/js/external/jquery.dd.js"/>
+        <resource type="download" name="jquery.menu.js" location="/js/external/jquery.menu.js"/>
+
+
+        <!--Utilities-->
+        <resource type="download" name="lodash.js" location="js/external/lodash.js"/>
+        <resource type="download" name="jsondiffpatch.min.js" location="js/external/jsondiffpatch.min.js"/>
+        <resource type="download" name="pako.min.js" location="js/external/pako.min.js"/>
+        <resource type="download" name="inlineProcessingNotification.js" location="js/excellentable/edit/inlineProcessingNotification.js"/>
+        <resource type="download" name="spectrum.js" location="/js/external/spectrum.js"/>
+
+        <!--Collaborative Editing-->
+        <resource type="download" name="randomColor.min.js" location="js/external/randomColor.min.js"/>
+        <resource type="download" name="collaborator.css" location="css/multiedit/collaborator.css"/>
+        <resource type="download" name="avatarManager.js" location="js/excellentable/multiedit/avatarManager.js"/>
+        <resource type="download" name="avatarManagerFirebase.js" location="js/excellentable/multiedit/avatarManagerFirebase.js"/>
+
+        <!--Enable Live Editing -->
+        <resource type="download" name="excellentableLiveOperations.js" location="js/excellentable/liveEdit/excellentableLiveOperations.js"/>
+        <resource type="download" name="firebase.js" location="js/excellentable/liveEdit/firebase.js"/>
+
+        <!--Check unsaved content in excellentable edit mode-->
+        <resource type="download" name="unsavedContentManager.js" location="js/excellentable/edit/unsavedContentManager.js"/>
+
+        <!--All images-->
+        <resource type="download" name="images/templates" location="/images/templates"/>
+        <resource type="download" name="images" location="/images"/>
+        <resource type="download" name="images/wijeditor/" location="/images/wijeditor"/>
+
+        <!--Icons & Fonts-->
+        <resource type="download" name="FontAwesome.otf" location="/fonts/excellentable/fontawesome/FontAwesome.otf"/>
+        <resource type="download" name="fontawesome-webfont.eot" location="/fonts/excellentable/fontawesome/fontawesome-webfont.eot"/>
+        <resource type="download" name="fontawesome-webfont.svg" location="/fonts/excellentable/fontawesome/fontawesome-webfont.svg"/>
+        <resource type="download" name="fontawesome-webfont.ttf" location="/fonts/excellentable/fontawesome/fontawesome-webfont.ttf"/>
+        <resource type="download" name="fontawesome-webfont.woff" location="/fonts/excellentable/fontawesome/fontawesome-webfont.woff"/>
+        <resource type="download" name="font-awesome.css" location="/fonts/excellentable/fontawesome/font-awesome.css"/>
+        <resource type="download" name="fonticons" location="/excellentable/fonticons"/>
+        <resource type="download" name="IcoMoon.eot" location="/fonts/excellentable/icomoons/icomoon.eot"/>
+        <resource type="download" name="IcoMoon.svg" location="/fonts/excellentable/icomoons/icomoon.svg"/>
+        <resource type="download" name="IcoMoon.ttf" location="/fonts/excellentable/icomoons/icomoon.ttf"/>
+        <resource type="download" name="IcoMoon.woff" location="/fonts/excellentable/icomoons/icomoon.woff"/>
+        <resource type="download" name="IcoMoon.woff2" location="/fonts/excellentable/icomoons/icomoon.woff2"/>
+        <resource type="download" name="fonts/" location="/fonts"/>
+        <resource type="download" name="load-external-fonts.css" location="/css/fonts/load-external-fonts.css"/>
+        <resource type="download" name="IcoMoon.css" location="/fonts/excellentable/icomoons/style.css"/>
+        <!--Excellentable functionality code-->
+        <resource type="download" name="menubarControls.js" location="/js/excellentable/menubarControls/menubarControls.js"/>
+        <resource type="download" name="tabstrip.js" location="/js/excellentable/tabstrip/tabstrip.js"/>
+        <resource type="download" name="jQuery.ExcDBOperations.js" location="/excellentable/common/jQuery.ExcDBOperations.js"/>
+        <resource type="download" name="jQuery.Excellentable.js" location="/excellentable/common/jQuery.Excellentable.js"/>
+        <resource type="download" name="ExcellentableManager.js" location="/excellentable/common/ExcellentableManager.js"/>
+        <resource type="download" name="jQuery.ExcCustomPlugins.js" location="/excellentable/common/jQuery.ExcCustomPlugins.js"/>
+        <resource type="download" name="jQuery.ExcDataTypeFormatting.js" location="/excellentable/common/jQuery.ExcDataTypeFormatting.js"/>
+        <resource type="download" name="jQuery.ExcInsertHyperlinkEvents.js" location="/excellentable/common/jQuery.ExcInsertHyperlinkEvents.js"/>
+        <resource type="download" name="jQuery.ExcGenerateData.js" location="/excellentable/common/jQuery.ExcGenerateData.js"/>
+        <resource type="download" name="editHistory.js" location="/js/excellentable/history/editHistory.js"/>
+        <resource type="download" name="versionDiffUtil.js" location="/js/util/versionDiffUtil.js"/>
+        <resource type="download" name="editHistory.css" location="/css/history/editHistory.css"/>
+        <resource type="download" name="excellentable-custom.css" location="/css/excellentable/excellentable-custom.css"/>
+        <resource type="download" name="bouncyBall.css" location="/css/spinner/bouncyBall.css"/>
+        <resource type="download" name="editor.css" location="/css/editor/inlineProcessingNotification.css"/>
+        <resource type="download" name="gcspread.sheets.resources.ja.9.40.20153.0.min.js"
+                  location="/excellentable/spreadjs/resources/js/gcspread.sheets.resources.ja.9.40.20153.0.min.js"/>
+        <resource type="download" name="gcspread.sheets.resources.zh.9.40.20153.0.min.js"
+                  location="/excellentable/spreadjs/resources/js/gcspread.sheets.resources.zh.9.40.20153.0.min.js"/>
+        <resource type="download" name="jQuery.spreadJsInternationalisation.js"
+                  location="/excellentable/spreadjs/internationalisation/jQuery.spreadJsInternationalisation.js"/>
+
+        <!--All .soy files-->
+        <resource type="download" name="editor-soy.js" location="/template/editor.soy"/>
+        <resource type="download" name="dialogs-soy.js" location="/template/dialogs.soy"/>
+        <resource type="download" name="aboutMe-soy.js" location="/template/aboutMe.soy"/>
+        <resource type="download" name="userProfileDialog-soy.js" location="/template/userProfileDialog.soy"/>
+    </web-resource>
+    <web-resource key="excellentableEditorResources" name="Excellentable Editor Web Resources">
+        <dependency>com.atlassian.auiplugin:ajs</dependency>
+        <dependency>com.atlassian.auiplugin:aui-messages</dependency>
+        <dependency>Addteq.Excellentable:spreadJSResourcesV1</dependency>
+        <dependency>confluence.editor.actions:editor-macro-browser</dependency>
+        <transformation extension="js">
+            <transformer key="jsI18n"/>
+        </transformation>
+        <resource type="download" name="excellentableGlobal.js" location="js/util/excellentableGlobal.js"/>
+        <resource type="download" name="jQuery.ExcPageEditOperations.js" location="/js/excellentable/edit/jQuery.ExcPageEditOperations.js"/>
+        <resource type="download" name="loadExcellentable.js" location="/js/excellentable/view/loadExcellentable.js"/>
+        <resource type="download" name="shareFilter.js" location="/js/excellentable/view/shareFilter.js"/>
+        <resource type="download" name="printExcellentable.js" location="/js/excellentable/view/printExcellentable.js"/>
+
+        <context>atl.general</context>
+    </web-resource>
+    <web-resource key="share-filter-resources" name="Excellentable Share Filter Web Resources">
+        <resource type="download" name="envelope.png" location="/images/share/envelope.png"/>
+        <resource type="download" name="group.png" location="/images/share/group.png"/>
+        <resource type="download" name="pageIcon.png" location="/images/share/pageIcon.png"/>
+        <context>page</context>
+    </web-resource>
+    <web-resource key="excellentable-admin" name="Excellentable Admin Config Web Resources">
+        <dependency>com.atlassian.auiplugin:ajs</dependency>
+        <dependency>confluence.web.resources:ajs</dependency>
+        <dependency>confluence.web.resources:jquery</dependency>
+        <dependency>com.atlassian.auiplugin:aui-toggle</dependency>
+
+        <transformation extension="js">
+            <transformer key="jsI18n"/>
+        </transformation>
+        <transformation extension="soy">
+            <transformer key="soyTransformer">
+                <functions>com.atlassian.confluence.plugins.soy:soy-core-functions</functions>
+            </transformer>
+        </transformation>
+        <resource type="download" name="jQuery.ExcCustomPlugins.js" location="/excellentable/common/jQuery.ExcCustomPlugins.js"/>
+        <resource type="download" name="liveEditConfig.css" location="/css/admin/liveEditConfig.css"/>
+        <resource type="download" name="liveEditAgreement-soy.js" location="/template/excellentable/multiedit/liveEditAgreement.soy"/>
+        <resource type="download" name="collaborativeEdit.js" location="/js/excellentable/admin/collaborativeEdit.js"/>
+        <context>atl.admin</context>
+    </web-resource>
+    <ao key="ao-module">
+        <description>The module configuring the Active Objects service used by this plugin</description>
+        <entity>com.addteq.confluence.plugin.excellentable.ao.ExcellentableDB</entity>
+        <entity>com.addteq.confluence.plugin.excellentable.ao.ETShare</entity>
+
+        <entity>com.addteq.confluence.plugin.excellentable.ao.ETShareDetails</entity>
+        <entity>com.addteq.confluence.plugin.excellentable.ao.EditHistoryDB</entity>
+        <entity>com.addteq.confluence.plugin.excellentable.multiedit.ao.CollaboratorDB</entity>
+        <entity>com.addteq.confluence.plugin.excellentable.multiedit.ao.LiveEditConfigDB</entity>
+        <entity>com.addteq.confluence.plugin.excellentable.whatsNew.ao.WhatsNewDB</entity>
+        <entity>com.addteq.confluence.plugin.excellentable.multiedit.ao.LiveEditRegisterDB</entity>
+    </ao>
+    <rest name="Excellentable Rest Resource" i18n-name-key="com.addteq.confluence.plugin.excellentable.rest.resource.name"
+          key="excellentable-rest-resource" path="/excellentable" version="1.0">
+        <description key="my-rest-resource.description">The My Rest Resource Plugin</description>
+    </rest>
+    <macro name="excellentable" class="com.addteq.confluence.plugin.excellentable.macro.ExcellentableMacro" key="Excellentablemacro"/>
+    <xhtml-macro name="excellentable" class="com.addteq.confluence.plugin.excellentable.macro.ExcellentableMacro"
+                 key="Excellentablemacro-xhtml" documentation-url="https://addteq.atlassian.net/wiki/display/EXCL"
+                 icon="/download/resources/${project.groupId}.${project.artifactId}/images/addteq-plugin-icon.png">
+        <description key="This is a plugin for enhancing the table and search functionality in Atlassian Confluence"/>
+        <parameters>
+            <parameter name="excellentable-id">
+                <option key="showNameInPlaceholder" value="false"/>
+                <option key="showValueInPlaceholder" value="false"/>
+            </parameter>
+            <parameter name="creation">
+                <option key="showNameInPlaceholder" value="false"/>
+                <option key="showValueInPlaceholder" value="false"/>
+            </parameter>
+        </parameters>
+    </xhtml-macro>
+    <!-- Excellentable Blueprint web resources -->
+    <web-resource key="excellentableBlueprintResources" name="Excellentable BlueprintWeb Resources">
+        <transformation extension="soy">
+            <transformer key="soyTransformer">
+                <functions>com.atlassian.confluence.plugins.soy:soy-core-functions</functions>
+            </transformer>
+        </transformation>
+        <resource type="download" name="excellentableBlueprint.soy.js" location="/blueprint/soy/excellentableBlueprint.soy"/>
+        <resource type="download" name="jQuery.excellentableBlueprint.js" location="/blueprint/js/jQuery.excellentableBlueprint.js"/>
+        <resource type="download" name="excellentableBlueprint.css" location="/blueprint/css/excellentableBlueprint.css"/>
+        <resource type="download" name="images/" location="/blueprint/images"/>
+        <context>excellentable-blueprint</context>
+        <context>atl.general</context>
+        <context>atl.admin</context>
+    </web-resource>
+
+    <!-- Inline menu web resources to add Excellentable inline in view mode -->
+    <web-resource key="confluence-highlight-actions-plugin-resources" name="confluence-highlight-actions-plugin Web Resources">
+        <!-- transform calls to AJS.getText() inside JS files -->
+        <transformation extension="js">
+            <transformer key="jsI18n"/>
+        </transformation>
+
+        <!-- transform Soy templates into JS -->
+        <transformation extension="soy">
+            <transformer key="soyTransformer">
+                <functions>com.atlassian.confluence.plugins.soy:soy-core-functions</functions>
+            </transformer>
+        </transformation>
+
+        <dependency>com.atlassian.auiplugin:ajs</dependency>
+
+        <resource type="download" name="highlightActionsDialog.css" location="/css/inlineMenu/highlightActionsDialog.css"/>
+        <resource type="download" name="highlightActionsDialog.js" location="/js/excellentable/inlineMenu/highlightActionsDialog.js"/>
+        <resource type="download" name="panelHelper.js" location="/js/excellentable/inlineMenu/panelHelper.js"/>
+        <resource type="download" name="highlightDialog.js" location="/template/inlineMenu/highlightDialog.soy"/>
+        <resource type="download" name="images/" location="/images"/>
+
+        <context>viewcontent</context>
+    </web-resource>
+
+    <!-- Excellentable Blueprint -->
+    <content-template key="excellentable-blueprint-template" i18n-name-key="com.addteq.confluence.plugin.excellentable.blueprint">
+        <resource name="template" type="download" location="blueprint/xml/excellentable-blueprint-template.xml"/>
+        <context-provider class="com.addteq.confluence.plugin.excellentable.blueprint.ExcellentableBlueprintContextProvider"/>
+    </content-template>
+    <web-item key="excellentable-blueprint-item" i18n-name-key="com.addteq.confluence.plugin.excellentable.blueprint"
+              section="system.create.dialog/content">
+        <description key="com.addteq.confluence.plugin.excellentable.blueprint.description"/>
+        <resource name="icon" type="download" location="images/addteq-plugin-icon.png"/>
+        <param name="blueprintKey" value="excellentable-blueprint"/>
+    </web-item>
+    <blueprint key="excellentable-blueprint" i18n-name-key="com.addteq.confluence.plugin.excellentable.blueprint"
+               index-key="excellentable">
+        <content-template ref="excellentable-blueprint-template"/>
+        <dialog-wizard key="excellentablebp-wizard">
+            <dialog-page id="excellentableBpPage1" template-key="Confluence.Templates.Excellentable.BlueprintWizard"
+                         title-key="com.addteq.confluence.plugin.excellentable.blueprint"/>
+        </dialog-wizard>
+    </blueprint>
+    <web-item key="addteqdatatable" name="Excellentable" section="system.editor.featured.macros.default" weight="11">
+        <label key="Excellentable"/>
+        <link linkId="excellentable"/>
+    </web-item>
+    <!--Web section and items for admin screen-->
+    <web-section name="ExcellentableAdminConfiguration" i18n-name-key="com.addteq.confluence.plugin.excellentable.admin.config.web-seciton"
+                 key="excellentable" location="system.admin" weight="10">
+        <description key="excellentable.description">The Excellentable Plugin</description>
+        <label key="Excellentable"/>
+    </web-section>
+    <web-item key="excellentable-admin-web-item" name="Excellentable Plugin Web Item"
+              i18n-name-key="com.addteq.confluence.plugin.excellentable.collaborative.admin.web.item.name"
+              section="system.admin/excellentable" weight="503">
+        <description>Configuration</description>
+        <label key="com.addteq.confluence.plugin.excellentable.collaborative.admin.web.item.name"></label>
+        <link linkId="excellentable-collaborativeEdit-admin-web-item-link">/admin/excellentable/multieditConfig.action</link>
+    </web-item>
+
+    <!-- register a button when hightlighting text -->
+    <web-item key="insert-excellentable" name="Insert Excellentable" section="page.view.selection/action-panel" weight="30">
+        <label key="com.addteq.confluence.plugin.excellentable.page.view.selection.action-panel.text"/>
+        <styleClass>eui-attachment-icon</styleClass>
+    </web-item>
+
+    <xwork name="ExcellentableAdminConfig" key="ExcellentableAdminConfig">
+        <package name="Excellentable Action" extends="default" namespace="/admin/excellentable">
+            <default-interceptor-ref name="defaultStack"/>
+            <!-- Action for add on's page Configuration link -->
+            <action name="multieditConfig" class="com.addteq.confluence.plugin.excellentable.action.MultieditSettingsAction">
+                    <result name="success" type="velocity">/template/excellentable/multiedit/configuration.vm</result>
+                    <result name="error" type="velocity">/template/excellentable/multiedit/configuration.vm</result>
+            </action>
+        </package>
+    </xwork>
+    <!--=============================================================================================================
+    = This filters all the rest calls made to enable/disable Live Editing whose URL pattern is */multieditconfig/* ==
+    = This filter can be used for any rest calls which need authorization check as Confluence System Admin. To add ==
+    = more such rest api ADD one more <url-pattern> under this servlet-filter.
+    ==============================================================================================================-->
+    <servlet-filter name="Admin Authorization Filter" i18n-name-key="com.addteq.confluence.plugin.excellentable.filter.admin-authorization"
+                key="admin-authorization-filter" location="before-dispatch"
+                class="com.addteq.confluence.plugin.excellentable.filter.AuthorizationFilter" weight="100">
+        <description key="com.addteq.confluence.plugin.excellentable.filter.admin-authorization.desc">
+            Admin Authorization Filter for all the API calls
+        </description>
+        <url-pattern>*/multieditconfig/*</url-pattern>
+    </servlet-filter>
+
+    <!--Whats New-->
+    <web-resource name="Whats New Resource" key="com.addteq.confluence.plugin.whatsNew">
+        <dependency>com.atlassian.auiplugin:ajs</dependency>
+        <!-- transform Soy templates into JS -->
+        <transformation extension="js">
+            <transformer key="jsI18n"/>
+        </transformation>
+        <transformation extension="soy">
+            <transformer key="soyTransformer">
+                <functions>com.atlassian.confluence.plugins.soy:soy-core-functions</functions>
+            </transformer>
+        </transformation>
+        <resource type="download" name="animate.css" location="/css/whatNew/external/animate.css"/>
+        <resource type="download" name="whatsNew-soy.js" location="/template/whatsNew/whatsNew.soy"/>
+        <resource type="download" name="whatsNew.js" location="/js/whatsNew/whatsNew.js"/>
+        <resource type="download" name="whatsNew.css" location="/css/whatNew/whatsNew.css"/>
+        <resource type="download" name="images/" location="/images"/>
+        <context>atl.general</context>
+    </web-resource>
+
+    <!-- HTML/PDF resources -->
+
+    <web-resource key="exc-html-pdf" name="HTML PDF Resources">
+
+        <!--Icons & Fonts-->
+        <resource type="download" name="FontAwesome.otf" location="/fonts/excellentable/fontawesome/FontAwesome.otf"/>
+        <resource type="download" name="fontawesome-webfont.eot" location="/fonts/excellentable/fontawesome/fontawesome-webfont.eot"/>
+        <resource type="download" name="fontawesome-webfont.svg" location="/fonts/excellentable/fontawesome/fontawesome-webfont.svg"/>
+        <resource type="download" name="fontawesome-webfont.ttf" location="/fonts/excellentable/fontawesome/fontawesome-webfont.ttf"/>
+        <resource type="download" name="fontawesome-webfont.woff" location="/fonts/excellentable/fontawesome/fontawesome-webfont.woff"/>
+        <resource type="download" name="font-awesome.css" location="/fonts/excellentable/fontawesome/font-awesome.css"/>
+        <resource type="download" name="fonticons" location="/excellentable/fonticons"/>
+        <resource type="download" name="IcoMoon.eot" location="/fonts/excellentable/icomoons/icomoon.eot"/>
+        <resource type="download" name="IcoMoon.svg" location="/fonts/excellentable/icomoons/icomoon.svg"/>
+        <resource type="download" name="IcoMoon.ttf" location="/fonts/excellentable/icomoons/icomoon.ttf"/>
+        <resource type="download" name="IcoMoon.woff" location="/fonts/excellentable/icomoons/icomoon.woff"/>
+        <resource type="download" name="IcoMoon.woff2" location="/fonts/excellentable/icomoons/icomoon.woff2"/>
+        <resource type="download" name="fonts/" location="/fonts"/>
+        <resource type="download" name="load-external-fonts.css" location="/css/fonts/load-external-fonts.css"/>
+        <resource type="download" name="IcoMoon.css" location="/fonts/excellentable/icomoons/style.css"/>
+
+    </web-resource>
+
+</atlassian-plugin>

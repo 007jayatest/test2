@@ -1,0 +1,17 @@
+.highlighted-text-content {
+    text-align: justify;
+    margin-bottom: 10px;
+}
+
+.eui-insert-exc-button-group {
+    clear: both;
+    text-align: right;
+}
+
+.eui-attachment-icon {
+    background-repeat: no-repeat;
+    background-image: url("images/exc-sq-icon.png");
+    background-size: 16px;
+    min-height:16px;
+    max-height:16px;
+}

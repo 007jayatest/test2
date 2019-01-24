@@ -1,0 +1,205 @@
+.wnm-container{
+    overflow: hidden;
+    outline: 0;
+    z-index: 1050;
+    padding-right: 15px;
+    width: fit-content;
+    display: block;
+    height: fit-content;
+    position: fixed;
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+.wnm-location{
+    right: 20px;
+    top: 100px;
+}
+.wnm-content{
+    background: transparent;
+    width: 400px;
+    border: 0px;
+    position: relative;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+    outline: 0
+}
+.wnm-logo{
+    border: 2px solid white;
+    width: 68px;
+    height: 68px;
+    border-radius: 50px;
+    position: relative;
+    left: 36%;
+    top: 2px;
+    z-index: 10;
+    content: url("images/addteq-plugin-icon-140by140.png");
+    background: url("images/addteq-plugin-icon-140by140.png") no-repeat;
+    background-size:  68px;
+    background-position-x: center;
+    background-position-y: center;
+}
+.wnm-header{
+    max-height: 0px;
+    background: transparent;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-pack: justify;
+    -webkit-justify-content: space-between;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+    padding: 15px;
+}
+.wnm-body{
+    background: white;
+    border-top-right-radius: 6px;
+    border-top-left-radius: 6px;
+    border: 1px solid rgba(0,0,0,.2);
+    border-bottom: 0px;
+    position: relative;
+    -webkit-box-flex: 1;
+    -webkit-flex: 1 1 auto;
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+    padding: 15px
+}
+.wnm-footer{
+    background: white;
+    border: 1px solid rgba(0,0,0,.2);
+    border-bottom-right-radius: 6px;
+    border-bottom-left-radius: 6px;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-pack: end;
+    -webkit-justify-content: flex-end;
+    -ms-flex-pack: end;
+    justify-content: flex-end;
+    padding: 15px;
+}
+.wnm-dialog {
+    -webkit-transition: -webkit-transform .3s ease-out;
+    transition: -webkit-transform .3s ease-out;
+    -o-transition: -o-transform .3s ease-out;
+    transition: transform .3s ease-out;
+    transition: transform .3s ease-out, -webkit-transform .3s ease-out, -o-transform .3s ease-out;
+    -webkit-transform: translate(0, -25%);
+    -o-transform: translate(0, -25%);
+    transform: translate(0, -25%)
+}
+.wnm-dialog {
+    -webkit-transform: translate(0, 0);
+    -o-transform: translate(0, 0);
+    transform: translate(0, 0)
+}
+
+.wnm-dialog {
+    position: relative;
+    width: auto;
+    margin: 10px
+}
+@media (min-width: 576px) {
+    .wnm-dialog {
+        max-width: 500px;
+        margin: 30px auto
+    }
+}
+
+.wnm-btn-primary {
+    color: #fff;
+    background-color: #0275d8;
+    border-color: #0275d8
+}
+
+.wnm-btn-primary:hover {
+    color: #fff;
+    background-color: #025aa5;
+    border-color: #01549b
+}
+
+.wnm-btn-primary:focus {
+    /*-webkit-box-shadow: 0 0 0 2px rgba(2, 117, 216, .5);*/
+    /*box-shadow: 0 0 0 2px rgba(2, 117, 216, .5)*/
+}
+
+.wnm-btn-primary:disabled {
+    background-color: #0275d8;
+    border-color: #0275d8
+}
+
+.wnm-btn-primary:active {
+    color: #fff;
+    background-color: #025aa5;
+    background-image: none;
+    border-color: #01549b
+}
+.wnm-close {
+    position: relative;
+    top: -.75rem;
+    color: inherit;
+    float: right;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+    text-shadow: 0 1px 0 #fff;
+    opacity: .5;
+    cursor: pointer;
+    background: 0 0;
+    border: 0;
+    -webkit-appearance: none;
+    left: 8px
+}
+
+.wnm-close:focus, .wnm-close:hover {
+    outline: 0;
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+    opacity: .75
+}
+
+.wnm-btn {
+    cursor: pointer;
+    right: 5px;
+    display: inline-block;
+    font-weight: 400;
+    line-height: 1.25;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    border: 1px solid transparent;
+    padding: .5rem 1rem;
+    font-size: 1rem;
+    border-radius: .25rem;
+    -webkit-transition: all .2s ease-in-out;
+    -o-transition: all .2s ease-in-out;
+    transition: all .2s ease-in-out
+}
+
+.wnm-btn:focus, .wnm-btn:hover {
+    outline: 0;
+    text-decoration: none
+}

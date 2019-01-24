@@ -1,0 +1,64 @@
+/*
+    Created on : Jan 29, 2018, 11:23:05 AM
+    Author     : Vikash Kumar <vikash.kumar@addteq.com>
+*/
+
+.eui-attachment-icon {
+    background-image: url("images/editor/attachment-icon.png");
+    background-size: 100%;
+    border-radius: 2px;
+}
+.eui-close {
+    position: relative;
+    float: right;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    background: 0 0;
+    border: 0;
+    -webkit-appearance: none;
+    right: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    height: 32px;
+}
+.eui-close:hover {
+    background-color: transparent;
+}
+.eui-attachment-menu-container {
+    min-height: 40px;
+    overflow: unset;
+    padding: 0 0;
+    background-color: white;
+}
+button.openExcellentable {
+    background: 0;
+}
+button.openExcellentable:hover {
+    outline: none;
+    cursor: pointer;
+}
+.eui-logo{
+
+    background-repeat: no-repeat;
+    background-image: url("images/exc-sq-icon.png");
+    background-size: 40px;
+    min-height:40px;
+    max-height:40px;
+    height:100%;
+    padding-left:50px;
+    padding-top: 3px;
+    display: block;
+    position: absolute;
+}
+#euiButtonContainer{
+    padding-left: 45px;
+    padding-top: 5px;
+}
+.eui-show-dialog{
+    display: block;
+    z-index: 3100;
+    overflow: visible;
+    position: fixed;
+}

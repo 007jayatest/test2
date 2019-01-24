@@ -1,0 +1,5 @@
+#requireResource("Addteq.Excellentable:exc-html-pdf")
+
+<style type="text/css">
+  #include("css/excellentable/excellentable-html.css")
+</style>

@@ -1,0 +1,67 @@
+{namespace Confluence.Templates.Excellentable}
+
+/************************************************
+ * Excellentable about details dialog
+ ***********************************************/
+{template .aboutDialog autoescape="false"}
+{@param updateLink: html}
+                <!-- Render the dialog -->
+                <div>
+                <section role="dialog" id="euiAboutDialog" class="aui-layer aui-dialog2 aui-dialog2-medium" aria-hidden="true" data-aui-modal="true">
+                    <!-- Dialog header -->
+                    <header class="aui-dialog2-header">
+                        <!-- The dialog's title -->
+                        <h2 class="aui-dialog2-header-main">{getText('com.addteq.confluence.plugin.excellentable.about.header.message1')}</h2>
+                        <!-- Actions to render on the right of the header -->
+
+                        <!-- Close icon -->
+                        <a class="aui-dialog2-header-close">
+                            <span class="aui-icon aui-icon-small aui-iconfont-close-dialog">{getText('com.addteq.confluence.plugin.excellentable.import.dialog.close.button')}</span>
+                        </a>
+                    </header>
+                    <!-- Main dialog content -->
+                    <div class="aui-dialog2-content">
+                     
+                    <h4>
+                        <div id = "euiAboutHeader"> 
+                            <span> <img class = "eui-about-head-img" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/addteq-plugin-icon.png" alt="logo" /></span>
+                            <span class = "eui-about-head-txt">{getText('com.addteq.confluence.plugin.excellentable.blueprint')}</span>
+                        </div>
+                    </h4>
+                    <hr>
+                    {$updateLink}
+                    <p><a href="https://nebula.addteq.com/display/EXC/Excellentable" target="_blank">{getText('Get help with Excellentable')}</a></p>
+                    <hr>
+                    <p>{getText('com.addteq.confluence.plugin.excellentable.about.copyright.message')}</p>
+                    <p><a href = " https://nebula.addteq.com/display/EXC/Excellentable+Privacy+Policy" target="_blank">{getText('com.addteq.confluence.plugin.excellentable.about.terms.servive')}</a></p>
+                    <hr>
+                    <section>
+                        <h4>{getText('com.addteq.confluence.plugin.excellentable.about.collaborator')}</h4>
+                        <ul>
+                            <li>{getText('com.addteq.confluence.plugin.excellentable.about.collaborator1')}</li>
+                            <li>{getText('com.addteq.confluence.plugin.excellentable.about.collaborator2')}</li>
+                            <li>{getText('com.addteq.confluence.plugin.excellentable.about.collaborator3')}</li>
+                            <li>{getText('com.addteq.confluence.plugin.excellentable.about.collaborator4')}</li>
+                            <li>{getText('com.addteq.confluence.plugin.excellentable.about.collaborator5')}</li>
+                            <li>{getText('com.addteq.confluence.plugin.excellentable.about.collaborator6')}</li>
+                            <li>{getText('com.addteq.confluence.plugin.excellentable.about.collaborator7')}</li>
+                            <li>{getText('com.addteq.confluence.plugin.excellentable.about.collaborator8')}</li>
+                            <li>{getText('com.addteq.confluence.plugin.excellentable.about.collaborator9')}</li>
+                            <li>{getText('com.addteq.confluence.plugin.excellentable.about.collaborator10')}</li>
+                            <li>{getText('com.addteq.confluence.plugin.excellentable.about.collaborator11')}</li>
+                            <li>{getText('com.addteq.confluence.plugin.excellentable.about.collaborator12')}</li>
+                            <li>{getText('com.addteq.confluence.plugin.excellentable.about.collaborator13')}</li>
+                        </ul>
+                    </section>
+                    </div>
+                    <!-- Dialog footer -->
+                    <footer class="aui-dialog2-footer">
+                        <!-- Actions to render on the right of the footer -->
+                        <div class="aui-dialog2-footer-actions">
+                            <button id="dialog-close-button" class="aui-button aui-button-link">{getText('com.addteq.confluence.plugin.excellentable.import.dialog.close.button')}</button>
+                        </div>
+
+                    </footer>
+                </section>
+            </div>
+{/template}

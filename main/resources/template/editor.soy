@@ -1,0 +1,1960 @@
+{namespace Confluence.Templates.Excellentable}
+/******************************************
+ *  Excellentable Edit mode template.
+ *  @param contextPath
+ *  @param isMac
+ *******************************************/
+{template .Spread}
+
+<!-- Class first-item and last-item are used to give rounded corner to the selected items in the context menu to match the dialog corner.
+    Addition of new menu items in future shall keep the first-item and last-item classes at it's respective place for example,
+    - items can be added in middle Or
+    - any item added at top or bottom shall have the first-item and last-item as class name and no other items.
+    - Merge and Unmerge are the last items because those appear one at a time.
+-->
+
+/**** Spread Context Menu ****/
+<aui-dropdown-menu id="euiSpreadContextMenu" role="menu" style="left: 832px; top: 411px; display: none;">
+    <aui-section>
+        <aui-item-link data-action="cut" name="cut" class="eui-first-item">
+            <span class="icon-icomoon icon-scissors icomoon-icon-small"></span>&nbsp;{getText('com.addteq.confluence.plugin.excellentable.context.menu.cut')}
+        </aui-item-link>
+        <aui-item-link data-action="copy" name="copy">
+            <span class="aui-icon aui-icon-small aui-iconfont-copy-clipboard"></span>&nbsp;{getText('com.addteq.confluence.plugin.excellentable.context.menu.copy')}
+        </aui-item-link>
+        <aui-item-link data-action="paste" name="paste">
+            <span class="icon-icomoon icon-clipboard"></span>&nbsp;{getText('com.addteq.confluence.plugin.excellentable.context.menu.paste')}
+        </aui-item-link>
+        <aui-item-link data-action="unlink" name="unlink">
+            <span class="aui-icon aui-icon-small aui-iconfont-unlink"></span>&nbsp;{getText('com.addteq.confluence.plugin.excellentable.context.menu.unlink')}
+        </aui-item-link>
+        <aui-item-link class="context-menu-trigger" for="euiPasteSpecial">
+            <span class="icon-icomoon icon-paste"></span>
+            &nbsp;{getText('com.addteq.confluence.plugin.excellentable.context.menu.paste.special')}
+        </aui-item-link>
+        <aui-item-link data-action="insert" name="insert" class="eui-context-header" style="display: none;">
+            {getText('com.addteq.confluence.plugin.excellentable.context.menu.insert')}
+        </aui-item-link>
+        <aui-item-link data-action="delete" name="delete" class="eui-context-header" style="display: none;">
+            {getText('com.addteq.confluence.plugin.excellentable.context.menu.delete')}
+        </aui-item-link>
+        <aui-item-link class="eui-divider"></aui-item-link>
+        <aui-item-link data-action="merge" name="merge" class="eui-context-cell eui-context-merge eui-last-item" style="display: none;">
+            <span class="aui-icon aui-icon-small aui-iconfont-table-merge"></span>&nbsp;
+                {getText('com.addteq.confluence.plugin.excellentable.context.menu.merge')}
+        </aui-item-link>
+        <aui-item-link data-action="unmerge" name="unmerge" class="eui-context-cell eui-context-unmerge eui-last-item" style="display: none;">
+            <span class="aui-icon aui-icon-small aui-iconfont-table-split"></span>&nbsp;
+            {getText('com.addteq.confluence.plugin.excellentable.context.menu.unmerge')}
+        </aui-item-link>
+        <aui-item-link data-action="comment" name="comment">
+            <span class="icon-icomoon icon-bubbles2"></span>&nbsp;
+            {getText('com.addteq.confluence.plugin.excellentable.note')}
+        </aui-item-link>
+        <aui-item-link data-action="protectcell" class="eui-last-item" name="protectcell">
+            <span class="aui-icon aui-icon-small aui-iconfont-locked"></span>&nbsp;
+            {getText('com.addteq.confluence.plugin.excellentable.context.menu.protect.cells')}
+        </aui-item-link>
+
+        <aui-item-link data-action="conditionalformatting" class="context-menu-trigger eui-last-item" for="euiConditionalFormat" name="conditionalFormatting">
+            <span class="aui-icon aui-icon-small aui-iconfont-new-edit"></span>&nbsp;
+            {getText('com.addteq.confluence.plugin.excellentable.context.menu.conditionalformatting')}
+        </aui-item-link>
+    </aui-section>
+</aui-dropdown-menu>
+
+
+/**** paste special ***/
+
+<aui-dropdown-menu id="euiPasteSpecial" role="menu">
+    <aui-section>
+        <aui-item-link data-action="pastevaluesonly" name="pastevaluesonly" class="eui-first-item">
+            {getText('com.addteq.confluence.plugin.excellentable.context.menu.paste.special.values')|noAutoescape}
+        </aui-item-link>
+        <aui-item-link data-action="pasteformatsonly" name="pasteformatsonly">
+            {getText('com.addteq.confluence.plugin.excellentable.context.menu.paste.special.format')|noAutoescape}
+        </aui-item-link>
+        <aui-item-link data-action="pasteformulaonly" name="pasteformulaonly">
+            {getText('com.addteq.confluence.plugin.excellentable.context.menu.paste.special.formula')|noAutoescape}
+        </aui-item-link>
+        <aui-item-link data-action="Pastallexceptborders" name="Pastallexceptborders" class="eui-last-item">
+            {getText('com.addteq.confluence.plugin.excellentable.context.menu.paste.special.except.border')|noAutoescape}
+        </aui-item-link>
+    </aui-section>
+</aui-dropdown-menu>
+
+/**** Border Dialog ***/
+<section id="euiBorderFormat" class="aui-dialog2 aui-dialog2-small aui-layer" role="dialog" aria-hidden="true">
+    <header class="aui-dialog2-header">
+        <h2 class="aui-dialog2-header-main">{getText('com.addteq.confluence.plugin.excellentable.border')}</h2>
+        <a class="aui-dialog2-header-close">
+            <span class="aui-icon aui-icon-small aui-iconfont-close-dialog">Close</span>
+        </a>
+    </header>
+    <div class="aui-dialog2-content">
+    <h4>Type:&nbsp;<a href="https://www.addteq.com/exc/user-guide/edit-mode/how-to-use-borders" target="_blank" style="color:#52b052;" title="{getText('com.addteq.confluence.plugin.excellentable.help')}">
+                      <span class="aui-icon aui-icon-small aui-iconfont-help">{getText('com.addteq.confluence.plugin.excellentable.help')}</span>
+                    </a>
+    </h4>
+        <div class="tablecontainer">
+            <svg id="euisvgtable" class="normal eui-border eui-border-type default">
+                <line class="default" for="border" data-src="top" x1="6" x2="200" y1="6" y2="6" />
+                <line class="default" for="border" data-src="innerHorizontal" x1="6" x2="200" y1="53" y2="53" />
+                <line class="default" for="border" data-src="bottom" x1="6" x2="200" y1="100" y2="100" />
+                <line class="default" for="border" data-src="left" x1="6"  x2="6" y1="6"y2="100" />
+                <line class="default" for="border" data-src="innerVertical" x1="103" x2="103" y1="6" y2="100" />
+                <line class="default" for="border" data-src="right" x1="200" x2="200" y1="6" y2="100" />
+                <line class="eui-background" data-src="top" x1="6" x2="200" y1="6" y2="6" />
+                <line class="eui-background" data-src="innerHorizontal" x1="6" x2="200" y1="53" y2="53" />
+                <line class="eui-background" data-src="bottom" x1="6" x2="200" y1="100" y2="100" />
+                <line class="eui-background" data-src="left" x1="6"  x2="6" y1="6" y2="100" />
+                <line class="eui-background" data-src="innerVertical" x1="103" x2="103" y1="6" y2="100" />
+                <line class="eui-background" data-src="right" x1="200" x2="200" y1="6" y2="100" />
+            </svg>
+        </div>
+        <table class="eui-border borderoptions">
+        <tr>
+        <td>
+            <h4>Style:&nbsp;</h4>
+        </td>
+        <td>
+            <button class="aui-button aui-dropdown2-trigger eui-border-type" id="euiLineStyle" aria-controls="euisvgtablestyle"><svg class="eui-border eui-border-type"><line x1="0" x2="200" y1="10" y2="10" /></svg></button>
+        </td>
+        </tr>
+        <tr>
+        <td>
+            <h4>Color:</h4>
+        </td>
+        <td>
+        <div><input type='text' id="togglePaletteOnly" /></div>
+        </td>
+        </tr>
+        <tr>
+        <td>
+        </td>
+        <td><button class="aui-button" id="euiBorderClear">Reset Defaults</button></td>
+        </tr>
+        </table>
+
+
+        <aui-dropdown-menu id="euisvgtablestyle" class="eui-border">
+          <aui-section>
+            <aui-item-link class="eui-border-type" title="Thin" checked><svg class="eui-border"><line class="thin" x1="0" x2="200" y1="10" y2="10" /></svg></aui-item-link>
+            <aui-item-link class="eui-border-type" title="Medium"><svg class="eui-border"><line class="medium" x1="0" x2="200" y1="10" y2="10" /></svg></aui-item-link>
+            <aui-item-link class="eui-border-type" title="Dashed"><svg class="eui-border"><line class="dashed" x1="0" x2="200" y1="10" y2="10" /></svg></aui-item-link>
+            <aui-item-link class="eui-border-type" title="Dotted"><svg class="eui-border"><line class="dotted" x1="0" x2="200" y1="10" y2="10" /></svg></aui-item-link>
+            <aui-item-link class="eui-border-type" title="Thick"><svg class="eui-border"><line class="thick" x1="0" x2="200" y1="10" y2="10" /></svg></aui-item-link>
+            <aui-item-link class="eui-border-type" title="Hair"><svg class="eui-border"><line class="hair" x1="0" x2="200" y1="10" y2="10" /></svg></aui-item-link>
+            <aui-item-link class="eui-border-type" title="Medium Dashed"><svg class="eui-border"><line class="mediumDashed" x1="0" x2="200" y1="10" y2="10" /></svg></aui-item-link>
+            <aui-item-link class="eui-border-type" title="Dash Dot"><svg class="eui-border"><line class="dashDot" x1="0" x2="200" y1="10" y2="10" /></svg></aui-item-link>
+            <aui-item-link class="eui-border-type" title="Medium Dash Dot"><svg class="eui-border"><line class="mediumDashDot" x1="0" x2="200" y1="10" y2="10" /></svg></aui-item-link>
+            <aui-item-link class="eui-border-type" title="Dash Dot Dot"><svg class="eui-border"><line class="dashDotDot" x1="0" x2="200" y1="10" y2="10" /></svg></aui-item-link>
+            <aui-item-link class="eui-border-type" title="Medium Dash Dot Dot"><svg class="eui-border"><line class="mediumDashDotDot" x1="0" x2="200" y1="10" y2="10" /></svg></aui-item-link>
+          </aui-section>
+         </aui-dropdown-menu>
+    </div>
+</section>
+
+
+/**** Data Validation Dialog ***/
+<div id="euiDataValidationDialog" class="eui-menu-dialog" title="Data Validation">
+    <ul>
+        <li>
+            <a href="#euiTabValidationSettings">Settings</a>
+        </li>
+        <li>
+            <a href="#euiTabValidationInputMessage" id="euiValidationInputMessge">Input Message</a>
+        </li>
+        <li>
+            <a href="#euiTabValidationErrorAlert" id="euiValidationErrorAlert">Error Alert</a>
+        </li>
+    </ul>
+    <div id="euiTabValidationSettings" class="eui-tab-validation-color">
+        <div class="eui-data-validation-dialog-subdiv">
+            <div>
+                <span>Validation criteria</span>
+            </div>
+            <div class="eui-subdiv">
+                <span>Allow:</span>
+            </div>
+            <div class="eui-subdiv">
+                <select id="euiValidatorTypes">
+                    <option value="AnyValidator" selected>Any value</option>
+                    <option value="NumberValidator">Number</option>
+                    <option value="ListValidator">List</option>
+                    <option value="FormulaListValidator">FormulaList</option>
+                    <option value="DateValidator">Date</option>
+                    <option value="TextLengthValidator">Text length</option>
+                    <option value="FormulaValidator">Custom</option>
+                </select>
+                <input id="euiChkValidatorIgnoreBlank" type="checkbox" class="eui-subdiv" />
+                <label for="euiChkValidatorIgnoreBlank" class="wijmo-wijribbon-checkbox">IgnoreBlank</label>
+            </div>
+            <div style="margin-top: 10px; display:none" id="euiDataTitle">
+                <span>Data:</span>
+            </div>
+            <div id="euiValidatorTab1" class="eui-subdiv">
+                <select id="euiValidatorComparisonOperator">
+                    <option value="6" selected>Between</option>
+                    <option value="7">NotBetween</option>
+                    <option value="0">EqualTo</option>
+                    <option value="1">NotEqualTo</option>
+                    <option value="2">GreaterThan</option>
+                    <option value="4">LessThan</option>
+                    <option value="3">GreaterThanOrEqualTo</option>
+                    <option value="5">LessThanOrEqualTo</option>
+                </select>
+                <div class="eui-subdiv">
+                    <span id="euiRangeStart"></span>
+                    <input id="euiTxtValidatorValue1" placeholder="Value1" class="eui-txt-validator-value">
+                </div>
+                <div class="eui-subdiv">
+                    <span id="euiRangeEnd"></span>
+                    <input id="euiTxtValidatorValue2" placeholder="Value2" class="eui-txt-validator-value">
+                </div>
+                <div id="euiIsTimeTab" class="eui-subdiv">
+                    <input id="euiChkIsTime" type="checkbox" />
+                    <label for="euiChkIsTime" class="wijmo-wijribbon-checkbox"> Is Time </label>
+                </div>
+                <div id="euiIsIntTab" class="eui-subdiv">
+                    <input id="euiChkIsInteger" type="checkbox" />
+                    <label for="euiChkIsInteger" class="wijmo-wijribbon-checkbox"> Is Integer </label>
+                </div>
+            </div>
+            <div id="euiValidatorTab2" class="eui-subdiv">
+                <span id="euiRangeValidator"></span>
+                <input id="euiTxtValidatorValue" placeholder="Value1">
+                <span id="euiPrompt"></span>
+            </div>
+        </div>
+    </div>
+    <div id="euiTabValidationInputMessage"  class="eui-tab-validation-color">
+        <div class="eui-data-validation-dialog-subdiv">
+            <div>
+                <input id="euiChkShowMessage" type="checkbox" />
+                <label for="euiChkShowMessage" class="wijmo-wijribbon-checkbox">
+                        Show input message when cell is selected.
+                </label>
+            </div>
+            <div class="eui-menu-dialog-subdiv">
+                <span>When cell is selected,show this input message:</span>
+            </div>
+            <div style="margin-top: 20px; margin-left: 10px">
+                <div>Title:</div>
+                <input id="euiTxtMessageTitle" placeholder="MessageTitle" style="width:88%" />
+            </div>
+            <div style="margin-top: 20px; margin-left: 10px">
+                <div>Message:</div>
+                <textarea rows="5" id="euiTxtMessageMessage" placeholder="Message" style="width:88%"></textarea>
+            </div>
+        </div>
+    </div>
+    <div id="euiTabValidationErrorAlert" class="eui-tab-validation-color">
+        <div class="eui-data-validation-dialog-subdiv">
+            <div>
+                <input id="euiChkShowError" type="checkbox" />
+                <label for="euiChkShowError" class="wijmo-wijribbon-checkbox">show error alert after invalid data is entered</label>
+            </div>
+            <div class="eui-menu-dialog-subdiv">
+                <span>When the user enters invalid data,show this error alert:</span>
+            </div>
+            <div class="eui-menu-dialog-subdiv">
+                <select id="euiValidatorErrorStyles">
+                    <option value="0" selected>Stop</option>
+                    <option value="1">Warning</option>
+                    <option value="2">Information</option>
+                </select>
+            </div>
+            <div class="eui-menu-dialog-subdiv">
+                <div>Title:</div>
+                <input id="euiTxtErrorTitle" placeholder="ErrorTitle" style="width:88%" />
+            </div>
+            <div class="eui-menu-dialog-subdiv">
+                <div>Message:</div>
+                <textarea rows="5" id="euiTxtErrorMessage" placeholder="ErrorMessage" style="width:88%" ></textarea>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+/**** Conditional Formatting ****/
+<div id="euiConditionalFormatDialog" class="eui-menu-dialog" title="Formatting Rule">
+    <div style="margin-left: 5px; margin-top: 3px;">
+        <div style="margin-left: 5px; margin-top: 10px">
+            <span id="euiRuleText" style="font-weight:bold">Format only cells with:</span>
+        </div>
+        <div style="margin-left: 5px; margin-top: 10px">
+            <span id="euiColorScaleStyle" style="width: 40px; display: none; display: -moz-inline-box;">Style:</span>
+            <select id="euiRule1">
+                <option value="0" selected>Cell Value</option>
+                <option value="1">Specific Text</option>
+                <option value="2">Dates Occurring</option>
+                <option value="3">Formula</option>
+                <option value="4">Top10</option>
+                <option value="5">Unique</option>
+                <option value="6">Duplicate</option>
+                <option value="7">Average</option>
+                <option value="8">2-Color Scale</option>
+                <option value="9">3-Color Scale</option>
+            </select>
+            <select id="euiComparisonOperator1" style="margin-left: 3px">
+                <option value='0' selected>EqualsTo</option>
+                <option value='1'>NotEqualsTo</option>
+                <option value='2'>GreaterThan</option>
+                <option value='3'>GreaterThanOrEqualsTo</option>
+                <option value='4'>LessThan</option>
+                <option value='5'>LessThanOrEqualsTo</option>
+                <option value='6'>Between</option>
+                <option value='7'>NotBetween</option>
+            </select>
+            <input type="input" id="euiValue1" style="width: 60px; margin-left: 3px">
+            <span id="euiAndText" style="display: none; margin-left: 3px">and</span>
+            <input type="input" id="euiValue2" style="width: 60px; margin-left: 3px; display: none">
+            <span id="euiFormatText" style="display: none; margin-left: 5px"></span>
+        </div>
+        <div id="euiColorScale" style="display:block; margin-left: 5px; margin-top: 16px;">
+            <div style="margin-left: 40px">
+                <span>Minimum</span>
+                <span id="euiMidPoint" style="margin-left: 65px">Midpoint</span>
+                <span style="margin-left: 65px">Maximum</span>
+            </div>
+            <div class="eui-subdiv">
+                <span class="eui-conditionalformatdialog-span" class="eui-conditional-format-dialog-span">Type:</span>
+                <select id="euiMinType" class="eui-conditional-format-dialog-color-scale">
+                    <option value="0">Number</option>
+                    <option value="1" selected>LowestValue</option>
+                    <option value="3">Percent</option>
+                    <option value="4">Percentile</option>
+                    <option value="6">Formula</option>
+                </select>
+                <select id="euiMidType" class="eui-conditional-format-dialog-color-scale">
+                    <option value="0">Number</option>
+                    <option value="3">Percent</option>
+                    <option value="4" selected>Percentile</option>
+                    <option value="6">Formula</option>
+                </select>
+                <select id="euiMaxType" class="eui-conditional-format-dialog-color-scale">
+                    <option value="0">Number</option>
+                    <option value="2" selected>HighestValue</option>
+                    <option value="3">Percent</option>
+                    <option value="4">Percentile</option>
+                    <option value="6">Formula</option>
+                </select>
+            </div>
+            <div class="eui-subdiv">
+                <span class="eui-conditional-format-dialog-span">Value:</span>
+                <input id="euiMinValue" type="text" value="" class="eui-conditional-format-dialog-input" />
+                <input id="euiMidValue" type="text" value="50" class="eui-conditional-format-dialog-input" />
+                <input id="euiMaxValue" type="text" value="" class="eui-conditional-format-dialog-input" />
+            </div>
+            <div class="eui-subdiv">
+                <span class="eui-conditional-format-dialog-span">Color:</span>
+                <input type="button" id="euiMinColor" value="" class="eui-conditional-format-dialog-color-scale"
+                    title="minColor" onclick="setColor(event, 'Min Color')" />
+                <input type="button" id="euiMidColor" value="" class="eui-conditional-format-dialog-color-scale"
+                    title="midColor" onclick="setColor(event, 'Mid Color')" />
+                <input type="button" id="euiMaxColor" value="" class="eui-conditional-format-dialog-color-scale"
+                    title="maxColor" onclick="setColor(event, 'Max Color')" />
+            </div>
+        </div>
+    </div>
+</div>
+
+
+/**** Data Bar Dialog ****/
+<div id="euiDatabarDialog" class="eui-menu-dialog" title="Data Bars">
+    <div style="margin-top: 4px; margin-right: 5px; border:1px solid gray; padding: 8px">
+        <div>
+            <b>Value</b>
+        </div>
+        <div style="height:16px">
+            <div style="width: 100px; position:absolute; left:70px; text-align:center">Minimum</div>
+            <div style="width: 100px; position:absolute; left:220px; text-align:center">Maximum</div>
+        </div>
+        <div class="eui-databar-dialog-subdiv">
+            <span>Type:</span>
+            <select id="euiMinimumType" style="width: 100px; position:absolute; left:70px; height: 22px">
+                <option value="0">Number</option>
+                <option value="1">LowestValue</option>
+                <option value="3">Percent</option>
+                <option value="4">Percentile</option>
+                <option value="5" selected="selected">Automin</option>
+                <option value="6">Formula</option>
+            </select>
+            <select id="euiMaximumType" style="width: 100px; position:absolute; left:220px; height: 22px">
+                <option value="0">Number</option>
+                <option value="2">HighestValue</option>
+                <option value="3">Percent</option>
+                <option value="4">Percentile</option>
+                <option value="6">Formula</option>
+                <option value="7" selected="selected">Automax</option>
+            </select>
+        </div>
+        <div style="margin-top: 16px;">
+            <span >Values:</span>
+            <input id="euiMinimumValue" type="text" style="width: 96px; position:absolute; left:70px;" placeholder="minimumValue">
+            <input id="euiMaximumValue" type="text" style="width: 96px; position:absolute; left:220px;" placeholder="maximumValue">
+        </div>
+        <div style="margin-top: 18px">
+            <b>Appearance</b>
+        </div>
+        <div class="eui-databar-dialog-subdiv">
+            <input type="checkbox" id="euiShowBarOnly" />
+            <label for="euiShowBarOnly">Show Bar Only</label>
+        </div>
+        <div class="eui-databar-dialog-subdiv">
+            <input type="checkbox" id="euiGradient" />
+            <label for="euiGradient" class="eui-data-bar-dialog-label">Gradient</label>
+            <span style="width: 80px; display: inline-block; display: -moz-inline-box;">Color:</span>
+            <input type="button" id="euiColor" value="" title="barcolor" style="width:80px; background:#638EC6"
+                onclick="setColor(event, 'Bar Color')" />
+        </div>
+        <div class="eui-databar-dialog-subdiv">
+            <input type="checkbox" id="euiShowBorder" />
+            <label for="euiShowBorder" class="eui-data-bar-dialog-label">
+                {getText('com.addteq.confluence.plugin.excellentable.comment.border.show.label')}</label>
+            <span style="width: 80px; display: inline-block; display: -moz-inline-box;">
+                {getText('com.addteq.confluence.plugin.excellentable.comment.border.euiColor.text')}</span>
+            <input type="button" id="euiBorderColor" value="" title="barbordercolor" style="width:80px; background:#000000"
+                 onclick="setColor(event, 'Bar Border Color')" />
+        </div>
+        <div class="eui-subdiv">
+            <span>Bar Direction:</span>
+            <select id="euiDataBarDirection" style="height: 22px">
+                <option value="0" selected="selected">Left-to-Right</option>
+                <option value="1">Right-to-Left</option>
+            </select>
+        </div>
+        <div class="eui-databar-dialog-subdiv">
+            <input type="checkbox" id="euiUseNegativeFillColor" />
+            <label for="euiUseNegativeFillColor" class="eui-data-bar-dialog-label">
+                Use Negative Fill Color</label>
+            <span class="eui-databar-dialog-span">Negative Fill Color:</span>
+            <input type="button" id="euiNegativeFillColor" value="" title="barnegativefillcolor" style="width:50px; background:#FF0000"
+                onclick="setColor(event, 'Bar Negative Fill Color')" />
+        </div>
+        <div class="eui-databar-dialog-subdiv">
+            <input type="checkbox" id="euiUseNegativeBorderColor" />
+            <label for="euiUseNegativeBorderColor" class="eui-data-bar-dialog-label">
+                Use Negative Border Color</label>
+            <span class="eui-databar-dialog-span">Negative Border Color:</span>
+            <input type="button" id="euiNegativeBorderColor" value="" title="barnegativebordercolor" style="width:50px; background:#000000"
+                onclick="setColor(event, 'Bar Negative Border Color')" />
+        </div>
+        <div class="eui-databar-dialog-subdiv">
+            <span>Axis Position:</span>
+                <select id="euiAxisPosition" style="height: 22px;">
+                    <option value="0" selected="selected">Automatic</option>
+                    <option value="1">CellMidPoint</option>
+                    <option value="2">None</option>
+                </select>
+            <span class="eui-databar-dialog-span  eui-sparkline-dialog-lbl">Axis Color:</span>
+            <input type="button" id="euiAxisColor" value="" title="baraxiscolor" style="width:50px; background:#000000"
+                onclick="setColor(event, 'Bar Axis Color')" />
+        </div>
+    </div>
+</div>
+
+
+/**** Icon Set Dialog ****/
+<div id="euiIconSetDialog" class="eui-menu-dialog" title="Icon Sets">
+    <div style="margin-left: 20px; margin-top: 20px; font-size: 12px">
+        <div class="eui-subdiv">
+            <span>Icon Style:</span>
+            <select id="euiIconSetType" style="margin-left: 40px">
+                <option value="0" selected="selected">ThreeArrowsColored</option>
+                <option value="1">ThreeArrowsGray</option>
+                <option value="2">ThreeTriangles</option>
+                <option value="3">ThreeStars</option>
+                <option value="4">ThreeFlags</option>
+                <option value="5">ThreeTrafficLightsUnrimmed</option>
+                <option value="6">ThreeTrafficLightsRimmed</option>
+                <option value="7">ThreeSigns</option>
+                <option value="8">ThreeSymbolsCircled</option>
+                <option value="9">ThreeSymbolsUncircled</option>
+                <option value="10">FourArrowsColored</option>
+                <option value="11">FourArrowsGray</option>
+                <option value="12">FourRedToBlack</option>
+                <option value="13">FourRatings</option>
+                <option value="14">FourTrafficLights</option>
+                <option value="15">FiveArrowsColored</option>
+                <option value="16">FiveArrowsGray</option>
+                <option value="17">FiveRatings</option>
+                <option value="18">FiveQuarters</option>
+                <option value="19">FiveBoxes</option>
+            </select>
+        </div>
+        <div class="eui-subdiv">
+            <input type="checkbox" id="euiShowIconOnly" />
+            <label for="euiShowIconOnly">Show Icon Only</label>
+            <input type="checkbox" id="euiReverseIconOrder" style="margin-left: 40px" />
+            <label for="euiReverseIconOrder">Reverse Icon Order</label>
+        </div>
+        <div style="margin-top: 20px;">
+            <span>Display each icon according to these rules:</span>
+        </div>
+        <div id="euiIconCriteriaSetting" class="eui-subdiv"></div>
+    </div>
+</div>
+
+
+/**** Cell Type Dialog ****/
+<div id="euiCellTypeDialog" class="eui-menu-dialog" title="Cell Type">
+    <div class="eui-menu-dialog-subdiv eui-menu-dialog-subdiv-fontsize">
+        <div id="euiComboCellOptions">
+            <div>
+                <span class="eui-cell-type-dialog-span">EditorValueType: </span>
+                <select id="euiSelComboCellEditorValueType">
+                    <option value="0" selected="selected">Text</option>
+                    <option value="1">Index</option>
+                    <option value="2">Value</option>
+                </select>
+            </div>
+            <div class="eui-subdiv">
+                <span class="eui-cell-type-dialog-span">Items Text:</span>
+                <input id="euiTxtComboCellItemsText" placeholder="(eg:123,456,789)" />
+            </div>
+            <div class="eui-subdiv">
+                <span class="eui-cell-type-dialog-span">Items Value:</span>
+                <input id="euiTxtComboCellItemsValue" placeholder="(eg:abc,def,ghi)" />
+            </div>
+        </div>
+        <div id="euiCheckBoxCellOptions">
+            <div>
+                <span class="eui-cell-type-dialog-span">caption:</span>
+                <input type="text" id="euiTxtCheckBoxCellTextCaption" />
+            </div>
+            <div class="eui-subdiv">
+                <span class="eui-cell-type-dialog-span">textTrue:</span>
+                <input type="text" id="euiTxtCheckBoxCellTextTrue" value="" />
+            </div>
+            <div class="eui-subdiv">
+                <span class="eui-cell-type-dialog-span">textIndeterminate:</span>
+                <input type="text" id="euiTxtCheckBoxCellTextIndeterminate" value="" />
+            </div>
+            <div class="eui-subdiv">
+                <span class="eui-cell-type-dialog-span">textFalse:</span>
+                <input type="text" id="euiTxtCheckBoxCellTextFalse" value="" />
+            </div>
+            <div class="eui-subdiv">
+                <span class="eui-cell-type-dialog-span">textAlign:</span>
+                <select id="euiSelCheckBoxCellAlign">
+                    <option value="0" selected="selected">top</option>
+                    <option value="1">bottom</option>
+                    <option value="2">left</option>
+                    <option value="3">right</option>
+                </select>
+            </div>
+            <div class="eui-subdiv">
+                <input type="checkbox" id="euiCkbCheckBoxCellIsThreeState" />
+                <label for="euiCkbCheckBoxCellIsThreeState">isThreeState</label>
+            </div>
+        </div>
+        <div id="euiButtonCellOptions">
+            <div>
+                <span class="eui-cell-type-dialog-span">margin-left:</span>
+                <input type="text" id="euiTxtButtonCellMarginLeft" class="eui-cell-type-dialog-input-txt"/>
+            </div>
+            <div class="eui-subdiv">
+                <span class="eui-cell-type-dialog-span">margin-top:</span>
+                <input type="text" id="euiTxtButtonCellMarginTop" class="eui-cell-type-dialog-input-txt"/>
+            </div>
+            <div class="eui-subdiv">
+                <span class="eui-cell-type-dialog-span">margin-right:</span>
+                <input type="text" id="euiTxtButtonCellMarginRight" class="eui-cell-type-dialog-input-txt"/>
+            </div>
+            <div class="eui-subdiv">
+                <span class="eui-cell-type-dialog-span">margin-bottom:</span>
+                <input type="text" id="euiTxtButtonCellMarginBottom" class="eui-cell-type-dialog-input-txt"/>
+            </div>
+            <div class="eui-subdiv">
+                <span class="eui-cell-type-dialog-span">text:</span>
+                <input type="text" id="euiTxtButtonCellText" value="" class="eui-cell-type-dialog-input-txt"/>
+            </div>
+            <div class="eui-subdiv">
+                <span class="eui-cell-type-dialog-span">backColor:</span>
+                <input type="button" id="euiTxtButtonCellBackColor"
+                    class="eui-cell-type-dialog-input-btn" onclick="setColor(event, 'Button Background Color')"/>
+            </div>
+        </div>
+        <div id="euiHyperlinkCellOptions">
+            <div class="eui-subdiv">
+                <span class="eui-cell-type-dialog-span">linkColor:</span>
+                <input type="button" id="euiTxtHyperLinkCellLinkColor"
+                   class="eui-cell-type-dialog-input-btn" onclick="setColor(event, 'Link Color')"/>
+            </div>
+            <div class="eui-subdiv">
+                <span class="eui-cell-type-dialog-span">visitedLinkColor:</span>
+                <input type="text" id="euiTxtHyperLinkCellVisitedLinkColor"
+                    class="eui-cell-type-dialog-input-btn" onclick="setColor(event, 'Visited Link Color')"/>
+            </div>
+            <div class="eui-subdiv">
+                <span class="eui-cell-type-dialog-span">text:</span>
+                <input type="text" id="euiTxtHyperLinkCellText" class="eui-cell-type-dialog-input-txt" />
+            </div>
+            <div class="eui-subdiv">
+                <span class="eui-cell-type-dialog-span">linkToolTip:</span>
+                <input type="text" id="euiTxtHyperLinkCellToolTip" class="eui-cell-type-dialog-input-txt" />
+            </div>
+        </div>
+    </div>
+</div>
+
+
+/**** Freeze Setting Dialog****/
+<div id="euiFreezeSettingDialog" class="eui-menu-dialog" title="Freeze Setting">
+    <div class="eui-menu-dialog-subdiv eui-menu-dialog-subdiv-fontsize">
+        <div>
+            <div class="eui-subdiv">
+                <span class="eui-freeze-setting-dialog-span">FrozenColumnCount:</span>
+                <input id="euiFrozenColumnCount" />
+            </div>
+            <div class="eui-subdiv">
+                <span class="eui-freeze-setting-dialog-span">FrozenRowCount:</span>
+                <input id="euiFrozenRowCount" />
+            </div>
+            <div class="eui-subdiv">
+                <span class="eui-freeze-setting-dialog-span">FrozenTrailingColumnCount:</span>
+                <input id="euiFrozenTrailingColumnCount" />
+            </div>
+            <div class="eui-subdiv">
+                <span class="eui-freeze-setting-dialog-span">FrozenTrailingRowCount:</span>
+                <input id="euiFrozenTrailingRowCount" />
+            </div>
+        </div>
+    </div>
+</div>
+
+/**** Table Dialog ****/
+
+<section id="euiTableformat" class="aui-dialog2 aui-dialog2-small aui-layer" role="dialog" aria-hidden="true">
+    <header class="aui-dialog2-header">
+        <h2 class="aui-dialog2-header-main">{getText('com.addteq.confluence.plugin.excellentable.add.table')}</h2>
+        <a class="aui-dialog2-header-close">
+            <span class="aui-icon aui-icon-small aui-iconfont-close-dialog">Close</span>
+        </a>
+    </header>
+    <div class="aui-dialog2-content">
+    <form name="tableformatform" id="tableformatform" class="aui">
+          <div>
+          <h4>{getText('com.addteq.confluence.plugin.excellentable.table.style.options')}:</h4>
+          </div>
+
+          <div class="">
+          <table id="tableformatproperties">
+            <tr>
+                <td>
+                <input type="checkbox" class="checkbox" id="euiShowHeader" name="showHeader" style="visibility:hidden;" checked/>
+                <label for="euiShowHeader" style="display:none;">{getText('com.addteq.confluence.plugin.excellentable.header.row')}</label>
+                </td>
+                <td>
+                <input type="checkbox" class="checkbox" id="euiHighlightFirstColumn"  name="highlightFirstColumn"/>
+                <label for="euiHighlightFirstColumn">{getText('com.addteq.confluence.plugin.excellentable.first.col')}</label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                <input type="checkbox" class="checkbox" id="euiShowFooter" name="showFooter" />
+                <label for="euiShowFooter">{getText('com.addteq.confluence.plugin.excellentable.total.row')}</label>
+                </td>
+                <td>
+                <input type="checkbox" class="checkbox" id="euiHighlightLastColumn"  name="highlightLastColumn"/>
+                <label for="euiHighlightLastColumn">{getText('com.addteq.confluence.plugin.excellentable.last.col')}</label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                <input type="checkbox" class="checkbox" id="euiBandRows" name="bandRows" checked/>
+                <label for="euiBandRows">{getText('com.addteq.confluence.plugin.excellentable.banded.row')}</label>
+                </td>
+                <td>
+                <input type="checkbox" class="checkbox" id="euiBandColumns"  name="bandColumns"/>
+                <label for="euiBandColumns">{getText('com.addteq.confluence.plugin.excellentable.banded.col')}</label>
+                </td>
+            </tr>
+        </table>
+
+          </div>
+
+          <input type="hidden" value="Excellentable" class="tableStyle" name="tablename">
+          </form>
+          <div>
+          <h4>{getText('com.addteq.confluence.plugin.excellentable.table.styles')}</h4>
+          </div>
+          <div class="tableformatpreview">
+          <img value="Light1" class="Light1 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Light1.png"/>
+          <img value="Light2" class="Light2 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Light2.png"/>
+          <img value="Light3" class="Light3 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Light3.png"/>
+          <img value="Light4" class="Light4 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Light4.png"/>
+          <img value="Light5" class="Light5 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Light5.png"/>
+          <img value="Light6" class="Light6 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Light6.png"/>
+          <img value="Light7" class="Light7 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Light7.png"/>
+          <img value="Light8" class="Light8 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Light8.png"/>
+          <img value="Light9" class="Light9 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Light9.png"/>
+          <img value="Light10" class="Light10 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Light10.png"/>
+          <img value="Light11" class="Light11 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Light11.png"/>
+          <img value="Light12" class="Light12 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Light12.png"/>
+          <img value="Light13" class="Light13 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Light13.png"/>
+          <img value="Light14" class="Light14 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Light14.png"/>
+          <img value="Light15" class="Light15 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Light15.png"/>
+          <img value="Light16" class="Light16 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Light16.png"/>
+          <img value="Light17" class="Light17 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Light17.png"/>
+          <img value="Light18" class="Light18 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Light18.png"/>
+          <img value="Light19" class="Light19 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Light19.png"/>
+          <img value="Light20" class="Light20 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Light20.png"/>
+          <img value="Light21" class="Light21 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Light21.png"/>
+          <img value="Medium1" class="Medium1 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Medium1.png"/>
+          <img value="Medium2" class="Medium2 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Medium2.png"/>
+          <img value="Medium3" class="Medium3 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Medium3.png"/>
+          <img value="Medium4" class="Medium4 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Medium4.png"/>
+          <img value="Medium5" class="Medium5 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Medium5.png"/>
+          <img value="Medium6" class="Medium6 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Medium6.png"/>
+          <img value="Medium7" class="Medium7 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Medium7.png"/>
+          <img value="Medium8" class="Medium8 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Medium8.png"/>
+          <img value="Medium9" class="Medium9 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Medium9.png"/>
+          <img value="Medium10" class="Medium10 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Medium10.png"/>
+          <img value="Medium11" class="Medium11 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Medium11.png"/>
+          <img value="Medium12" class="Medium12 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Medium12.png"/>
+          <img value="Medium13" class="Medium13 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Medium13.png"/>
+          <img value="Medium14" class="Medium14 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Medium14.png"/>
+          <img value="Medium15" class="Medium15 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Medium15.png"/>
+          <img value="Medium16" class="Medium16 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Medium16.png"/>
+          <img value="Medium17" class="Medium17 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Medium17.png"/>
+          <img value="Medium18" class="Medium18 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Medium18.png"/>
+          <img value="Medium19" class="Medium19 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Medium19.png"/>
+          <img value="Medium20" class="Medium20 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Medium20.png"/>
+          <img value="Medium21" class="Medium21 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Medium21.png"/>
+          <img value="Medium22" class="Medium22 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Medium22.png"/>
+          <img value="Medium23" class="Medium23 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Medium23.png"/>
+          <img value="Medium24" class="Medium24 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Medium24.png"/>
+          <img value="Medium25" class="Medium25 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Medium25.png"/>
+          <img value="Medium26" class="Medium26 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Medium26.png"/>
+          <img value="Medium27" class="Medium27 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Medium27.png"/>
+          <img value="Medium28" class="Medium28 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Medium28.png"/>
+          <img value="Dark1" class="Dark1 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Dark1.png"/>
+          <img value="Dark2" class="Dark2 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Dark2.png"/>
+          <img value="Dark3" class="Dark3 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Dark3.png"/>
+          <img value="Dark4" class="Dark4 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Dark4.png"/>
+          <img value="Dark5" class="Dark5 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Dark5.png"/>
+          <img value="Dark6" class="Dark6 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Dark6.png"/>
+          <img value="Dark7" class="Dark7 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Dark7.png"/>
+          <img value="Dark8" class="Dark8 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Dark8.png"/>
+          <img value="Dark9" class="Dark9 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Dark9.png"/>
+          <img value="Dark10" class="Dark10 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Dark10.png"/>
+          <img value="Dark11" class="Dark11 thumbnail" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/Dark11.png"/>
+          <img value="noformatting" class="noformatting" src="{contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/images/noformatting.png"/>
+          </div>
+
+
+          <div style="margin-top: 10px;display:none;">
+              <label for="euiTableName">Table Name:</label>
+              <input type="text" id="euiTableName" style="margin-left: 53px;width: 100px" />
+              <label id="euiCkName"></label>
+          </div>
+    </div>
+</section>
+
+/****** Sections related to Pictures Start ***************/
+<!-- Picture Insert  Dialog . This comes up when the user does Insert , then Picture on the single spreadsheet -->
+<section id="euiPictureDialog" class="aui-layer aui-dialog2 aui-dialog2-small" role="dialog" aria-hidden="true">
+     <!-- Dialog header -->
+     <header class="aui-dialog2-header">
+        <!-- The dialog's title -->
+        <h2 class="aui-dialog2-header-main">
+            {getText('com.addteq.confluence.plugin.excellentable.title.picture')}
+        </h2>
+     </header>
+      <!-- Main dialog content -->
+     <div class="aui-dialog2-content">
+         <span>{getText('com.addteq.confluence.plugin.excellentable.picture.dialog.image')}</span><br/>
+         <input class="upfile" type="file" id="euiFileInput" name="image"/>
+     </div>
+
+     <!-- Dialog footer -->
+     <footer class="aui-dialog2-footer">
+         <!-- Actions to render on the right of the footer -->
+         <div class="aui-dialog2-footer-actions">
+             <!-- Add button -->
+             <button id="euiDialogPictureAddButton" class="aui-button aui-button-primary">
+                 {getText('com.addteq.confluence.plugin.excellentable.add')}
+             </button>
+              <!-- Close icon -->
+             <button id="euiDialogPictureCancelButton" class="aui-button aui-button-link" >
+                 {getText('com.addteq.confluence.plugin.excellentable.cancel')}
+             </button>
+         </div>
+     </footer>
+</section>
+
+<!-- Picture Edit Dialog -->
+<section id="euiPictureEditDialog" class="aui-layer aui-dialog2 aui-dialog2-small hidden" role="dialog" aria-hidden="true">
+    <!-- Dialog header -->
+    <header class="aui-dialog2-header">
+        <!-- The dialog's title -->
+        <h2 class="aui-dialog2-header-main">
+                {getText('com.addteq.confluence.plugin.excellentable.picture.options')}
+        </h2>
+        <a class="aui-dialog2-header-close">
+            <span class="aui-icon aui-icon-small aui-iconfont-close-dialog">Close</span>
+        </a>
+    </header>
+    <!-- Main dialog content -->
+    <div class="aui-dialog2-content">
+        <form name="euiPictureSettingsOptionsForm" id="euiPictureSettingsOptionsForm" class="aui">
+            <div class="field-group" style="display: none">
+                <input type="checkbox" id="euiDynamicSize" />
+                <label for="euiDynamicSize">{getText('com.addteq.confluence.plugin.excellentable.comment.dynamic.size.label')}</label>
+            </div>
+            <div class="eui-subdiv field-group" style="display: none">
+                <input type="checkbox" id="euiDynamicMove" />
+                <label for="euiDynamicMove">{getText('com.addteq.confluence.plugin.excellentable.comment.dynamic.move.label')}</label>
+            </div>
+            <h4>
+                <label for="euiPictureBackColor">
+                    {getText('com.addteq.confluence.plugin.excellentable.picture.dialog.back.color')}:
+                </label>
+                <input type="text" id="euiPictureBackColor" value="" title="euiPictureBackColor" style="margin-left: 10px;width: 70px" />
+            </h4>
+            <div class="eui-subdiv field-group" style="display: none">
+                <label for="euiPictureBorderColor">
+                    {getText('com.addteq.confluence.plugin.excellentable.picture.dialog.border.color')}
+                </label>
+                <input type="text" id="euiPictureBorderColor" value="" title="pictureBorderColor" style="margin-left: 10px;width: 70px" />
+             </div>
+            <div class="eui-subdiv field-group" style="display: none">
+                <label for="euiPictureBorderWidth">
+                    {getText('com.addteq.confluence.plugin.excellentable.picture.dialog.border.width')}
+                </label>
+                <input type="text" id="euiPictureBorderWidth" style="margin-left: 10px;width: 70px" />
+            </div>
+            <div class="eui-subdiv field-group" style="display: none">
+                <label for="euiPictureBorderRadius">
+                  {getText('com.addteq.confluence.plugin.excellentable.picture.dialog.border.radius')}
+                </label>
+                <input type="text" id="euiPictureBorderRadius" style="margin-left: 10px;width: 70px" />
+            </div>
+            <div class="eui-subdiv field-group" style="display: none">
+                <label for="euiPictureBorderStyle">
+                    {getText('com.addteq.confluence.plugin.excellentable.picture.dialog.border.style')}
+                </label>
+                <select class="select" id="euiPictureBorderStyle" style="margin-left: 5px; width:74px">
+                    <option value="solid" selected="selected">
+                        {getText('com.addteq.confluence.plugin.excellentable.picture.dialog.border.solid')}
+                    </option>
+                    <option value="dotted">
+                        {getText('com.addteq.confluence.plugin.excellentable.picture.dialog.border.dotted')}
+                    </option>
+                    <option value="dashed">
+                        {getText('com.addteq.confluence.plugin.excellentable.picture.dialog.border.dashed')}
+                    </option>
+                    <option value="double">
+                        {getText('com.addteq.confluence.plugin.excellentable.picture.dialog.border.double')}
+                    </option>
+                    <option value="groove">
+                        {getText('com.addteq.confluence.plugin.excellentable.picture.dialog.border.groove')}
+                    </option>
+                    <option value="ridge">
+                        {getText('com.addteq.confluence.plugin.excellentable.picture.dialog.border.ridge')}
+                    </option>
+                    <option value="inset">
+                        {getText('com.addteq.confluence.plugin.excellentable.picture.dialog.border.inset')}
+                    </option>
+                    <option value="outset">
+                        {getText('com.addteq.confluence.plugin.excellentable.picture.dialog.border.outset')}
+                    </option>
+                </select>
+            </div>
+            <div class="eui-subdiv field-group" style="display: none">
+                <label for="euiPictureStretch">
+                    {getText('com.addteq.confluence.plugin.excellentable.picture.dialog.picture.stretch')}
+                </label>
+                <select class="select" id="euiPictureStretch" style="margin-left: 5px; width:80px">
+                    <option value="0" selected="selected">
+                        {getText('com.addteq.confluence.plugin.excellentable.picture.dialog.stretch')}
+                    </option>
+                    <option value="1">
+                        {getText('com.addteq.confluence.plugin.excellentable.picture.dialog.center')}
+                    </option>
+                    <option value="2">
+                        {getText('com.addteq.confluence.plugin.excellentable.picture.dialog.zoom')}
+                    </option>
+                    <option value="3">
+                        {getText('com.addteq.confluence.plugin.excellentable.picture.dialog.none')}
+                    </option>
+                </select>
+            </div>
+        </form>
+        <button id="euiPictureEditDialogUpdateButton" class="aui-button aui-button-primary">
+            {getText('com.addteq.confluence.plugin.excellentable.update')}
+        </button>
+    </div>
+</section>
+
+<!-- Picture Edit Dropdown -->
+<aui-dropdown-menu id="euipictureDropdown">
+    <aui-section class="eui-dropdownmenu">
+        <aui-item-link href="#" name="editimage"><span class="aui-icon aui-icon-small aui-iconfont-edit"></span>&nbsp;{getText('com.addteq.confluence.plugin.excellentable.picture.dropdown.edit')}</aui-item-link>
+    </aui-section>
+    <aui-section class="eui-dropdownmenu" label="{getText('com.addteq.confluence.plugin.excellentable.picture.dropdown.resize')}">
+        <aui-item-link href="#" name="smallerimagesize"><span class="aui-icon aui-icon-small aui-iconfont-unfocus"></span>&nbsp;{getText('com.addteq.confluence.plugin.excellentable.picture.dropdown.smaller')}</aui-item-link>
+        <aui-item-link href="#" name="originalimagesize"><span class="aui-icon aui-icon-small aui-iconfont-image"></span>&nbsp;{getText('com.addteq.confluence.plugin.excellentable.picture.dropdown.original')}</aui-item-link>
+        <aui-item-link href="#" name="largerimagesize"><span class="aui-icon aui-icon-small aui-iconfont-focus"></span>&nbsp;{getText('com.addteq.confluence.plugin.excellentable.picture.dropdown.larger')}</aui-item-link>
+    </aui-section>
+    <aui-section class="eui-dropdownmenu">
+        <aui-item-link href="#" name="removeimage"><span class="aui-icon aui-icon-small aui-iconfont-delete"></span>&nbsp;{getText('com.addteq.confluence.plugin.excellentable.picture.dropdown.remove')}</aui-item-link>
+    </aui-section>
+</aui-dropdown-menu>
+
+/****** Sections related to Pictures END ***************/
+
+
+
+/**** Add Hyperlink Dialog ****/
+
+<section id="euiAddHyperlinkDialog" class="aui-dialog2 aui-dialog2-medium aui-layer" role="dialog" aria-hidden="true">
+    <header class="aui-dialog2-header">
+        <h2 class="aui-dialog2-header-main">Link</h2>
+        <a class="aui-dialog2-header-close">
+            <span class="aui-icon aui-icon-small aui-iconfont-close-dialog">Close</span>
+        </a>
+    </header>
+    <div class="aui-dialog2-content">
+        <form class="aui" style="padding-bottom:20px;">
+            <div class="field-group">
+                <label for="eui-link-text">{getText('com.addteq.confluence.plugin.excellentable.insert.link.dialog.text')}</label>
+                <input class="text medium-long-field" type="text" id="eui-link-text" name="eui-link-text" placeholder="{getText('com.addteq.confluence.plugin.excellentable.insert.link.dialog.text')}">
+            </div>
+            <div class="field-group">
+                <label for="eui-link">{getText('com.addteq.confluence.plugin.excellentable.link')}<span class="aui-icon icon-required">(required)</span></label>
+                <input class="text medium-long-field" type="text" id="eui-link" name="eui-link" placeholder="http://{getText('com.addteq.confluence.plugin.excellentable.link')}">
+            </div>
+        </form>
+    </div>
+    <footer class="aui-dialog2-footer">
+        <div class="aui-dialog2-footer-actions">
+            <button id="dialog-submit-button" class="aui-button aui-button-primary">{getText('com.addteq.confluence.plugin.excellentable.spreadjs.oK')}</button>
+        </div>
+    </footer>
+</section>
+
+
+/**** Generate Data Dialog ****/
+<div id="euiGenerateDataDialog" class="eui-menu-dialog" title="{getText('com.addteq.confluence.plugin.excellentable.generate.data')}">
+    <form>
+        <div class="eui-field-group eui-data-types">
+            <span>{getText('com.addteq.confluence.plugin.excellentable.data.types')}</span>
+            <br/>
+            <br/>
+            <label>
+                <input type="radio" name="data-types" value="onlyNumber">{getText('com.addteq.confluence.plugin.excellentable.generate.only.number')}
+            </label>
+            <br/>
+            <label>
+                <input type="radio" name="data-types" value="onlyString">{getText('com.addteq.confluence.plugin.excellentable.generate.only.string')}
+            </label>
+            <br/>
+            <label>
+                <input type="radio" name="data-types" value="Alphanumeric">{getText('com.addteq.confluence.plugin.excellentable.generate.only.alphanumeric')}
+            </label>
+        </div>
+        <div class="eui-field-group eui-rows-columns">
+            <span>{getText('com.addteq.confluence.plugin.excellentable.generate.rows.cross.columns')}</span>
+            <br/>
+            <br/>
+            <label for="euiNoOfRows" style="padding-right:10px">
+                {getText('com.addteq.confluence.plugin.excellentable.no.of.rows')}
+            </label>
+            <input type="text" id="euiNoOfRows" name="noOfRows" title="No of Rows"
+                placeholder="{getText('com.addteq.confluence.plugin.excellentable.enter.no.of.rows')}">
+            <br/>
+            <br/>
+            <label for="euiNoOfColumns" style="padding-right:10px">
+                {getText('com.addteq.confluence.plugin.excellentable.no.of.cols')}
+            </label>
+            <input type="text" id="euiNoOfColumns" name="noOfColumns" title="No of Columns"
+                placeholder="{getText('com.addteq.confluence.plugin.excellentable.enter.no.of.cols')}">
+        </div>
+    </form>
+</div>
+
+
+/**** Comment Dialog - also used for comment view ****/
+<section id="eui-comment-dialog" class="aui-dialog2 aui-dialog2-small aui-layer" role="dialog" aria-hidden="true" data-aui-focus-selector=".eui-comment-textarea">
+    <header class="aui-dialog2-header ">
+        <h2 class="aui-dialog2-header-main">{getText('com.addteq.confluence.plugin.excellentable.add.note')}</h2>
+        <a class="aui-dialog2-header-close">
+            <span class="aui-icon aui-icon-small aui-iconfont-close-dialog">Close</span>
+        </a>
+    </header>
+    <div class="aui-dialog2-content">
+    <div class="field-group">
+          <textarea class="textarea eui-comment-textarea eui-corner-all" name="eui-comment" id="eui-comment" placeholder="{getText('com.addteq.confluence.plugin.excellentable.note.to.self')}"></textarea>
+    </div>
+    </div>
+    <footer class="aui-dialog2-footer">
+        <div class="aui-dialog2-footer-actions">
+            <button id="eui-comment-dialog-submit-button" class="aui-button aui-button-primary">{getText('com.addteq.confluence.plugin.excellentable.spreadjs.done')}</button>
+        </div>
+    </footer>
+</section>
+
+/**** Show Comment View ****/
+<section id="eui-comment-note" class="aui-dialog2 aui-dialog2-small aui-layer" role="dialog" aria-hidden="true">
+    <div class="aui-dialog2-content">
+    </div>
+    <footer class="aui-dialog2-footer eui-note-footer">
+        <div class="aui-dialog2-footer-actions">
+        <button name="comment" id="edit-note-thru-flag" class="eui aui-button aui-button-subtle" original-title=""><span class="aui-icon aui-icon-small aui-iconfont-edit"></span></button>
+        <button id="dialog-resolve-button" class="aui-button aui-button-primary">{getText('com.addteq.confluence.plugin.excellentable.spreadjs.resolve')}</button>
+        </div>
+        </footer>
+</section>
+
+
+/**** SparkLine Dialog ****/
+<div id="euiSparklineExDialog" class="eui-menu-dialog" title="SparklineEx">
+    <div class="eui-menu-dialog-subdiv eui-menu-dialog-subdiv-fontsize">
+        <div class="eui-subdiv">
+            <label>Type:</label>
+            <select id="euiSparklineExType" style="width:104px;height:22px;">
+                <option value="LINESPARKLINE">Line</option>
+                <option value="COLUMNSPARKLINE">Column</option>
+                <option value="WINLOSSSPARKLINE">Win/Loss</option>
+                <option value="PIESPARKLINE">Pie</option>
+                <option value="AREASPARKLINE">Area</option>
+                <option value="SCATTERSPARKLINE">Scatter</option>
+                <option value="SPREADSPARKLINE">Spread</option>
+                <option value="STACKEDSPARKLINE">Stacked</option>
+                <option value="BULLETSPARKLINE">Bullet</option>
+                <option value="HBARSPARKLINE">Hbar</option>
+                <option value="VBARSPARKLINE">Vbar</option>
+                <option value="VARISPARKLINE">Variance</option>
+                <option value="BOXPLOTSPARKLINE">BoxPlot</option>
+                <option value="CASCADESPARKLINE">Cascade</option>
+                <option value="PARETOSPARKLINE">Pareto</option>
+            </select>
+        </div>
+        <div id="euiCommonSparkline">
+            <div class="eui-subdiv">
+                <fieldset>
+                    <legend>Choose the data that you want</legend>
+                    <label style="width:100px">Data Range:</label>
+                    <input id="euiDataRange" type="text" style="width:100px" />
+                    <label id="euiDataRangeInValid" style="display: block;"></label>
+                </fieldset>
+            </div>
+            <div class="eui-subdiv">
+                <fieldset>
+                    <legend>Choose where you want the sparkline to be placed</legend>
+                    <label style="width:100px">Location Range:</label>
+                    <input id="euiLocationRange" type="text" style="width:100px" />
+                    <label id="euiLocationRangeInValid" style="display: block;"></label>
+                </fieldset>
+            </div>
+        </div>
+        <div id="euiBullet" class="eui-subdiv">
+            <div>
+                <label>Measure:</label>
+                <input id="euiBulletMeasure" type="text" />
+                <label class="eui-sparkline-dialog-lbl">Target:</label>
+                <input id="euiBulletTarget" type="text" />
+            </div>
+            <div>
+                <label>Maxi:</label>
+                <input id="euiBulletMaxi" type="text" />
+                <label class="eui-sparkline-dialog-lbl">Forecast:</label>
+                <input id="euiBulletForecast" type="text" />
+            </div>
+            <div>
+                <label>Good:</label>
+                <input id="euiBulletGood" type="text" />
+                <label class="eui-sparkline-dialog-lbl">Bad:</label>
+                <input id="euiBulletBad" type="text" />
+            </div>
+            <div>
+                <label>Tickunit:</label>
+                <input id="euiBulletTickunit" type="text" />
+                <label class="eui-sparkline-dialog-lbl">ColorScheme:</label>
+                <input id="euiBulletColorScheme" type="button"
+                     style="width: 104px; background: #A0A0A0;" onclick="setColor(event, 'Bullet Color Scheme')" />
+            </div>
+            <div>
+                <input id="euiBulletVertical" type="checkbox" />
+                <label for="euiBulletVertical">Vertical</label>
+            </div>
+        </div>
+        <div id="euiHBar" class="eui-subdiv">
+            <div>
+                <label>Value:</label>
+                <input id="euiHBarValue" type="text" />
+            </div>
+            <div>
+                <label>ColorScheme:</label>
+                <input id="euiHBarColorScheme" type="button"
+                     style="width: 104px; background: gray;" onclick="setColor(event, 'HBar Color Scheme')" />
+            </div>
+        </div>
+        <div id="euiVBar" class="eui-subdiv">
+            <div>
+                <label>Value:</label>
+                <input id="euiVBarValue" type="text" />
+            </div>
+            <div>
+                <label>ColorScheme:</label>
+                <input id="euiVBarColorScheme" type="button"
+                     style="width: 104px; background: gray;" onclick="setColor(event, 'VBar Color Scheme')" />
+            </div>
+        </div>
+        <div id="euiVari" class="eui-subdiv">
+            <div>
+                <label>Variance:</label>
+                <input id="euiVariVariance" type="text" />
+                <label class="eui-sparkline-dialog-lbl">Reference:</label>
+                <input id="euiVariReference" type="text" />
+            </div>
+            <div>
+                <label>Mini:</label>
+                <input id="euiVariMini" type="text" />
+                <label class="eui-sparkline-dialog-lbl">Maxi:</label>
+                <input id="euiVariMaxi" type="text" />
+            </div>
+            <div>
+                <label>Mark:</label>
+                <input id="euiVariMark" type="text" />
+                <label class="eui-sparkline-dialog-lbl">TickUnit:</label>
+                <input id="euiVariTickunit" type="text" />
+            </div>
+            <div>
+                <label>ColorPositive:</label>
+                <input id="euiVariColorPositive" type="button" style="width: 104px; background: green;"
+                    onclick="setColor(event, 'Variance Positive Color')" />
+                <label class="eui-sparkline-dialog-lbl">ColorNegative:</label>
+                <input id="euiVariColorNegative" type="button" style="width: 104px; background: red;"
+                    onclick="setColor(event, 'Variance Negative Color')" />
+            </div>
+            <div>
+                <input id="euiVariLegend" type="checkbox" style="margin-left:100px;"/>
+                <label for="euiVariLegend">Legend</label>
+                <input id="euiVariVertical" type="checkbox" style="margin-left:140px;" />
+                <label for="euiVariVertical">Vertical</label>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+/**** MenuBar ****/
+<div id="euiMenuBar" class="aui-tabs horizontal-tabs">
+    <span id="euiDialogCloseButton"
+         class="aui-icon aui-icon-small aui-iconfont-close-dialog"></span>
+    <span title="{getText('com.addteq.confluence.plugin.excellentable.dialog.edit.history')}" class="icon-icomoon icon-history eui-show-version-button"></span>
+    <a class="eui-logo"></a>
+    <button class="aui-button aui-dropdown2-trigger aui-dropdown2-trigger-arrowless eui-dropdown hidden" id="eui-tab-menu-trigger" aria-controls="eui-tab-menu">Sheet Tab Menu</button>
+    <button class="aui-button aui-dropdown2-trigger aui-dropdown2-trigger-arrowless eui-dropdown eui-logo-next" aria-controls="euiFileDropdown">{getText('com.addteq.confluence.plugin.excellentable.file')}</button>
+    <button class="aui-button aui-dropdown2-trigger aui-dropdown2-trigger-arrowless eui-dropdown" aria-controls="euiEditDropdown">{getText('com.addteq.confluence.plugin.excellentable.edit')}</button>
+    <button class="aui-button aui-dropdown2-trigger aui-dropdown2-trigger-arrowless eui-dropdown" aria-controls="euiViewDropdown">{getText('com.addteq.confluence.plugin.excellentable.view')}</button>
+    <button class="aui-button aui-dropdown2-trigger aui-dropdown2-trigger-arrowless eui-dropdown" aria-controls="euiInsertDropdown">{getText('com.addteq.confluence.plugin.excellentable.insert')}</button>
+    <button class="aui-button aui-dropdown2-trigger aui-dropdown2-trigger-arrowless eui-dropdown" aria-controls="euiFormat2Dropdown">{getText('com.addteq.confluence.plugin.excellentable.format')}</button>
+    <button class="aui-button aui-dropdown2-trigger aui-dropdown2-trigger-arrowless eui-dropdown" aria-controls="euiDataDropdown">{getText('com.addteq.confluence.plugin.excellentable.data')}</button>
+    <button class="aui-button aui-dropdown2-trigger aui-dropdown2-trigger-arrowless eui-dropdown" aria-controls="euiHelpDropdown">{getText('com.addteq.confluence.plugin.excellentable.help')}</button>
+    <div class="eui-inline-notification">
+
+    </div>
+<aui-dropdown-menu id="euiFileDropdown">
+    <aui-section class="eui-dropdownmenu">
+        <aui-item-link href="#" name="importexcel"><span class="icon-icomoon icon-cloud-upload">&nbsp;</span>
+            {getText('com.addteq.confluence.plugin.excellentable.import')}</aui-item-link>
+        </aui-section>
+        <aui-section class="eui-dropdownmenu">
+        <aui-item-link href="#" id="euiDropdownSave" name="save"><span class="icon-icomoon icon-file-text2">&nbsp;</span>
+        {getText('com.addteq.confluence.plugin.excellentable.save')}
+        {if $isMac != true}
+            <span class="eui-dropdown-shortcutkeys">{getText('com.addteq.confluence.plugin.excellentable.keyboard.shortcut.save')} </span>
+        {else}
+            <span class="eui-dropdown-shortcutkeys">{getText('com.addteq.confluence.plugin.excellentable.keyboard.shortcut.save.mac')} </span>
+        {/if}
+        </aui-item-link>
+        </aui-section>
+        <aui-section class="eui-dropdownmenu">
+        <aui-item-link href="#" name="exportasxlsx"><span class="icon-icomoon icon-windows8">&nbsp;</span>
+            {getText('com.addteq.confluence.plugin.excellentable.export.xlsx')}</aui-item-link>
+        <aui-item-link href="#" name="exportascsv"><span class="icon-icomoon icon-file-text2">&nbsp;</span>
+            {getText('com.addteq.confluence.plugin.excellentable.export.csv')}</aui-item-link>
+        <aui-item-link href="#" name="exportashtml" style="display: none;"><span class="icon-icomoon icon-html-five">&nbsp;</span>
+            {getText('com.addteq.confluence.plugin.excellentable.export.html')}</aui-item-link>
+        <aui-item-link href="#" id="euiDeleteSheet" name="deletesheet"><span class="aui-icon aui-icon-small aui-iconfont-delete"></span>&nbsp;
+                            {getText('com.addteq.confluence.plugin.excellentable.delete.sheet')}</aui-item-link>
+        <aui-item-link href="#" id="euiDropdownExit" name="exit"><span class="aui-icon aui-icon-small aui-iconfont-close-dialog"></span>
+            &nbsp;{getText('com.addteq.confluence.plugin.excellentable.dialog.close')}</aui-item-link>
+    </aui-section>
+</aui-dropdown-menu>
+
+<aui-dropdown-menu id="euiEditDropdown">
+    <aui-section class="eui-dropdownmenu">
+        <aui-item-link href="#" name="undo"><span class="aui-icon aui-icon-small aui-iconfont-undo"></span>
+        &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.undo')}
+        {if $isMac != true}
+            <span class="eui-dropdown-shortcutkeys">{getText('com.addteq.confluence.plugin.excellentable.keyboard.shortcut.undo')} </span>
+        {else}
+            <span class="eui-dropdown-shortcutkeys">{getText('com.addteq.confluence.plugin.excellentable.keyboard.shortcut.undo.mac')} </span>
+        {/if}
+        </aui-item-link>
+        <aui-item-link href="#" name="redo"><span class="aui-icon aui-icon-small aui-iconfont-redo"></span>
+        &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.redo')}
+        {if $isMac != true}
+            <span class="eui-dropdown-shortcutkeys">{getText('com.addteq.confluence.plugin.excellentable.keyboard.shortcut.redo')} </span>
+        {else}
+            <span class="eui-dropdown-shortcutkeys">{getText('com.addteq.confluence.plugin.excellentable.keyboard.shortcut.redo.mac')} </span>
+        {/if}
+    </aui-item-link>
+    </aui-section>
+    <aui-section class="eui-dropdownmenu">
+    <aui-item-link href="#" name="cut"><span class="icon-icomoon icon-scissors icomoon-icon-small"></span>
+        &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.cut')}
+        {if $isMac != true}
+            <span class="eui-dropdown-shortcutkeys">{getText('com.addteq.confluence.plugin.excellentable.keyboard.shortcut.cut')} </span>
+        {else}
+            <span class="eui-dropdown-shortcutkeys">{getText('com.addteq.confluence.plugin.excellentable.keyboard.shortcut.cut.mac')} </span>
+        {/if}
+    </aui-item-link>
+    <aui-item-link href="#" name="copy"><span class="aui-icon aui-icon-small aui-iconfont-copy-clipboard"></span>
+&nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.copy')}
+        {if $isMac != true}
+            <span class="eui-dropdown-shortcutkeys">{getText('com.addteq.confluence.plugin.excellentable.keyboard.shortcut.copy')} </span>
+        {else}
+            <span class="eui-dropdown-shortcutkeys">{getText('com.addteq.confluence.plugin.excellentable.keyboard.shortcut.copy.mac')} </span>
+        {/if}
+    </aui-item-link>
+    <aui-item-link href="#" name="paste"><span class="icon-icomoon icon-clipboard"></span>
+        &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.paste')}
+        {if $isMac != true}
+            <span class="eui-dropdown-shortcutkeys">{getText('com.addteq.confluence.plugin.excellentable.keyboard.shortcut.paste')} </span>
+        {else}
+            <span class="eui-dropdown-shortcutkeys">{getText('com.addteq.confluence.plugin.excellentable.keyboard.shortcut.paste.mac')} </span>
+        {/if}
+    </aui-item-link>
+    <aui-item-link for="euiEditPasteSpecial"><span class="icon-icomoon icon-paste"></span>
+            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.context.menu.paste.special')}</aui-item-link>
+    </aui-section>
+    <aui-section class="eui-dropdownmenu">
+    <aui-item-link href="#" name="deletecol"><span class="aui-icon aui-icon-small aui-iconfont-table-col-remove"></span>
+            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.col.remove')}</aui-item-link>
+    <aui-item-link href="#" name="deleterow"><span class="aui-icon aui-icon-small aui-iconfont-table-row-remove"></span>
+            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.row.remove')}</aui-item-link>
+    </aui-section>
+</aui-dropdown-menu>
+
+<aui-dropdown-menu id="euiEditPasteSpecial" role="menu">
+    <aui-section class="eui-dropdownmenu">
+        <aui-item-link data-action="pastevaluesonly" name="pastevaluesonly" class="eui-first-item">
+            {getText('com.addteq.confluence.plugin.excellentable.context.menu.paste.special.values')|noAutoescape}
+        </aui-item-link>
+        <aui-item-link data-action="pasteformatsonly" name="pasteformatsonly">
+            {getText('com.addteq.confluence.plugin.excellentable.context.menu.paste.special.format')|noAutoescape}
+        </aui-item-link>
+        <aui-item-link data-action="pasteformulaonly" name="pasteformulaonly">
+            {getText('com.addteq.confluence.plugin.excellentable.context.menu.paste.special.formula')|noAutoescape}
+        </aui-item-link>
+        <aui-item-link data-action="Pastallexceptborders" name="Pastallexceptborders" class="eui-last-item">
+            {getText('com.addteq.confluence.plugin.excellentable.context.menu.paste.special.except.border')|noAutoescape}
+        </aui-item-link>
+    </aui-section>
+</aui-dropdown-menu>
+
+<aui-dropdown-menu id="euiViewDropdown">
+    <aui-section class="eui-dropdownmenu">
+    <aui-item-link href="#" name="freezepane"><span class="aui-icon aui-icon-small aui-iconfont-table-bg"></span>
+            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.freeze')}</aui-item-link>
+    <aui-item-link href="#" name="unfreeze"><span class="aui-icon aui-icon-small aui-iconfont-table-no-bg"></span>
+            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.unfreeze')}</aui-item-link>
+    </aui-section>
+    <aui-section class="eui-dropdownmenu">
+    <aui-item-link href="#" name="rowheader" title="{getText('com.addteq.confluence.plugin.excellentable.row.header.dialog')}">
+            <span class="aui-icon aui-icon-small aui-iconfont-table-header-column"></span>
+            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.row.header')}</aui-item-link>
+    <aui-item-link href="#" name="columnheader" title="{getText('com.addteq.confluence.plugin.excellentable.col.header.dialog')}">
+            <span class="aui-icon aui-icon-small aui-iconfont-table-header-row"></span>
+            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.col.header')}</aui-item-link>
+    <aui-item-link href="#" name="gridlines"><span class="aui-icon aui-icon-small aui-iconfont-table-col-remove"></span>
+            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.gridline')}</aui-item-link>
+    </aui-section>
+    <aui-section class="eui-dropdownmenu">
+    <aui-item-link href="#" name="excellentableprintarea"><span class="icon-icomoon icon-printer"></span>
+            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.print.area')}</aui-item-link>
+    <aui-item-link href="#" id = "euiDropdownHistory"><span class="icon-icomoon icon-history"></span>
+            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.version.history')} </aui-item-link>
+    </aui-section>
+</aui-dropdown-menu>
+
+<aui-dropdown-menu id="euiInsertDropdown">
+    <aui-section class="eui-dropdownmenu">
+    <aui-item-link href="#" name="insertrow"><span class="aui-icon aui-icon-small aui-iconfont-table-row-up"></span>
+            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.insert.row.before')}
+            <span class="eui-dropdown-shortcutkeys">{getText('com.addteq.confluence.plugin.excellentable.keyboard.row.shortcut.before')} </span>
+    </aui-item-link>
+    <aui-item-link href="#" name="insertrowbelow"><span class="aui-icon aui-icon-small aui-iconfont-table-row-down"></span>
+            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.insert.row.after')}
+            <span class="eui-dropdown-shortcutkeys">{getText('com.addteq.confluence.plugin.excellentable.keyboard.row.shortcut.after')} </span>
+    </aui-item-link>
+    </aui-section>
+    <aui-section class="eui-dropdownmenu">
+    <aui-item-link href="#" name="insertcol"><span class="aui-icon aui-icon-small aui-iconfont-table-col-left"></span>
+            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.insert.col.before')}</aui-item-link>
+    <aui-item-link href="#" name="insertcolright"><span class="aui-icon aui-icon-small aui-iconfont-table-col-right"></span>
+            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.insert.col.after')}</aui-item-link>
+    </aui-section>
+    <aui-section class="eui-dropdownmenu">
+    <aui-item-link href="#" name="tableformat"><span class="icon-icomoon icon-table2"></span>
+            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.table')}</aui-item-link>
+    <aui-item-link href="#" name="picture"><span class="icon-icomoon icon-image"></span>
+            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.picture')}</aui-item-link>
+    <aui-item-link href="#" name="addlink"><span class="icon-icomoon icon-link fa"></span>
+            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.insert.link')}</aui-item-link>
+    <aui-item-link for="euiFormulaFunctions"><span class="icon-icomoon icon-sigma"></span>
+            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.functions')}</aui-item-link>
+    <aui-item-link href="#" name="conditionalFormatting"><span class="icon-icomoon icon-quill"></span>
+            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.insert.conditionalformatting')}</aui-item-link>
+</aui-dropdown-menu>
+
+<aui-dropdown-menu id="euiFormulaFunctions">
+    <aui-section class="eui-dropdownmenu">
+        <aui-item-link href="#" id="euiSum" name="sum">{getText('com.addteq.confluence.plugin.excellentable.function.sum')}</aui-item-link>
+        <aui-item-link href="#" id="euiAverage" name="average">{getText('com.addteq.confluence.plugin.excellentable.function.avg')}</aui-item-link>
+        <aui-item-link href="#" id="euiCount" name="count">{getText('com.addteq.confluence.plugin.excellentable.function.count')}</aui-item-link>
+        </aui-section>
+        <aui-section class="eui-dropdownmenu">
+        <aui-item-link href="#" id="euiMaximum" name="max">{getText('com.addteq.confluence.plugin.excellentable.function.max')}</aui-item-link>
+        <aui-item-link href="#" id="euiMinimum" name="min">{getText('com.addteq.confluence.plugin.excellentable.function.min')}</aui-item-link>
+        </aui-section>
+        <aui-section class="eui-dropdownmenu">
+        <aui-item-link href="#" id="euiMore" name="more">{getText('com.addteq.confluence.plugin.excellentable.function.more')}</aui-item-link>
+    </aui-section>
+</aui-dropdown-menu>
+
+<aui-dropdown-menu id="euiFormat2Dropdown">
+    <aui-section class="eui-dropdownmenu">
+    <aui-item-link href="#" name="bold"><span class="aui-icon aui-icon-small aui-iconfont-editor-bold"></span>
+        &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.bold')}
+        {if $isMac != true}
+            <span class="eui-dropdown-shortcutkeys">{getText('com.addteq.confluence.plugin.excellentable.keyboard.shortcut.bold')} </span>
+        {else}
+            <span class="eui-dropdown-shortcutkeys">{getText('com.addteq.confluence.plugin.excellentable.keyboard.shortcut.bold.mac')} </span>
+        {/if}
+    </aui-item-link>
+    <aui-item-link href="#" name="italic"><span class="aui-icon aui-icon-small aui-iconfont-editor-italic"></span>
+        &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.italic')}
+        {if $isMac != true}
+            <span class="eui-dropdown-shortcutkeys">{getText('com.addteq.confluence.plugin.excellentable.keyboard.shortcut.italic')} </span>
+        {else}
+            <span class="eui-dropdown-shortcutkeys">{getText('com.addteq.confluence.plugin.excellentable.keyboard.shortcut.italic.mac')} </span>
+        {/if}
+    </aui-item-link>
+    <aui-item-link href="#" name="underline"><span class="aui-icon aui-icon-small aui-iconfont-editor-underline"></span>
+        &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.underline')}
+        {if $isMac != true}
+            <span class="eui-dropdown-shortcutkeys">{getText('com.addteq.confluence.plugin.excellentable.keyboard.shortcut.underline')} </span>
+        {else}
+            <span class="eui-dropdown-shortcutkeys">{getText('com.addteq.confluence.plugin.excellentable.keyboard.shortcut.underline.mac')} </span>
+        {/if}
+    </aui-item-link>
+    <aui-item-link href="#" name="strikethrough"><span class="icon-icomoon icon-strikethrough"></span>
+        &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.strikethrough')}
+        {if $isMac != true}
+            <span class="eui-dropdown-shortcutkeys">{getText('com.addteq.confluence.plugin.excellentable.keyboard.shortcut.strikethrough')} </span>
+        {else}
+            <span class="eui-dropdown-shortcutkeys">{getText('com.addteq.confluence.plugin.excellentable.keyboard.shortcut.strikethrough.mac')} </span>
+        {/if}
+    </aui-item-link>
+    </aui-section>
+    <aui-section class="eui-dropdownmenu">
+
+    <aui-item-link for="euinumberSubmenu" name="number"><span class="icon-icomoon icon-number123"></span>
+            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.number')}</aui-item-link>
+    <aui-item-link href="#" name="currency"><span class="icon-icomoon icon-coin-dollar"></span>
+            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.currency')}</aui-item-link>
+    <aui-item-link href="#" name="percentage"><span class="icon-icomoon icon-percent"></span>
+            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.percentage')}</aui-item-link>
+    </aui-section>
+
+    <aui-section class="eui-dropdownmenu">
+    <aui-item-link href="#" name="borders"><span class="icon-icomoon icon-border"></span>
+            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.borders')}</aui-item-link>
+    </aui-section>
+
+    <aui-section class="eui-dropdownmenu">
+    <aui-item-link for="euiIndentSubmenu"><span class="aui-icon aui-icon-small aui-iconfont-editor-indent"></span>&nbsp;&nbsp; Indent</aui-item-link>
+    <aui-item-link for="euiJustifySubmenu"><span class="aui-icon aui-icon-small aui-iconfont-editor-align-left"></span>
+            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.justify.select')}</aui-item-link>
+    </aui-section>
+    <aui-section class="eui-dropdownmenu">
+    <aui-item-link href="#" name="clearformatting"><span class="icon-icomoon icon-clear-formatting"></span>
+            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.format.clear')}</aui-item-link>
+    </aui-section>
+</aui-dropdown-menu>
+
+<aui-dropdown-menu id="euinumberSubmenu">
+    <aui-section class="eui-dropdownmenu">
+    <aui-item-link href="#" name="general" data-control="customformat" data-value=""> General
+        <span class="eui-info">No specific format</span>
+    </aui-item-link>
+    <aui-item-link href="#" name="number" data-control="customformat" data-value="0.00"> Number
+        <span class="eui-info">435455.00</span>
+    </aui-item-link>
+    <aui-item-link href="#" name="currency" data-control="customformat" data-value="$#,##0.00"> Currency
+        <span class="eui-info">$435,455.00</span>
+    </aui-item-link>
+    <aui-item-link href="#" name="accounting" data-control="customformat" data-value="$ #,##0.00;$ (#,##0.00);$ \&quot;-\&quot;??;@"> Accounting
+        <span class="eui-info">$(435,455.00)</span>
+    </aui-item-link>
+    <aui-item-link href="#" name="shortdate" data-control="customformat" data-value="m/d/yyyy"> Short Date
+        <span class="eui-info">5/9/2018</span>
+    </aui-item-link>
+    <aui-item-link href="#" name="longdate" data-control="customformat" data-value="dddd, mmmm dd, yyyy"> Long Date
+        <span class="eui-info">Wednesday, May 9, 2018</span>
+    </aui-item-link>
+    <aui-item-link href="#" name="time" data-control="customformat" data-value="h:mm:ss AM/PM"> Time
+        <span class="eui-info">12:00:00 AM</span>
+    </aui-item-link>
+    <aui-item-link href="#" name="percentage" data-control="customformat" data-value="0.00%"> Percentage
+        <span class="eui-info">43545500.00%</span>
+    </aui-item-link>
+    <aui-item-link href="#" name="fraction" data-control="customformat" data-value="# ?/?"> Fraction
+        <span class="eui-info">435455</span>
+    </aui-item-link>
+    <aui-item-link href="#" name="scientific" data-control="customformat" data-value="0.00E+00"> Scientific
+      <span class="eui-info">4.35E+05</span>
+    </aui-item-link>
+    <aui-item-link href="#" name="text" data-control="customformat" data-value="@"> Text
+      <span class="eui-info">435455</span>
+    </aui-item-link>
+    </aui-section>
+</aui-dropdown-menu>
+
+<aui-dropdown-menu id="euiIndentSubmenu">
+    <aui-section class="eui-dropdownmenu">
+        <aui-item-link href="#" name="increaseindent"><span class="aui-icon aui-icon-small aui-iconfont-editor-indent"></span>
+            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.indent.increase')}</aui-item-link>
+        <aui-item-link href="#" name="decreaseindent"><span class="aui-icon aui-icon-small aui-iconfont-editor-outdent"></span>
+            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.indent.decrease')}</aui-item-link>
+    </aui-section>
+</aui-dropdown-menu>
+
+<aui-dropdown-menu id="euiJustifySubmenu">
+    <aui-section class="eui-dropdownmenu">
+    <aui-item-link href="#" name="justifyleft"><span class="aui-icon aui-icon-small aui-iconfont-editor-align-left"></span>
+            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.align.left')}</aui-item-link>
+    <aui-item-link href="#" name="justifycenter"><span class="aui-icon aui-icon-small aui-iconfont-editor-align-center"></span>
+            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.align.center')}</aui-item-link>
+    <aui-item-link href="#" name="justifyright"><span class="aui-icon aui-icon-small aui-iconfont-editor-align-right"></span>
+            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.align.right')}</aui-item-link>
+    </aui-section>
+</aui-dropdown-menu>
+
+<aui-dropdown-menu id="euiDataDropdown">
+    <aui-section class="eui-dropdownmenu">
+    <aui-item-link href="#" name="sortaz"><span class="fa icon-icomoon icon-sort-alpha-asc textside"></span>
+            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.sort.asc')}</aui-item-link>
+    <aui-item-link href="#" name="sortza"><span class="fa icon-icomoon icon-sort-alpha-desc textside"></span>
+            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.sort.desc')}</aui-item-link>
+    <aui-item-link href="#" name="rangeSort"><span class="fa icon-sort-amount-desc icon-icomoon"></span>
+            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.sort.range')}</aui-item-link>
+    </aui-section>
+    <aui-section class="eui-dropdownmenu">
+    <aui-item-link href="#" name="filter"><span class="fa icon-icomoon icon-filter"></span>
+            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.filter')}</aui-item-link>
+    </aui-section>
+    <aui-section class="eui-dropdownmenu">
+    <aui-item-link href="#" name="group"><span class="icon-icomoon icon-make-group"></span>
+            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.group')}</aui-item-link>
+    <aui-item-link href="#" name="ungroup"><span class="icon-icomoon icon-ungroup"></span>
+            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.ungroup')}</aui-item-link>
+    </aui-section>
+    <aui-section class="eui-dropdownmenu">
+    <aui-item-link href="#" name="comment"><span class="icon-icomoon icon-bubbles2"></span>
+            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.note')}</aui-item-link>
+    </aui-section>
+</aui-dropdown-menu>
+
+<aui-dropdown-menu id="euiHelpDropdown">
+    <aui-section class="eui-dropdownmenu">
+    <aui-item-link href="#" name="help"><span class="aui-icon aui-icon-small aui-iconfont-help"></span>
+            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.help')}</aui-item-link>
+    </aui-section>
+    <aui-section class="eui-dropdownmenu">
+    <aui-item-link href="#" name="bug"><span class="icon-icomoon icon-bug"></span>
+            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.report.bug')}</aui-item-link>
+    <aui-item-link href="#" name="feature"><span class="icon-icomoon icon-magic-wand"></span>
+            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.suggest.feature')}</aui-item-link>
+    </aui-section>
+    <aui-section class="eui-dropdownmenu">
+    <aui-item-link href="#" name="functionlist"><span class="icon-icomoon icon-sigma"></span>
+            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.function.list')}</aui-item-link>
+    <aui-item-link href="#" name="keyboardshortcuts"><span class="icon-icomoon icon-keyboard"></span>
+            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.keyboard.shortcut')}</aui-item-link>
+    </aui-section>
+    <aui-section class="eui-dropdownmenu">
+    <aui-item-link href="#" name="about"><span class="aui-icon aui-icon-small aui-iconfont-error"></span>&nbsp; About</aui-item-link>
+    </aui-section>
+</aui-dropdown-menu>
+
+    <ul class="tabs-menu hidden">
+        <li class="menu-item active-tab">
+            <a href="#euiFormatHome">{getText('com.addteq.confluence.plugin.excellentable.format')}</a>
+        </li>
+    </ul>
+
+    <div id="euiFormatHome" class="tabs-pane active-pane">
+        <ul style="padding:0px;">
+        <li>
+        <input id="euiColorSample" type="text" disabled="disabled" style="border:1px solid gray;" />
+        <button name="bold" class="aui-button aui-button-subtle eui-left-most-button">
+            <span class="aui-icon aui-icon-small aui-iconfont-editor-bold"></span>
+        </button>
+        <button name="italic" class="aui-button aui-button-subtle">
+            <span class="aui-icon aui-icon-small aui-iconfont-editor-italic"></span>
+        </button>
+        <button name="underline" class="aui-button aui-button-subtle">
+            <span class="aui-icon aui-icon-small aui-iconfont-editor-underline"></span>
+        </button>
+        <button name="backcolor" title="{getText('com.addteq.confluence.plugin.excellentable.color.background')}" class="aui-button aui-button-subtle">
+            <span id="euiMenubarBackcolorButtonDrop" class="icon-icomoon icon-droplet"></span>
+            <span class="eui-back-color-highlight"></span>
+        </button>
+        <button name="fontcolor" title="{getText('com.addteq.confluence.plugin.excellentable.color.font')}" class="aui-button aui-button-subtle">
+            <span class="icon-icomoon icon-text-color"></span>
+            <span class="eui-font-color-highlight"></span>
+        </button>
+        </li>
+            <li>
+                <span>
+                    <!-- Trigger -->
+                    <a href="#fontname" id="euiFontNameBox" name="fontname"
+                        title ="{getText('com.addteq.confluence.plugin.excellentable.font')}" data-gravity="s"
+                        aria-owns="euiFontNameArea" aria-haspopup="true" class="aui-button aui-style-default aui-dropdown2-trigger">
+                        {getText('com.addteq.confluence.plugin.excellentable.font.verdana')}
+                    </a>
+                    <!-- Dropdown -->
+                    <div id="euiFontNameArea" name="fontname" class="aui-style-default aui-dropdown2 eui-dropdown">
+                        <ul class="aui-list-truncate">
+                            <li>
+                                <a id="euiFn20" name="fn20" href="#" style="font-family:Alegreya;">
+                                    {getText('com.addteq.confluence.plugin.excellentable.font.alegreya')}
+                                </a>
+                            </li>
+                            <li>
+                                <a id="euiFn21" name="fn21" href="#" style="font-family:Amatic SC;">
+                                    {getText('com.addteq.confluence.plugin.excellentable.font.amaticsc')}
+                                </a>
+                            </li>
+                            <li>
+                                <a id="euiFn1" name="fn1" href="#" style="font-family:Arial;">
+                                    {getText('com.addteq.confluence.plugin.excellentable.font.arial')}
+                                </a>
+                            </li>
+                            <li>
+                                <a id="euiFn7" name="fn7" href="#" style="font-family:Arial Black;">
+                                    {getText('com.addteq.confluence.plugin.excellentable.font.arialblack')}
+                                </a>
+                            </li>
+                            <li>
+                                <a id="euiFn22" name="fn22" href="#" style="font-family:Bree Serif;">
+                                    {getText('com.addteq.confluence.plugin.excellentable.font.breeserif')}
+                                </a>
+                            </li>
+                            <li>
+                                <a id="euiFn6" name="fn6" href="#" style="font-family:Calibri;">
+                                    {getText('com.addteq.confluence.plugin.excellentable.font.calibri')}
+                                </a>
+                            </li>
+                            <li>
+                                <a id="euiFn8" name="fn8" href="#" style="font-family:Cambria;">
+                                    {getText('com.addteq.confluence.plugin.excellentable.font.cambria')}
+                                </a>
+                            </li>
+                            <li>
+                                <a id="euiFn9" name="fn9" href="#" style="font-family:Century;">
+                                    {getText('com.addteq.confluence.plugin.excellentable.font.century')}
+                                </a>
+                            </li>
+                            <li>
+                                <a id="euiFn5" name="fn5" href="#" style="font-family:Comic Sans MS;">
+                                    {getText('com.addteq.confluence.plugin.excellentable.font.comicsansms')}
+                                </a>
+                            </li>
+                            <li>
+                                <a id="euiFn2" name="fn2" href="#" style="font-family:Courier New;">
+                                    {getText('com.addteq.confluence.plugin.excellentable.font.couriernew')}
+                                </a>
+                            </li>
+                            <li>
+                                <a id="euiFn10" name="fn10" href="#" style="font-family:Garamond;">
+                                    {getText('com.addteq.confluence.plugin.excellentable.font.garamond')}
+                                </a>
+                            </li>
+                            <li>
+                                <a id="euiFn11" name="fn11" href="#" style="font-family:Georgia;">
+                                    {getText('com.addteq.confluence.plugin.excellentable.font.georgia')}
+                                </a>
+                            </li>
+                            <li>
+                                <a id="euiFn23" name="fn23" href="#" style="font-family:Impact;">
+                                    {getText('com.addteq.confluence.plugin.excellentable.font.impact')}
+                                </a>
+                            </li>
+                            <li>
+                                <a id="euiFn24" name="fn24" href="#" style="font-family:Merriweather;">
+                                    {getText('com.addteq.confluence.plugin.excellentable.font.merriweather')}
+                                </a>
+                            </li>
+                            <li>
+                                <a id="euiFn25" name="fn25" href="#" style="font-family:Permanent Marker;">
+                                    {getText('com.addteq.confluence.plugin.excellentable.font.permanentmarker')}
+                                </a>
+                            </li>
+                            <li>
+                                <a id="euiFn26" name="fn26" href="#" style="font-family:Pinyon Script;">
+                                    {getText('com.addteq.confluence.plugin.excellentable.font.pinyonscript')}
+                                </a>
+                            </li>
+                            <li>
+                                <a id="euiFn27" name="fn27" href="#" style="font-family:Playfair Display;">
+                                    {getText('com.addteq.confluence.plugin.excellentable.font.playfairdisplay')}
+                                </a>
+                            </li>
+                            <li>
+                                <a id="euiFn28" name="fn28" href="#" style="font-family:Roboto;">
+                                    {getText('com.addteq.confluence.plugin.excellentable.font.roboto')}
+                                </a>
+                            </li>
+                            <li>
+                                <a id="euiFn29" name="fn29" href="#" style="font-family:Roboto Mono;">
+                                    {getText('com.addteq.confluence.plugin.excellentable.font.robotomono')}
+                                </a>
+                            </li>
+                            <li>
+                            <li>
+                                <a id="euiFn17" name="fn17" href="#" style="font-family:Tahoma;">
+                                    {getText('com.addteq.confluence.plugin.excellentable.font.tahoma')}
+                                </a>
+                            </li>
+                            <li>
+                                <a id="euiFn3" name="fn3" href="#" style="font-family:Times New Roman;">
+                                    {getText('com.addteq.confluence.plugin.excellentable.font.timesnewroman')}
+                                </a>
+                            </li>
+                            <li>
+                                <a id="euiFn18" name="fn18" href="#" style="font-family:Trebuchet MS;">
+                                    {getText('com.addteq.confluence.plugin.excellentable.font.trebuchetms')}
+                                </a>
+                            </li>
+                            <li>
+                            <li>
+                                <a id="euiFn30" name="fn30" href="#" style="font-family:Ultra;">
+                                    {getText('com.addteq.confluence.plugin.excellentable.font.ultra')}
+                                </a>
+                            </li>
+                            <li>
+                                <a id="euiFn31" name="fn31" href="#" style="font-family:Varela Round;">
+                                    {getText('com.addteq.confluence.plugin.excellentable.font.varelaround')}
+                                </a>
+                            </li>
+                            <li>
+                                <a id="euiFn4" name="fn4" href="#" style="font-family:Verdana;">
+                                    {getText('com.addteq.confluence.plugin.excellentable.font.verdana')}
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </span>
+                <span>
+                    <!-- Trigger -->
+                    <a href="#fontsize" name="fontsize" title ="{getText('com.addteq.confluence.plugin.excellentable.font.size')}"
+                         data-gravity="s" aria-owns="euiFontSizeArea" aria-haspopup="true" class="aui-button aui-style-default aui-dropdown2-trigger">10</a>
+                    <!-- Dropdown -->
+                    <div id="euiFontSizeArea" name="fontsize" class="aui-style-default aui-dropdown2 eui-dropdown">
+                        <ul class="aui-list-truncate">
+                            <li>
+                                <a id="euiFs1" name="fs1" href="#">6</a>
+                            </li>
+                            <li>
+                                <a id="euiFs2" name="fs2" href="#">7</a>
+                            </li>
+                            <li>
+                                <a id="euiFs3" name="fs3" href="#">8</a>
+                            </li>
+                            <li>
+                                <a id="euiFs4" name="fs4" href="#">9</a>
+                            </li>
+                            <li>
+                                <a id="euiFs5" name="fs5" href="#">10</a>
+                            </li>
+                            <li>
+                                <a id="euiFs6" name="fs6" href="#">11</a>
+                            </li>
+                            <li>
+                                <a id="euiFs7" name="fs7" href="#">12</a>
+                            </li>
+                            <li>
+                                <a id="euiFs8" name="fs8" href="#">14</a>
+                            </li>
+                            <li>
+                                <a id="euiFs9" name="fs9" href="#">18</a>
+                            </li>
+                            <li>
+                                <a id="euiFs10" name="fs10" href="#">24</a>
+                            </li>
+                            <li>
+                                <a id="euiFs11" name="fs11" href="#">36</a>
+                            </li>
+                        </ul>
+                    </div>
+                </span>
+            </li>
+            <li>
+            <button name="currency" class="aui-button aui-button-subtle">
+                <span class="icon-icomoon icon-coin-dollar"></span>
+            </button>
+            <button name="percentage" class="aui-button aui-button-subtle">
+                <span class="icon-icomoon icon-percent"></span>
+            </button>
+            <button name="decrementdecimal" title="{getText('com.addteq.confluence.plugin.excellentable.decimal.places.decrease')}"
+                data-gravity="s" class="aui-button aui-button-subtle" >
+                <span class="icon-icomoon  icon-decrease-decimal-places"></span>
+            </button>
+            <button name="incrementdecimal" title="{getText('com.addteq.confluence.plugin.excellentable.decimal.places.increase')}"
+                data-gravity="s" class="aui-button aui-button-subtle">
+                <span class="icon-icomoon icon-increase-decimal-places"></span>
+            </button>
+            <button name="number" class="aui-button aui-button-subtle">
+                <span class="icon-icomoon icon-number123"></span>
+            </button>
+            </li>
+            <li>
+                <span>
+                <button id="euiWrapSelect" class="aui-button aui-dropdown2-trigger"
+                  title = "{getText('com.addteq.confluence.plugin.excellentable.wrap.select')}"
+                  data-gravity="s" aria-owns="wraptextDropdown" aria-controls="euiWrapDropdown">
+                  <span class="icon-icomoon icon-textwrapover"></span>
+                </button>
+                    <!-- Dropdown -->
+                    <aui-dropdown-menu id="euiWrapDropdown">
+                        <aui-section class="eui-dropdownmenu">
+                        <aui-item-link href="#" name="overflowtext"><span class="icon-icomoon icon-textwrapover"></span>
+                            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.overflow')}</aui-item-link>
+                        <aui-item-link href="#" name="wraptext"><span class="icon-icomoon icon-textwrap"></span>
+                            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.wrap')}</aui-item-link>
+                        <aui-item-link href="#" name="cliptext"><span class="icon-icomoon icon-textwrapunder"></span>
+                            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.clip')}</aui-item-link>
+                        </aui-section>
+                    </aui-dropdown-menu>
+                </span>
+                <span>
+                <button id="euiJustifySelect" class="aui-button aui-dropdown2-trigger"
+                    title = "{getText('com.addteq.confluence.plugin.excellentable.justify.select')}"data-gravity="s" aria-controls="euiJustifyDropdown">
+                  <span class="aui-icon aui-icon-small aui-iconfont-editor-align-left"></span>
+                </button>
+                    <!-- Dropdown -->
+                    <aui-dropdown-menu id="euiJustifyDropdown">
+                        <aui-section class="eui-dropdownmenu">
+                        <aui-item-link href="#" name="justifyleft"><span class="aui-icon aui-icon-small aui-iconfont-editor-align-left"></span>
+                            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.align.left')}</aui-item-link>
+                        <aui-item-link href="#" name="justifycenter"><span class="aui-icon aui-icon-small aui-iconfont-editor-align-center"></span>
+                            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.align.center')}</aui-item-link>
+                        <aui-item-link href="#" name="justifyright"><span class="aui-icon aui-icon-small aui-iconfont-editor-align-right"></span>
+                            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.align.right')}</aui-item-link>
+                        </aui-section>
+                    </aui-dropdown-menu>
+                </span>
+
+                <span>
+                <button id="euiVerticalAlign" class="aui-button aui-dropdown2-trigger"
+                    title = "{getText('com.addteq.confluence.plugin.excellentable.align.vertical')}"
+                    data-gravity="s" aria-owns="verticalAlignDropdown" aria-controls="euiVerticalAlignDropdown">
+                  <span class="icon-icomoon icon-middle-align"></span>
+                </button>
+                    <!-- Dropdown -->
+                    <aui-dropdown-menu id="euiVerticalAlignDropdown">
+                        <aui-section class="eui-dropdownmenu">
+                        <aui-item-link href="#" name="alignTop"><span class="icon-icomoon icon-top-align"></span>
+                            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.align.top')}</aui-item-link>
+                        <aui-item-link href="#" name="alignMiddle"><span class="icon-icomoon icon-middle-align"></span>
+                            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.align.middle')}</aui-item-link>
+                        <aui-item-link href="#" name="alignBottom"><span class="icon-icomoon icon-bottom-align"></span>
+                            &nbsp;&nbsp;{getText('com.addteq.confluence.plugin.excellentable.align.bottom')}</aui-item-link>
+                        </aui-section>
+                    </aui-dropdown-menu>
+                </span>
+
+
+                    <button name="borders" title="{getText('com.addteq.confluence.plugin.excellentable.borders')}"
+                        data-gravity="s" class="aui-button aui-button-subtle">
+                        <span class="icon-icomoon icon-border"></span>
+                    </button>
+
+
+            </li>
+            <li>
+                    <button name="merge" title="{getText('com.addteq.confluence.plugin.excellentable.cell.merge')}"
+                        data-gravity="s" class="aui-button aui-button-subtle">
+                        <span class="aui-icon aui-icon-small aui-iconfont-table-merge"></span>
+                    </button>
+                    <button name="unmerge" title="{getText('com.addteq.confluence.plugin.excellentable.cell.unmerge')}"
+                        data-gravity="s" class="aui-button aui-button-subtle">
+                        <span class="aui-icon aui-icon-small aui-iconfont-table-split"></span>
+                    </button>
+            </li>
+        </ul>
+    </div>
+</div>
+
+/**** Excellentable Message Container ****/
+<div id="euiMessagePanel"></div>
+
+/**** Formula Bar ****/
+<table id="euiFormulaBar" style="position:relative;width: 100%;">
+    <tr>
+        <td>
+            <input type="text" id="euiPositionBox" disabled="disabled"
+                style="text-align: center; height: 18px;margin: 0;float:left;width:8%;margin-right:5px;"></input>
+            <textarea id="euiFormulaBox" spellcheck="false" style="float:left;width:88%;line-height:16px;"/>
+        </td>
+    </tr>
+</table>
+
+/**** Main Container ****/
+<div id="euiControlPanel" style="bottom: 0;">
+    <div class="eui-edit-spread" spellcheck="false" style="width:100%;">
+        <div id="euiPrintArea"></div>
+    </div>
+</div>
+<div class="eui-print"></div>
+<table id="euiStatusBar" style="width: 100%;height: auto;padding-top:6px;">
+    <tr>
+        <td style="background-color: #217346;">
+            <span id="euiRapidInputMode" style="font-family: 'Segoe UI'; font-size: 9pt; margin-left:16px; color: white" />
+        </td>
+        <td style="width: 300px; background-color: #217346;">
+            <input type="range" min="25" max="400" value="100" step="5"
+                style="width: 100%; margin: 0;border: none; padding: 0;" onchange="zoomFactor_Changed(this.value/100)" />
+        </td>
+        <td>
+            <input id="euiOpenFile" hidden="hidden" type="file" style="visibility: collapse" accept=".xls, .xlsx, .csv, .ods"/>
+            <input id="euiSpreadContentChanged" type="hidden" value="false">
+            <form id="euiExport" action = "{$contextPath}/rest/excellentable/1.0/export"
+                class="aui" method = "post" enctype="multipart/form-data">
+                <input type="hidden" id="euiExportType" name="exportType"/>
+                <input type="hidden" id="euiDataVal" name="data"/>
+                <input type="hidden" id="euiExportFileNameVal" name="exportFileName"/>
+                <button class ="aui-button exportToExcel" style="float:left;">Export</button>
+            </form>
+        </td>
+    </tr>
+</table>
+
+
+/**** For edit history ****/
+<div id="euiWrapper" class="eui-wrapper"></div>
+    <nav id="euiMenuPushRight" class="eui-menu eui-menu-push-right">
+        <div class="eui-version-header" style="background:green;">
+            <button class="eui-version-menu-bar">
+            <span class="icon-icomoon icon-history" id="euiVersionMenuBarHeaderIcon"></span>
+                 {getText('com.addteq.confluence.plugin.excellentable.version.history')}
+            </button>
+        </div>
+        <div class="eui-version-history-container">
+            <ul class="eui-version-menu-items"></ul>
+        </div>
+    </nav>
+    <div id="euiVersionMask" class="eui-version-mask">
+        <div class="eui-version-topBar">
+            <span title="{getText('com.addteq.confluence.plugin.excellentable.dialog.close')}"
+                class="eui-version-menu-close aui-icon aui-icon-small aui-iconfont-close-dialog"></span>
+        </div>
+        <div id="euiVersionSpread"></div>
+    </div>
+/**** End for edit history ****/
+
+/** Sheet Delete warning dialog that asks user confirmation to delete **/
+<section id="sheet-delete-warning-dialog" class="aui-dialog2 aui-dialog2-medium aui-dialog2-warning aui-layer" role="dialog" aria-hidden="true">
+    <header class="aui-dialog2-header">
+        <h2 class="aui-dialog2-header-main">{getText('com.addteq.confluence.plugin.excellentable.confirmsheetdeletion')}</h2>
+        <a class="aui-dialog2-header-close">
+            <span class="aui-icon aui-icon-small aui-iconfont-close-dialog">Close</span>
+        </a>
+    </header>
+    <div class="aui-dialog2-content">
+        <p>{getText('com.addteq.confluence.plugin.excellentable.sheetdeleteareyousure')}</p>
+    </div>
+    <footer class="aui-dialog2-footer">
+        <div class="aui-dialog2-footer-actions">
+            <button id="sheet-delete-confirm-button" class="aui-button aui-button-primary">
+            {getText('com.addteq.confluence.plugin.excellentable.delete.sheet')}</button>
+        </div>
+    </footer>
+</section>
+
+/**** EUI Tabstrip *****/
+<div id="eui-tab-strip">
+    /*   Sheet Tab Context Menu. */
+    <button class="aui-button aui-dropdown2-trigger aui-dropdown2-trigger-arrowless eui-dropdown hidden" id="eui-tab-context-menu-trigger" aria-controls="eui-tab-context-menu">Sheet Tab Context Menu</button>
+    <aui-dropdown-menu id="eui-tab-context-menu" data-aui-alignment-container="#eui-tab-strip">
+        <aui-section class="eui-dropdownmenu">
+            <aui-item-link data-name="deletesheet" data-action="remove"><span class="aui-icon aui-icon-small aui-iconfont-delete"></span>&nbsp;
+                {getText('com.addteq.confluence.plugin.excellentable.context.menu.delete')}
+            </aui-item-link>
+
+            <aui-item-link data-name="renamesheet" data-action="rename"><span class="aui-icon aui-icon-small aui-iconfont-build"></span>&nbsp;
+                {getText('com.addteq.confluence.plugin.excellentable.context.menu.rename')}
+            </aui-item-link>
+
+            <aui-item-link data-name="protectsheet" data-action="protect"><span class="aui-icon aui-icon-small aui-iconfont-locked"></span>&nbsp;
+                {getText('com.addteq.confluence.plugin.excellentable.context.menu.protect')}
+            </aui-item-link>
+
+        </aui-section>
+     </aui-dropdown-menu>
+    <div class="eui-tab-strip-container">
+        <div class="eui-tab-strip-dd hidden">
+            <ul class="eui-menu-list menu-list eui-tab-nav" data-nav-type="menu">
+            </ul>         
+        </div>
+        <div class="eui-tab-strip-scrollbar">
+        </div>
+        <div class="eui-tab-strip-controls">
+            <span id="euiTabstripAddSheet" class="aui-icon aui-icon-small aui-iconfont-add eui-tab-strip-icon" title="{getText('com.addteq.confluence.plugin.excellentable.tabstrip.newsheet')}">{getText('com.addteq.confluence.plugin.excellentable.tabstrip.newsheet')}</span>
+            <span id="euiTabstripOptions" class="aui-icon aui-icon-small aui-iconfont-menu eui-tab-strip-icon" title="{getText('com.addteq.confluence.plugin.excellentable.tabstrip.allsheets')}">{getText('com.addteq.confluence.plugin.excellentable.tabstrip.allsheets')}</span>
+        </div>
+        <div class="eui-tab-strip-tabs">
+            <div class="aui-tabs horizontal-tabs">
+                <ul class="eui-tabs-menu tabs-menu eui-tab-nav" data-nav-type="tabs">
+                </ul>
+            </div>
+        </div>
+        <div class="eui-scrolloptions hidden">
+            <span id="euiScrollLeft" class="fa fa-caret-left eui-tab-strip-icon"></span>
+            <span id="euiScrollRight" class="fa fa-caret-right eui-tab-strip-icon"></span>
+        </div>
+    </div>
+</div>
+
+
+{/template}
+
+
+/****************************************
+ * Load Font.
+ * @param contextPath
+ * @param font
+*******************************************/
+{template .fontTag}
+    <style>
+        @font-face{lb} {\n}
+            font-family:{$font.fontfamily}; {\n}
+            src: url("{$contextPath}/download/resources/Addteq.Excellentable:spreadJSResourcesV1/fonts/{$font.fontfile}") format("truetype"); {\n}
+            font-weight: normal; {\n}
+            font-style: normal; {\n}
+        {rb}
+    </style>
+{/template}

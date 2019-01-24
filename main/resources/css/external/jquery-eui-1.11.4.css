@@ -1,0 +1,1225 @@
+/*! jQuery UI - v1.11.4 - 2015-03-11
+* http://jqueryui.com
+* Includes: core.css, accordion.css, autocomplete.css, button.css, datepicker.css, dialog.css, draggable.css, menu.css, progressbar.css, resizable.css, selectable.css, selectmenu.css, slider.css, sortable.css, spinner.css, tabs.css, tooltip.css, theme.css
+* To view and modify this theme, visit http://jqueryui.com/themeroller/?ffDefault=Trebuchet%20MS%2CTahoma%2CVerdana%2CArial%2Csans-serif&fwDefault=bold&fsDefault=1.1em&cornerRadius=4px&bgColorHeader=f6a828&bgTextureHeader=gloss_wave&bgImgOpacityHeader=35&borderColorHeader=e78f08&fcHeader=ffffff&iconColorHeader=ffffff&bgColorContent=eeeeee&bgTextureContent=highlight_soft&bgImgOpacityContent=100&borderColorContent=dddddd&fcContent=333333&iconColorContent=222222&bgColorDefault=f6f6f6&bgTextureDefault=glass&bgImgOpacityDefault=100&borderColorDefault=cccccc&fcDefault=1c94c4&iconColorDefault=ef8c08&bgColorHover=fdf5ce&bgTextureHover=glass&bgImgOpacityHover=100&borderColorHover=fbcb09&fcHover=c77405&iconColorHover=ef8c08&bgColorActive=ffffff&bgTextureActive=glass&bgImgOpacityActive=65&borderColorActive=fbd850&fcActive=eb8f00&iconColorActive=ef8c08&bgColorHighlight=ffe45c&bgTextureHighlight=highlight_soft&bgImgOpacityHighlight=75&borderColorHighlight=fed22f&fcHighlight=363636&iconColorHighlight=228ef1&bgColorError=b81900&bgTextureError=diagonals_thick&bgImgOpacityError=18&borderColorError=cd0a0a&fcError=ffffff&iconColorError=ffd27a&bgColorOverlay=666666&bgTextureOverlay=diagonals_thick&bgImgOpacityOverlay=20&opacityOverlay=50&bgColorShadow=000000&bgTextureShadow=flat&bgImgOpacityShadow=10&opacityShadow=20&thicknessShadow=5px&offsetTopShadow=-5px&offsetLeftShadow=-5px&cornerRadiusShadow=5px
+* Copyright 2015 jQuery Foundation and other contributors; Licensed MIT */
+
+/* Layout helpers
+----------------------------------*/
+.eui-helper-hidden {
+	display: none;
+}
+.eui-helper-hidden-accessible {
+	border: 0;
+	clip: rect(0 0 0 0);
+	height: 1px;
+	margin: -1px;
+	overflow: hidden;
+	padding: 0;
+	position: absolute;
+	width: 1px;
+}
+.eui-helper-reset {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	outline: 0;
+	line-height: 1.3;
+	text-decoration: none;
+	font-size: 100%;
+	list-style: none;
+}
+.eui-helper-clearfix:before,
+.eui-helper-clearfix:after {
+	content: "";
+	display: table;
+	border-collapse: collapse;
+}
+.eui-helper-clearfix:after {
+	clear: both;
+}
+.eui-helper-clearfix {
+	min-height: 0; /* support: IE7 */
+}
+.eui-helper-zfix {
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+	position: absolute;
+	opacity: 0;
+	filter:Alpha(Opacity=0); /* support: IE8 */
+}
+
+.eui-front {
+	z-index: 100;
+}
+
+
+/* Interaction Cues
+----------------------------------*/
+.eui-state-disabled {
+	cursor: default !important;
+}
+
+
+/* Icons
+----------------------------------*/
+
+/* states and images */
+.eui-icon {
+	display: block;
+	text-indent: -99999px;
+	overflow: hidden;
+	background-repeat: no-repeat;
+}
+
+
+/* Misc visuals
+----------------------------------*/
+
+/* Overlays */
+.eui-widget-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+.eui-accordion .eui-accordion-header {
+	display: block;
+	cursor: pointer;
+	position: relative;
+	margin: 2px 0 0 0;
+	padding: .5em .5em .5em .7em;
+	min-height: 0; /* support: IE7 */
+	font-size: 100%;
+}
+.eui-accordion .eui-accordion-icons {
+	padding-left: 2.2em;
+}
+.eui-accordion .eui-accordion-icons .eui-accordion-icons {
+	padding-left: 2.2em;
+}
+.eui-accordion .eui-accordion-header .eui-accordion-header-icon {
+	position: absolute;
+	left: .5em;
+	top: 50%;
+	margin-top: -8px;
+}
+.eui-accordion .eui-accordion-content {
+	padding: 1em 2.2em;
+	border-top: 0;
+	overflow: auto;
+}
+.eui-autocomplete {
+	position: absolute;
+	top: 0;
+	left: 0;
+	cursor: default;
+}
+.eui-button {
+	display: inline-block;
+	position: relative;
+	padding: 0;
+	line-height: normal;
+	margin-right: .1em;
+	cursor: pointer;
+	vertical-align: middle;
+	text-align: center;
+	overflow: visible; /* removes extra width in IE */
+}
+.eui-button,
+.eui-button:link,
+.eui-button:visited,
+.eui-button:hover,
+.eui-button:active {
+	text-decoration: none;
+}
+/* to make room for the icon, a width needs to be set here */
+.eui-button-icon-only {
+	width: 2.2em;
+}
+/* button elements seem to need a little more width */
+button.eui-button-icon-only {
+	width: 2.4em;
+}
+.eui-button-icons-only {
+	width: 3.4em;
+}
+button.eui-button-icons-only {
+	width: 3.7em;
+}
+
+/* button text element */
+.eui-button .eui-button-text {
+	display: block;
+	line-height: normal;
+}
+.eui-button-text-only .eui-button-text {
+	padding: .4em 1em;
+}
+.eui-button-icon-only .eui-button-text,
+.eui-button-icons-only .eui-button-text {
+	padding: .4em;
+	text-indent: -9999999px;
+}
+.eui-button-text-icon-primary .eui-button-text,
+.eui-button-text-icons .eui-button-text {
+	padding: .4em 1em .4em 2.1em;
+}
+.eui-button-text-icon-secondary .eui-button-text,
+.eui-button-text-icons .eui-button-text {
+	padding: .4em 2.1em .4em 1em;
+}
+.eui-button-text-icons .eui-button-text {
+	padding-left: 2.1em;
+	padding-right: 2.1em;
+}
+/* no icon support for input elements, provide padding by default */
+input.eui-button {
+	padding: .4em 1em;
+}
+
+/* button icon element(s) */
+.eui-button-icon-only .eui-icon,
+.eui-button-text-icon-primary .eui-icon,
+.eui-button-text-icon-secondary .eui-icon,
+.eui-button-text-icons .eui-icon,
+.eui-button-icons-only .eui-icon {
+	position: absolute;
+	top: 50%;
+	margin-top: -8px;
+}
+.eui-button-icon-only .eui-icon {
+	left: 50%;
+	margin-left: -8px;
+}
+.eui-button-text-icon-primary .eui-button-icon-primary,
+.eui-button-text-icons .eui-button-icon-primary,
+.eui-button-icons-only .eui-button-icon-primary {
+	left: .5em;
+}
+.eui-button-text-icon-secondary .eui-button-icon-secondary,
+.eui-button-text-icons .eui-button-icon-secondary,
+.eui-button-icons-only .eui-button-icon-secondary {
+	right: .5em;
+}
+
+/* button sets */
+.eui-buttonset {
+	margin-right: 7px;
+}
+.eui-buttonset .eui-button {
+	margin-left: 0;
+	margin-right: -.3em;
+}
+
+/* workarounds */
+/* reset extra padding in Firefox, see h5bp.com/l */
+input.eui-button::-moz-focus-inner,
+button.eui-button::-moz-focus-inner {
+	border: 0;
+	padding: 0;
+}
+.eui-datepicker {
+	width: 17em;
+	padding: .2em .2em 0;
+	display: none;
+}
+.eui-datepicker .eui-datepicker-header {
+	position: relative;
+	padding: .2em 0;
+}
+.eui-datepicker .eui-datepicker-prev,
+.eui-datepicker .eui-datepicker-next {
+	position: absolute;
+	top: 2px;
+	width: 1.8em;
+	height: 1.8em;
+}
+.eui-datepicker .eui-datepicker-prev-hover,
+.eui-datepicker .eui-datepicker-next-hover {
+	top: 1px;
+}
+.eui-datepicker .eui-datepicker-prev {
+	left: 2px;
+}
+.eui-datepicker .eui-datepicker-next {
+	right: 2px;
+}
+.eui-datepicker .eui-datepicker-prev-hover {
+	left: 1px;
+}
+.eui-datepicker .eui-datepicker-next-hover {
+	right: 1px;
+}
+.eui-datepicker .eui-datepicker-prev span,
+.eui-datepicker .eui-datepicker-next span {
+	display: block;
+	position: absolute;
+	left: 50%;
+	margin-left: -8px;
+	top: 50%;
+	margin-top: -8px;
+}
+.eui-datepicker .eui-datepicker-title {
+	margin: 0 2.3em;
+	line-height: 1.8em;
+	text-align: center;
+}
+.eui-datepicker .eui-datepicker-title select {
+	font-size: 1em;
+	margin: 1px 0;
+}
+.eui-datepicker select.eui-datepicker-month,
+.eui-datepicker select.eui-datepicker-year {
+	width: 45%;
+}
+.eui-datepicker table {
+	width: 100%;
+	font-size: .9em;
+	border-collapse: collapse;
+	margin: 0 0 .4em;
+}
+.eui-datepicker th {
+	padding: .7em .3em;
+	text-align: center;
+	font-weight: bold;
+	border: 0;
+}
+.eui-datepicker td {
+	border: 0;
+	padding: 1px;
+}
+.eui-datepicker td span,
+.eui-datepicker td a {
+	display: block;
+	padding: .2em;
+	text-align: right;
+	text-decoration: none;
+}
+.eui-datepicker .eui-datepicker-buttonpane {
+	background-image: none;
+	margin: .7em 0 0 0;
+	padding: 0 .2em;
+	border-left: 0;
+	border-right: 0;
+	border-bottom: 0;
+}
+.eui-datepicker .eui-datepicker-buttonpane button {
+	float: right;
+	margin: .5em .2em .4em;
+	cursor: pointer;
+	padding: .2em .6em .3em .6em;
+	width: auto;
+	overflow: visible;
+}
+.eui-datepicker .eui-datepicker-buttonpane button.eui-datepicker-current {
+	float: left;
+}
+
+/* with multiple calendars */
+.eui-datepicker.eui-datepicker-multi {
+	width: auto;
+}
+.eui-datepicker-multi .eui-datepicker-group {
+	float: left;
+}
+.eui-datepicker-multi .eui-datepicker-group table {
+	width: 95%;
+	margin: 0 auto .4em;
+}
+.eui-datepicker-multi-2 .eui-datepicker-group {
+	width: 50%;
+}
+.eui-datepicker-multi-3 .eui-datepicker-group {
+	width: 33.3%;
+}
+.eui-datepicker-multi-4 .eui-datepicker-group {
+	width: 25%;
+}
+.eui-datepicker-multi .eui-datepicker-group-last .eui-datepicker-header,
+.eui-datepicker-multi .eui-datepicker-group-middle .eui-datepicker-header {
+	border-left-width: 0;
+}
+.eui-datepicker-multi .eui-datepicker-buttonpane {
+	clear: left;
+}
+.eui-datepicker-row-break {
+	clear: both;
+	width: 100%;
+	font-size: 0;
+}
+
+/* RTL support */
+.eui-datepicker-rtl {
+	direction: rtl;
+}
+.eui-datepicker-rtl .eui-datepicker-prev {
+	right: 2px;
+	left: auto;
+}
+.eui-datepicker-rtl .eui-datepicker-next {
+	left: 2px;
+	right: auto;
+}
+.eui-datepicker-rtl .eui-datepicker-prev:hover {
+	right: 1px;
+	left: auto;
+}
+.eui-datepicker-rtl .eui-datepicker-next:hover {
+	left: 1px;
+	right: auto;
+}
+.eui-datepicker-rtl .eui-datepicker-buttonpane {
+	clear: right;
+}
+.eui-datepicker-rtl .eui-datepicker-buttonpane button {
+	float: left;
+}
+.eui-datepicker-rtl .eui-datepicker-buttonpane button.eui-datepicker-current,
+.eui-datepicker-rtl .eui-datepicker-group {
+	float: right;
+}
+.eui-datepicker-rtl .eui-datepicker-group-last .eui-datepicker-header,
+.eui-datepicker-rtl .eui-datepicker-group-middle .eui-datepicker-header {
+	border-right-width: 0;
+	border-left-width: 1px;
+}
+.eui-dialog {
+	overflow: hidden;
+	position: absolute;
+	top: 0;
+	left: 0;
+	padding: .2em;
+	outline: 0;
+}
+.eui-dialog .eui-dialog-titlebar {
+	padding: .4em 1em;
+	position: relative;
+}
+.eui-dialog .eui-dialog-title {
+	float: left;
+	margin: .1em 0;
+	white-space: nowrap;
+	width: 90%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+.eui-dialog .eui-dialog-titlebar-close {
+	position: absolute;
+	right: .3em;
+	top: 50%;
+	width: 20px;
+	margin: -10px 0 0 0;
+	padding: 1px;
+	height: 20px;
+}
+.eui-dialog .eui-dialog-content {
+	position: relative;
+	border: 0;
+	padding: .5em 1em;
+	background: none;
+	overflow: auto;
+}
+.eui-dialog .eui-dialog-buttonpane {
+	text-align: left;
+	border-width: 1px 0 0 0;
+	background-image: none;
+	margin-top: .5em;
+	padding: .3em 1em .5em .4em;
+}
+.eui-dialog .eui-dialog-buttonpane .eui-dialog-buttonset {
+	float: right;
+}
+.eui-dialog .eui-dialog-buttonpane button {
+	margin: .5em .4em .5em 0;
+	cursor: pointer;
+}
+.eui-dialog .eui-resizable-se {
+	width: 12px;
+	height: 12px;
+	right: -5px;
+	bottom: -5px;
+	background-position: 16px 16px;
+}
+.eui-draggable .eui-dialog-titlebar {
+	cursor: move;
+}
+.eui-draggable-handle {
+	-ms-touch-action: none;
+	touch-action: none;
+}
+.eui-menu {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	display: block;
+	outline: none;
+}
+.eui-menu .eui-menu {
+	position: absolute;
+}
+.eui-menu .eui-menu-item {
+	position: relative;
+	margin: 0;
+	padding: 3px 1em 3px .4em;
+	cursor: pointer;
+	min-height: 0; /* support: IE7 */
+	/* support: IE10, see #8844 */
+	list-style-image: url("data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7");
+}
+.eui-menu .eui-menu-divider {
+	margin: 5px 0;
+	height: 0;
+	font-size: 0;
+	line-height: 0;
+	border-width: 1px 0 0 0;
+}
+.eui-menu .eui-state-focus,
+.eui-menu .eui-state-active {
+	margin: -1px;
+}
+
+/* icon support */
+.eui-menu-icons {
+	position: relative;
+}
+.eui-menu-icons .eui-menu-item {
+	padding-left: 2em;
+}
+
+/* left-aligned */
+.eui-menu .eui-icon {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: .2em;
+	margin: auto 0;
+}
+
+/* right-aligned */
+.eui-menu .eui-menu-icon {
+	left: auto;
+	right: 0;
+}
+.eui-progressbar {
+	height: 2em;
+	text-align: left;
+	overflow: hidden;
+}
+.eui-progressbar .eui-progressbar-value {
+	margin: -1px;
+	height: 100%;
+}
+.eui-progressbar .eui-progressbar-overlay {
+	background: url("data:image/gif;base64,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");
+	height: 100%;
+	filter: alpha(opacity=25); /* support: IE8 */
+	opacity: 0.25;
+}
+.eui-progressbar-indeterminate .eui-progressbar-value {
+	background-image: none;
+}
+.eui-resizable {
+	position: relative;
+}
+.eui-resizable-handle {
+	position: absolute;
+	font-size: 0.1px;
+	display: block;
+	-ms-touch-action: none;
+	touch-action: none;
+}
+.eui-resizable-disabled .eui-resizable-handle,
+.eui-resizable-autohide .eui-resizable-handle {
+	display: none;
+}
+.eui-resizable-n {
+	cursor: n-resize;
+	height: 7px;
+	width: 100%;
+	top: -5px;
+	left: 0;
+}
+.eui-resizable-s {
+	cursor: s-resize;
+	height: 7px;
+	width: 100%;
+	bottom: -5px;
+	left: 0;
+}
+.eui-resizable-e {
+	cursor: e-resize;
+	width: 7px;
+	right: -5px;
+	top: 0;
+	height: 100%;
+}
+.eui-resizable-w {
+	cursor: w-resize;
+	width: 7px;
+	left: -5px;
+	top: 0;
+	height: 100%;
+}
+.eui-resizable-se {
+	cursor: se-resize;
+	width: 12px;
+	height: 12px;
+	right: 1px;
+	bottom: 1px;
+}
+.eui-resizable-sw {
+	cursor: sw-resize;
+	width: 9px;
+	height: 9px;
+	left: -5px;
+	bottom: -5px;
+}
+.eui-resizable-nw {
+	cursor: nw-resize;
+	width: 9px;
+	height: 9px;
+	left: -5px;
+	top: -5px;
+}
+.eui-resizable-ne {
+	cursor: ne-resize;
+	width: 9px;
+	height: 9px;
+	right: -5px;
+	top: -5px;
+}
+.eui-selectable {
+	-ms-touch-action: none;
+	touch-action: none;
+}
+.eui-selectable-helper {
+	position: absolute;
+	z-index: 100;
+	border: 1px dotted black;
+}
+.eui-selectmenu-menu {
+	padding: 0;
+	margin: 0;
+	position: absolute;
+	top: 0;
+	left: 0;
+	display: none;
+}
+.eui-selectmenu-menu .eui-menu {
+	overflow: auto;
+	/* Support: IE7 */
+	overflow-x: hidden;
+	padding-bottom: 1px;
+}
+.eui-selectmenu-menu .eui-menu .eui-selectmenu-optgroup {
+	font-size: 1em;
+	font-weight: bold;
+	line-height: 1.5;
+	padding: 2px 0.4em;
+	margin: 0.5em 0 0 0;
+	height: auto;
+	border: 0;
+}
+.eui-selectmenu-open {
+	display: block;
+}
+.eui-selectmenu-button {
+	display: inline-block;
+	overflow: hidden;
+	position: relative;
+	text-decoration: none;
+	cursor: pointer;
+}
+.eui-selectmenu-button span.eui-icon {
+	right: 0.5em;
+	left: auto;
+	margin-top: -8px;
+	position: absolute;
+	top: 50%;
+}
+.eui-selectmenu-button span.eui-selectmenu-text {
+	text-align: left;
+	padding: 0.4em 2.1em 0.4em 1em;
+	display: block;
+	line-height: 1.4;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.eui-slider {
+	position: relative;
+	text-align: left;
+}
+.eui-slider .eui-slider-handle {
+	position: absolute;
+	z-index: 2;
+	width: 1.2em;
+	height: 1.2em;
+	cursor: default;
+	-ms-touch-action: none;
+	touch-action: none;
+}
+.eui-slider .eui-slider-range {
+	position: absolute;
+	z-index: 1;
+	font-size: .7em;
+	display: block;
+	border: 0;
+	background-position: 0 0;
+}
+
+/* support: IE8 - See #6727 */
+.eui-slider.eui-state-disabled .eui-slider-handle,
+.eui-slider.eui-state-disabled .eui-slider-range {
+	filter: inherit;
+}
+
+.eui-slider-horizontal {
+	height: .8em;
+}
+.eui-slider-horizontal .eui-slider-handle {
+	top: -.3em;
+	margin-left: -.6em;
+}
+.eui-slider-horizontal .eui-slider-range {
+	top: 0;
+	height: 100%;
+}
+.eui-slider-horizontal .eui-slider-range-min {
+	left: 0;
+}
+.eui-slider-horizontal .eui-slider-range-max {
+	right: 0;
+}
+
+.eui-slider-vertical {
+	width: .8em;
+	height: 100px;
+}
+.eui-slider-vertical .eui-slider-handle {
+	left: -.3em;
+	margin-left: 0;
+	margin-bottom: -.6em;
+}
+.eui-slider-vertical .eui-slider-range {
+	left: 0;
+	width: 100%;
+}
+.eui-slider-vertical .eui-slider-range-min {
+	bottom: 0;
+}
+.eui-slider-vertical .eui-slider-range-max {
+	top: 0;
+}
+.eui-sortable-handle {
+	-ms-touch-action: none;
+	touch-action: none;
+}
+.eui-spinner {
+	position: relative;
+	display: inline-block;
+	overflow: hidden;
+	padding: 0;
+	vertical-align: middle;
+}
+.eui-spinner-input {
+	border: none;
+	background: none;
+	color: inherit;
+	padding: 0;
+	margin: .2em 0;
+	vertical-align: middle;
+	margin-left: .4em;
+	margin-right: 22px;
+}
+.eui-spinner-button {
+	width: 16px;
+	height: 50%;
+	font-size: .5em;
+	padding: 0;
+	margin: 0;
+	text-align: center;
+	position: absolute;
+	cursor: default;
+	display: block;
+	overflow: hidden;
+	right: 0;
+}
+/* more specificity required here to override default borders */
+.eui-spinner a.eui-spinner-button {
+	border-top: none;
+	border-bottom: none;
+	border-right: none;
+}
+/* vertically center icon */
+.eui-spinner .eui-icon {
+	position: absolute;
+	margin-top: -8px;
+	top: 50%;
+	left: 0;
+}
+.eui-spinner-up {
+	top: 0;
+}
+.eui-spinner-down {
+	bottom: 0;
+}
+
+/* TR overrides */
+.eui-spinner .eui-icon-triangle-1-s {
+	/* need to fix icons sprite */
+	background-position: -65px -16px;
+}
+.eui-tabs {
+	position: relative;/* position: relative prevents IE scroll bug (element with position: relative inside container with overflow: auto appear as "fixed") */
+	padding: .2em;
+}
+.eui-tabs .eui-tabs-nav {
+	margin: 0;
+	padding: .2em .2em 0;
+}
+.eui-tabs .eui-tabs-nav li {
+	list-style: none;
+	float: left;
+	position: relative;
+	top: 0;
+	margin: 1px .2em 0 0;
+	border-bottom-width: 0;
+	padding: 0;
+	white-space: nowrap;
+}
+.eui-tabs .eui-tabs-nav .eui-tabs-anchor {
+	float: left;
+	padding: .5em 1em;
+	text-decoration: none;
+}
+.eui-tabs .eui-tabs-nav li.eui-tabs-active {
+	margin-bottom: -1px;
+	padding-bottom: 1px;
+}
+.eui-tabs .eui-tabs-nav li.eui-tabs-active .eui-tabs-anchor,
+.eui-tabs .eui-tabs-nav li.eui-state-disabled .eui-tabs-anchor,
+.eui-tabs .eui-tabs-nav li.eui-tabs-loading .eui-tabs-anchor {
+	cursor: text;
+}
+.eui-tabs-collapsible .eui-tabs-nav li.eui-tabs-active .eui-tabs-anchor {
+	cursor: pointer;
+}
+.eui-tabs .eui-tabs-panel {
+	display: block;
+	border-width: 0;
+	padding: 1em 1.4em;
+	background: none;
+}
+.eui-tooltip {
+	padding: 8px;
+	position: absolute;
+	z-index: 9999;
+	max-width: 300px;
+	-webkit-box-shadow: 0 0 5px #aaa;
+	box-shadow: 0 0 5px #aaa;
+}
+body .eui-tooltip {
+	border-width: 2px;
+}
+
+/* Component containers
+----------------------------------*/
+.eui-widget {
+	font-family: Trebuchet MS,Tahoma,Verdana,Arial,sans-serif;
+	font-size: 1.1em;
+}
+.eui-widget .eui-widget {
+	font-size: 1em;
+}
+.eui-widget input,
+.eui-widget select,
+.eui-widget textarea,
+.eui-widget button {
+	font-family: Trebuchet MS,Tahoma,Verdana,Arial,sans-serif;
+	font-size: 1em;
+}
+.eui-widget-content {
+	border: 1px solid #dddddd;
+	background: #eeeeee url("images/eui-bg_highlight-soft_100_eeeeee_1x100.png") 50% top repeat-x;
+	color: #333333;
+}
+.eui-widget-content a {
+	color: #333333;
+}
+.eui-widget-header {
+	border: 1px solid #e78f08;
+	background: #f6a828 url("images/eui-bg_gloss-wave_35_f6a828_500x100.png") 50% 50% repeat-x;
+	color: #ffffff;
+	font-weight: bold;
+}
+.eui-widget-header a {
+	color: #ffffff;
+}
+
+/* Interaction states
+----------------------------------*/
+.eui-state-default,
+.eui-widget-content .eui-state-default,
+.eui-widget-header .eui-state-default {
+	border: 1px solid #cccccc;
+	background: #f6f6f6 url("images/eui-bg_glass_100_f6f6f6_1x400.png") 50% 50% repeat-x;
+	font-weight: bold;
+	color: #1c94c4;
+}
+.eui-state-default a,
+.eui-state-default a:link,
+.eui-state-default a:visited {
+	color: #1c94c4;
+	text-decoration: none;
+}
+.eui-state-hover,
+.eui-widget-content .eui-state-hover,
+.eui-widget-header .eui-state-hover,
+.eui-state-focus,
+.eui-widget-content .eui-state-focus,
+.eui-widget-header .eui-state-focus {
+	border: 1px solid #fbcb09;
+	background: #fdf5ce url("images/eui-bg_glass_100_fdf5ce_1x400.png") 50% 50% repeat-x;
+	font-weight: bold;
+	color: #c77405;
+}
+.eui-state-hover a,
+.eui-state-hover a:hover,
+.eui-state-hover a:link,
+.eui-state-hover a:visited,
+.eui-state-focus a,
+.eui-state-focus a:hover,
+.eui-state-focus a:link,
+.eui-state-focus a:visited {
+	color: #c77405;
+	text-decoration: none;
+}
+.eui-state-active,
+.eui-widget-content .eui-state-active,
+.eui-widget-header .eui-state-active {
+	border: 1px solid #fbd850;
+	background: #ffffff url("images/eui-bg_glass_65_ffffff_1x400.png") 50% 50% repeat-x;
+	font-weight: bold;
+	color: #eb8f00;
+}
+.eui-state-active a,
+.eui-state-active a:link,
+.eui-state-active a:visited {
+	color: #eb8f00;
+	text-decoration: none;
+}
+
+/* Interaction Cues
+----------------------------------*/
+.eui-state-highlight,
+.eui-widget-content .eui-state-highlight,
+.eui-widget-header .eui-state-highlight {
+	border: 1px solid #fed22f;
+	background: #ffe45c url("images/eui-bg_highlight-soft_75_ffe45c_1x100.png") 50% top repeat-x;
+	color: #363636;
+}
+.eui-state-highlight a,
+.eui-widget-content .eui-state-highlight a,
+.eui-widget-header .eui-state-highlight a {
+	color: #363636;
+}
+.eui-state-error,
+.eui-widget-content .eui-state-error,
+.eui-widget-header .eui-state-error {
+	border: 1px solid #cd0a0a;
+	background: #b81900 url("images/eui-bg_diagonals-thick_18_b81900_40x40.png") 50% 50% repeat;
+	color: #ffffff;
+}
+.eui-state-error a,
+.eui-widget-content .eui-state-error a,
+.eui-widget-header .eui-state-error a {
+	color: #ffffff;
+}
+.eui-state-error-text,
+.eui-widget-content .eui-state-error-text,
+.eui-widget-header .eui-state-error-text {
+	color: #ffffff;
+}
+.eui-priority-primary,
+.eui-widget-content .eui-priority-primary,
+.eui-widget-header .eui-priority-primary {
+	font-weight: bold;
+}
+.eui-priority-secondary,
+.eui-widget-content .eui-priority-secondary,
+.eui-widget-header .eui-priority-secondary {
+	opacity: .7;
+	filter:Alpha(Opacity=70); /* support: IE8 */
+	font-weight: normal;
+}
+.eui-state-disabled,
+.eui-widget-content .eui-state-disabled,
+.eui-widget-header .eui-state-disabled {
+	opacity: .35;
+	filter:Alpha(Opacity=35); /* support: IE8 */
+	background-image: none;
+}
+.eui-state-disabled .eui-icon {
+	filter:Alpha(Opacity=35); /* support: IE8 - See #6059 */
+}
+
+/* Icons
+----------------------------------*/
+
+/* states and images */
+.eui-icon {
+	width: 16px;
+	height: 16px;
+}
+.eui-icon,
+.eui-widget-content .eui-icon {
+	background-image: url("images/eui-icons_222222_256x240.png");
+}
+.eui-widget-header .eui-icon {
+	background-image: url("images/eui-icons_ffffff_256x240.png");
+}
+.eui-state-default .eui-icon {
+	background-image: url("images/eui-icons_ef8c08_256x240.png");
+}
+.eui-state-hover .eui-icon,
+.eui-state-focus .eui-icon {
+	background-image: url("images/eui-icons_ef8c08_256x240.png");
+}
+.eui-state-active .eui-icon {
+	background-image: url("images/eui-icons_ef8c08_256x240.png");
+}
+.eui-state-highlight .eui-icon {
+	background-image: url("images/eui-icons_228ef1_256x240.png");
+}
+.eui-state-error .eui-icon,
+.eui-state-error-text .eui-icon {
+	background-image: url("images/eui-icons_ffd27a_256x240.png");
+}
+
+/* positioning */
+.eui-icon-blank { background-position: 16px 16px; }
+.eui-icon-carat-1-n { background-position: 0 0; }
+.eui-icon-carat-1-ne { background-position: -16px 0; }
+.eui-icon-carat-1-e { background-position: -32px 0; }
+.eui-icon-carat-1-se { background-position: -48px 0; }
+.eui-icon-carat-1-s { background-position: -64px 0; }
+.eui-icon-carat-1-sw { background-position: -80px 0; }
+.eui-icon-carat-1-w { background-position: -96px 0; }
+.eui-icon-carat-1-nw { background-position: -112px 0; }
+.eui-icon-carat-2-n-s { background-position: -128px 0; }
+.eui-icon-carat-2-e-w { background-position: -144px 0; }
+.eui-icon-triangle-1-n { background-position: 0 -16px; }
+.eui-icon-triangle-1-ne { background-position: -16px -16px; }
+.eui-icon-triangle-1-e { background-position: -32px -16px; }
+.eui-icon-triangle-1-se { background-position: -48px -16px; }
+.eui-icon-triangle-1-s { background-position: -64px -16px; }
+.eui-icon-triangle-1-sw { background-position: -80px -16px; }
+.eui-icon-triangle-1-w { background-position: -96px -16px; }
+.eui-icon-triangle-1-nw { background-position: -112px -16px; }
+.eui-icon-triangle-2-n-s { background-position: -128px -16px; }
+.eui-icon-triangle-2-e-w { background-position: -144px -16px; }
+.eui-icon-arrow-1-n { background-position: 0 -32px; }
+.eui-icon-arrow-1-ne { background-position: -16px -32px; }
+.eui-icon-arrow-1-e { background-position: -32px -32px; }
+.eui-icon-arrow-1-se { background-position: -48px -32px; }
+.eui-icon-arrow-1-s { background-position: -64px -32px; }
+.eui-icon-arrow-1-sw { background-position: -80px -32px; }
+.eui-icon-arrow-1-w { background-position: -96px -32px; }
+.eui-icon-arrow-1-nw { background-position: -112px -32px; }
+.eui-icon-arrow-2-n-s { background-position: -128px -32px; }
+.eui-icon-arrow-2-ne-sw { background-position: -144px -32px; }
+.eui-icon-arrow-2-e-w { background-position: -160px -32px; }
+.eui-icon-arrow-2-se-nw { background-position: -176px -32px; }
+.eui-icon-arrowstop-1-n { background-position: -192px -32px; }
+.eui-icon-arrowstop-1-e { background-position: -208px -32px; }
+.eui-icon-arrowstop-1-s { background-position: -224px -32px; }
+.eui-icon-arrowstop-1-w { background-position: -240px -32px; }
+.eui-icon-arrowthick-1-n { background-position: 0 -48px; }
+.eui-icon-arrowthick-1-ne { background-position: -16px -48px; }
+.eui-icon-arrowthick-1-e { background-position: -32px -48px; }
+.eui-icon-arrowthick-1-se { background-position: -48px -48px; }
+.eui-icon-arrowthick-1-s { background-position: -64px -48px; }
+.eui-icon-arrowthick-1-sw { background-position: -80px -48px; }
+.eui-icon-arrowthick-1-w { background-position: -96px -48px; }
+.eui-icon-arrowthick-1-nw { background-position: -112px -48px; }
+.eui-icon-arrowthick-2-n-s { background-position: -128px -48px; }
+.eui-icon-arrowthick-2-ne-sw { background-position: -144px -48px; }
+.eui-icon-arrowthick-2-e-w { background-position: -160px -48px; }
+.eui-icon-arrowthick-2-se-nw { background-position: -176px -48px; }
+.eui-icon-arrowthickstop-1-n { background-position: -192px -48px; }
+.eui-icon-arrowthickstop-1-e { background-position: -208px -48px; }
+.eui-icon-arrowthickstop-1-s { background-position: -224px -48px; }
+.eui-icon-arrowthickstop-1-w { background-position: -240px -48px; }
+.eui-icon-arrowreturnthick-1-w { background-position: 0 -64px; }
+.eui-icon-arrowreturnthick-1-n { background-position: -16px -64px; }
+.eui-icon-arrowreturnthick-1-e { background-position: -32px -64px; }
+.eui-icon-arrowreturnthick-1-s { background-position: -48px -64px; }
+.eui-icon-arrowreturn-1-w { background-position: -64px -64px; }
+.eui-icon-arrowreturn-1-n { background-position: -80px -64px; }
+.eui-icon-arrowreturn-1-e { background-position: -96px -64px; }
+.eui-icon-arrowreturn-1-s { background-position: -112px -64px; }
+.eui-icon-arrowrefresh-1-w { background-position: -128px -64px; }
+.eui-icon-arrowrefresh-1-n { background-position: -144px -64px; }
+.eui-icon-arrowrefresh-1-e { background-position: -160px -64px; }
+.eui-icon-arrowrefresh-1-s { background-position: -176px -64px; }
+.eui-icon-arrow-4 { background-position: 0 -80px; }
+.eui-icon-arrow-4-diag { background-position: -16px -80px; }
+.eui-icon-extlink { background-position: -32px -80px; }
+.eui-icon-newwin { background-position: -48px -80px; }
+.eui-icon-refresh { background-position: -64px -80px; }
+.eui-icon-shuffle { background-position: -80px -80px; }
+.eui-icon-transfer-e-w { background-position: -96px -80px; }
+.eui-icon-transferthick-e-w { background-position: -112px -80px; }
+.eui-icon-folder-collapsed { background-position: 0 -96px; }
+.eui-icon-folder-open { background-position: -16px -96px; }
+.eui-icon-document { background-position: -32px -96px; }
+.eui-icon-document-b { background-position: -48px -96px; }
+.eui-icon-note { background-position: -64px -96px; }
+.eui-icon-mail-closed { background-position: -80px -96px; }
+.eui-icon-mail-open { background-position: -96px -96px; }
+.eui-icon-suitcase { background-position: -112px -96px; }
+.eui-icon-comment { background-position: -128px -96px; }
+.eui-icon-person { background-position: -144px -96px; }
+.eui-icon-print { background-position: -160px -96px; }
+.eui-icon-trash { background-position: -176px -96px; }
+.eui-icon-locked { background-position: -192px -96px; }
+.eui-icon-unlocked { background-position: -208px -96px; }
+.eui-icon-bookmark { background-position: -224px -96px; }
+.eui-icon-tag { background-position: -240px -96px; }
+.eui-icon-home { background-position: 0 -112px; }
+.eui-icon-flag { background-position: -16px -112px; }
+.eui-icon-calendar { background-position: -32px -112px; }
+.eui-icon-cart { background-position: -48px -112px; }
+.eui-icon-pencil { background-position: -64px -112px; }
+.eui-icon-clock { background-position: -80px -112px; }
+.eui-icon-disk { background-position: -96px -112px; }
+.eui-icon-calculator { background-position: -112px -112px; }
+.eui-icon-zoomin { background-position: -128px -112px; }
+.eui-icon-zoomout { background-position: -144px -112px; }
+.eui-icon-search { background-position: -160px -112px; }
+.eui-icon-wrench { background-position: -176px -112px; }
+.eui-icon-gear { background-position: -192px -112px; }
+.eui-icon-heart { background-position: -208px -112px; }
+.eui-icon-star { background-position: -224px -112px; }
+.eui-icon-link { background-position: -240px -112px; }
+.eui-icon-cancel { background-position: 0 -128px; }
+.eui-icon-plus { background-position: -16px -128px; }
+.eui-icon-plusthick { background-position: -32px -128px; }
+.eui-icon-minus { background-position: -48px -128px; }
+.eui-icon-minusthick { background-position: -64px -128px; }
+.eui-icon-close { background-position: -80px -128px; }
+.eui-icon-closethick { background-position: -96px -128px; }
+.eui-icon-key { background-position: -112px -128px; }
+.eui-icon-lightbulb { background-position: -128px -128px; }
+.eui-icon-scissors { background-position: -144px -128px; }
+.eui-icon-clipboard { background-position: -160px -128px; }
+.eui-icon-copy { background-position: -176px -128px; }
+.eui-icon-contact { background-position: -192px -128px; }
+.eui-icon-image { background-position: -208px -128px; }
+.eui-icon-video { background-position: -224px -128px; }
+.eui-icon-script { background-position: -240px -128px; }
+.eui-icon-alert { background-position: 0 -144px; }
+.eui-icon-info { background-position: -16px -144px; }
+.eui-icon-notice { background-position: -32px -144px; }
+.eui-icon-help { background-position: -48px -144px; }
+.eui-icon-check { background-position: -64px -144px; }
+.eui-icon-bullet { background-position: -80px -144px; }
+.eui-icon-radio-on { background-position: -96px -144px; }
+.eui-icon-radio-off { background-position: -112px -144px; }
+.eui-icon-pin-w { background-position: -128px -144px; }
+.eui-icon-pin-s { background-position: -144px -144px; }
+.eui-icon-play { background-position: 0 -160px; }
+.eui-icon-pause { background-position: -16px -160px; }
+.eui-icon-seek-next { background-position: -32px -160px; }
+.eui-icon-seek-prev { background-position: -48px -160px; }
+.eui-icon-seek-end { background-position: -64px -160px; }
+.eui-icon-seek-start { background-position: -80px -160px; }
+/* eui-icon-seek-first is deprecated, use eui-icon-seek-start instead */
+.eui-icon-seek-first { background-position: -80px -160px; }
+.eui-icon-stop { background-position: -96px -160px; }
+.eui-icon-eject { background-position: -112px -160px; }
+.eui-icon-volume-off { background-position: -128px -160px; }
+.eui-icon-volume-on { background-position: -144px -160px; }
+.eui-icon-power { background-position: 0 -176px; }
+.eui-icon-signal-diag { background-position: -16px -176px; }
+.eui-icon-signal { background-position: -32px -176px; }
+.eui-icon-battery-0 { background-position: -48px -176px; }
+.eui-icon-battery-1 { background-position: -64px -176px; }
+.eui-icon-battery-2 { background-position: -80px -176px; }
+.eui-icon-battery-3 { background-position: -96px -176px; }
+.eui-icon-circle-plus { background-position: 0 -192px; }
+.eui-icon-circle-minus { background-position: -16px -192px; }
+.eui-icon-circle-close { background-position: -32px -192px; }
+.eui-icon-circle-triangle-e { background-position: -48px -192px; }
+.eui-icon-circle-triangle-s { background-position: -64px -192px; }
+.eui-icon-circle-triangle-w { background-position: -80px -192px; }
+.eui-icon-circle-triangle-n { background-position: -96px -192px; }
+.eui-icon-circle-arrow-e { background-position: -112px -192px; }
+.eui-icon-circle-arrow-s { background-position: -128px -192px; }
+.eui-icon-circle-arrow-w { background-position: -144px -192px; }
+.eui-icon-circle-arrow-n { background-position: -160px -192px; }
+.eui-icon-circle-zoomin { background-position: -176px -192px; }
+.eui-icon-circle-zoomout { background-position: -192px -192px; }
+.eui-icon-circle-check { background-position: -208px -192px; }
+.eui-icon-circlesmall-plus { background-position: 0 -208px; }
+.eui-icon-circlesmall-minus { background-position: -16px -208px; }
+.eui-icon-circlesmall-close { background-position: -32px -208px; }
+.eui-icon-squaresmall-plus { background-position: -48px -208px; }
+.eui-icon-squaresmall-minus { background-position: -64px -208px; }
+.eui-icon-squaresmall-close { background-position: -80px -208px; }
+.eui-icon-grip-dotted-vertical { background-position: 0 -224px; }
+.eui-icon-grip-dotted-horizontal { background-position: -16px -224px; }
+.eui-icon-grip-solid-vertical { background-position: -32px -224px; }
+.eui-icon-grip-solid-horizontal { background-position: -48px -224px; }
+.eui-icon-gripsmall-diagonal-se { background-position: -64px -224px; }
+.eui-icon-grip-diagonal-se { background-position: -80px -224px; }
+
+
+/* Misc visuals
+----------------------------------*/
+
+/* Corner radius */
+.eui-corner-all,
+.eui-corner-top,
+.eui-corner-left,
+.eui-corner-tl {
+	border-top-left-radius: 4px;
+}
+.eui-corner-all,
+.eui-corner-top,
+.eui-corner-right,
+.eui-corner-tr {
+	border-top-right-radius: 4px;
+}
+.eui-corner-all,
+.eui-corner-bottom,
+.eui-corner-left,
+.eui-corner-bl {
+	border-bottom-left-radius: 4px;
+}
+.eui-corner-all,
+.eui-corner-bottom,
+.eui-corner-right,
+.eui-corner-br {
+	border-bottom-right-radius: 4px;
+}
+
+/* Overlays */
+.eui-widget-overlay {
+	background: #666666 url("images/eui-bg_diagonals-thick_20_666666_40x40.png") 50% 50% repeat;
+	opacity: .5;
+	filter: Alpha(Opacity=50); /* support: IE8 */
+}
+.eui-widget-shadow {
+	margin: -5px 0 0 -5px;
+	padding: 5px;
+	background: #000000 url("images/eui-bg_flat_10_000000_40x100.png") 50% 50% repeat-x;
+	opacity: .2;
+	filter: Alpha(Opacity=20); /* support: IE8 */
+	border-radius: 5px;
+}

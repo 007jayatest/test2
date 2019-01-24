@@ -1,0 +1,5407 @@
+var spreadId = ".eui-edit-spread", contextMenuId="#euiSpreadContextMenu", sheetAreaHitTest,dialogId = "#euiDialog";
+var sortRangeDialogId = "#euiSortRangeDialog";
+var confluenceDialogHeaderHeight = 60,confluenceDialogFooterHeight = 25, ns = $.wijmo.wijspread;
+var defaultHyperLinkColor = "#0000FF";
+var excTableFilterName= "exc-table-filter";
+var defaultRowHeight = 25;
+var defaultColWidth = 150;
+var defaultFontSize = "10pt ";
+var formatError = false;
+var defaultRowColHeaderFontSize = "11pt ";
+var defaultFontName = AJS.I18n.getText('com.addteq.confluence.plugin.excellentable.font.verdana');
+var Excellentable = window.Excellentable || {};
+var hovernote;
+var clicknote;
+var protectedCellsBySheet = {};
+var HorizontalAlign = {
+		classes : {
+			0 : "aui-iconfont-editor-align-left",
+			1 : "aui-iconfont-editor-align-center",
+			2 : "aui-iconfont-editor-align-right",
+			3 : "aui-iconfont-editor-align-left"},
+
+		setIcon : function(c){
+			$("#euiJustifySelect span").attr("class","aui-icon aui-icon-small " + this.classes[c]);
+		}
+	}
+var VerticalAlign = {
+    classes: {
+        0: "icon-top-align",
+        1: "icon-middle-align",
+        2: "icon-bottom-align"
+    },
+    setIcon: function (c) {
+        $("#euiVerticalAlign span").attr("class", "icon-icomoon " + this.classes[c]);
+    }
+}
+
+//The global variable that shows the cell note to be displayed both on hover and click cell.
+// body attribute will be changed dynamically - see usages of this variable.
+
+var noteFlag = {
+    "type": 'warning',
+    "title": AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.note"),
+    "body": ""
+};
+
+/**
+ * Adjusts the protected/vs unprotected lock in the context menu to be shown to the user,
+ * depending on whether is sheet is protected or not. If the sheet is protected, it will show the option to unprotect
+ * and vice versa.
+ *
+ * @param SHEET_TAB_MENU
+ * @param isprotected
+ */
+function adjustProtectedLockAndSheetTabColorInContextMenu(SHEET_TAB_MENU, isprotected, activeSheet) {
+    var protectedSpan = AJS.$(SHEET_TAB_MENU).find("div > aui-section > div > aui-item-link[name='protectsheet'] > a > span");
+    var protectedAnchor = AJS.$(SHEET_TAB_MENU).find("div > aui-section > div > aui-item-link[name='protectsheet'] > a");
+    var protectMessage = AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.context.menu.protect");
+    var unProtectMessage = AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.context.menu.unprotect");
+    if (isprotected) {
+        // Add unlock icon and set text to Unprotect
+        protectedSpan.removeClass("aui-iconfont-locked");
+        protectedSpan.addClass("aui-iconfont-unlocked");
+        setTextContents(protectedAnchor, " " + unProtectMessage);
+        activeSheet.sheetTabColor("#c0392b");
+    } else {
+        //Add lock icon and set text to Protect
+        protectedSpan.removeClass("aui-iconfont-unlocked");
+        protectedSpan.addClass("aui-iconfont-locked");
+        setTextContents(protectedAnchor, " " + protectMessage);
+        activeSheet.sheetTabColor("default");
+    }
+}
+
+/**
+ * Toggle lock/unlock items on the context menu
+ * @param {SpreadJS} sheet
+ */
+function showProtectCellContextMenu(sheet) {
+    var protectedSpan = AJS.$(contextMenuId).find("aui-item-link[name='protectcell'] > a > span"),
+        protectedAnchor = AJS.$(contextMenuId).find("aui-item-link[name='protectcell'] > a"),
+        protectMessage = AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.context.menu.protect.cells"),
+        unProtectMessage = AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.context.menu.unprotect.cells"),
+        selection = sheet.getSelections().pop(),
+        cellRange = getSelectedCells(sheet, selection),
+        isprotected = cellRange.locked() === 'protected';
+
+    if (isprotected) {
+        protectedSpan.removeClass("aui-iconfont-locked");
+        protectedSpan.addClass("aui-iconfont-unlocked");
+        setTextContents(protectedAnchor, " " + unProtectMessage);
+        return;
+    }
+
+    protectedSpan.removeClass("aui-iconfont-unlocked");
+    protectedSpan.addClass("aui-iconfont-locked");
+    setTextContents(protectedAnchor, " " + protectMessage);
+}
+
+/**
+ * Toggle the protected state of the current selection
+ *
+ * @param {SpreadJS} sheet
+ */
+function toggleCellRangeProtect(sheet) {
+    var selection = sheet.getSelections().pop(),
+        cellRange = getSelectedCells(sheet, selection),
+        isprotected = cellRange.locked() === 'protected';
+
+    cellRange.locked(!isprotected && 'protected' || false);
+    refreshProtectedCellCount();
+}
+
+/**
+ * Set the protected cell count for all the sheets in the document
+ *
+ * @param {SpreadJS} tableMetaData (optional)
+ */
+function refreshProtectedCellCount(tableMetaData) {
+    /**
+     * Workaround to fetch all the protected cells, rows and columns.
+     * FYI: This is only possible through the use of the metaData object generated by the toJSON() method.
+     * SpreadJS does NOT provide any other alternative to get the protected cells information.
+     */
+
+    var spreadObj = jQuery(spreadId).wijspread("spread");
+
+    //No need to check in view mode
+    if (!spreadObj) {
+        return;
+    }
+
+    if (!tableMetaData) {
+        var tableMetaData = spreadObj.toJSON();
+    }
+
+    var sheets = tableMetaData.sheets;
+
+    lodash.forEach(sheets, function(sheet) {
+        var sheetName = sheet.name;
+
+        //Resets headers resize state
+        if (protectedCellsBySheet[sheetName]) {
+            lodash.forEach(protectedCellsBySheet[sheetName].rows, function(row) {
+                spreadObj.getSheet(sheet.index).setRowResizable(row, true);
+            });
+
+            lodash.forEach(protectedCellsBySheet[sheetName].cols, function(col) {
+                spreadObj.getSheet(sheet.index).setColumnResizable(col, true);
+            });
+        }
+
+        refreshProtectedCellsInSheet(sheet, spreadObj);
+    });
+}
+
+/**
+ * Set the protected cell count for a specific sheet in the document
+ *
+ * @param {MetaData} sheet
+ * @param {SpreadJS} spreadObj
+ */
+function refreshProtectedCellsInSheet(sheet, spreadObj) {
+    var count = 0,
+        sheetName = sheet.name;
+
+    protectedCellsBySheet[sheetName] = { count: 0, rows: [], cols: [] };
+
+    var refreshCell = function(row, col) {
+        if (protectedCellsBySheet[sheetName].rows.indexOf(parseInt(row)) === -1) {
+            protectedCellsBySheet[sheetName].rows.push(parseInt(row));
+            spreadObj.getSheet(sheet.index).setRowResizable(row, false);
+        }
+
+        if (protectedCellsBySheet[sheetName].cols.indexOf(parseInt(col)) === -1) {
+            protectedCellsBySheet[sheetName].cols.push(parseInt(col));
+            spreadObj.getSheet(sheet.index).setColumnResizable(col, false);
+        }
+
+        count ++;
+    };
+
+    lodash.forEach(sheet.data.dataTable, function(rowData, row) {
+        lodash.forEach(rowData, function(cellData, col){
+            //EXC-4676 check if style is undefined as it returns undefined when content is programatically entered into cell
+            if(cellData.style !== undefined){
+                if (cellData.style.locked !== 'protected') {
+                    return;
+                }
+                
+                refreshCell(row, col); 
+            }
+            return;
+        });
+    });
+
+    protectedCellsBySheet[sheetName].count = count;
+    if(jQuery().ExcellentableTabStrip.update) {
+       jQuery('body').ExcellentableTabStrip.update();   
+    }
+}
+
+/**
+ * Check if the selection has any protected cells
+ * @param SpreadJS sheet
+ * @param SpreadJS selection
+ * @returns {boolean}
+*/
+function selectionHasProtectedCell(sheet, selection) {
+   //This works for single cell selections or when the protected cells are on the extremities of the current selection
+   if (getSelectedCells(sheet, selection).locked() === 'protected') {
+       return true;
+   }
+
+   var cells = sheet.getCells(selection.row, selection.col, selection.row + selection.rowCount, selection.col + selection.colCount);
+
+   for (var row = cells.row; row < cells.row2; row++) {
+       for (var col = cells.col; col < cells.col2; col++) {
+            if (sheet.getCell(row, col).locked() === 'protected') {
+                return true;
+            }
+       }
+   }
+
+   return false;
+}
+
+/**
+ * Check if the first cell of the selection is protected. This is used in Filter cells for now.
+ * @param sheet
+ * @param selection
+ * @returns {boolean}
+ */
+function isTheFirstCellOfSelectionProtected(sheet, selection) {
+
+    var cells = sheet.getCells(selection.row, selection.col, selection.row + selection.rowCount, selection.col + selection.colCount);
+
+    //EXC-4742: If a header column is selected, increment the selected cell row index by 1 so that we can now look into the first cell of the selection
+    if(cells.row === -1) {
+        cells.row++;
+    }
+
+    //EXC-4742: If a header row is selected, increment the selected cell column index by 1 so that we can now look into the first cell of the selection
+    if (cells.col === -1) {
+        cells.col++;
+    }
+
+    if (sheet.getCell(cells.row, cells.col).locked() === 'protected') {
+        return true;
+    }
+
+    return false;
+}
+
+/**
+ * Check if the sheet has any protected cells
+ * @param {SpreadJS} sheet
+ * @returns {boolean}
+ */
+function sheetHasProtectedCell(sheet) {
+    var sheetName = sheet.getName();
+    return protectedCellsBySheet[sheetName] && protectedCellsBySheet[sheetName].count;
+}
+
+/**
+ * Check if the row has any protected cells
+ * @param {SpreadJS} sheet
+ * @param {int} col
+ * @returns {boolean}
+ */
+function rowHasProtectedCell(sheet, row) {
+    var sheetName = sheet.getName();
+    return  protectedCellsBySheet[sheetName] && protectedCellsBySheet[sheetName].rows.indexOf(parseInt(row)) !== -1;
+}
+
+/**
+ * Check if the column has any protected cells
+ * @param {SpreadJS} sheet
+ * @param {int} col
+ * @returns {boolean}
+ */
+function colHasProtectedCell(sheet, col) {
+    var sheetName = sheet.getName();
+    return protectedCellsBySheet[sheetName] && protectedCellsBySheet[sheetName].cols.indexOf(parseInt(col)) !== -1;
+}
+
+/**
+ * Check if the current selection is composed of a single cell
+ * @param {SpreadJS} sheet
+ * @returns {boolean}
+ */
+function isSingleCellSelection(sheet) {
+  var selection = sheet.getSelections()[0];
+  return selection.rowCount === 1 && selection.colCount === 1;
+}
+
+function findTablesInSelection(sheet) {
+    var selection = sheet.getSelections()[0];
+    var cells = sheet.getCells(selection.row, selection.col, selection.row + selection.rowCount, selection.col + selection.colCount);
+    var tableNames = [];
+    var tables = [];
+
+    for (var row = cells.row; row < cells.row2; row++) {
+        for (var col = cells.col; col < cells.col2; col++) {
+            var table = sheet.findTable(row, col);
+            if(table){
+                tableNames.push(table._name);
+            }
+        }
+    }
+
+    var uniqueTableNames = tableNames.filter(function(item, index){
+        return tableNames.indexOf(item) >= index;
+    });
+
+    uniqueTableNames.forEach(function(el) {
+        tables.push(sheet.findTableByName(el));
+    });
+
+   return tables;
+}
+
+/**
+ * This is a helper method too extract the Node value from an html element without taking into consideration
+ * the subelements within it. This is currently used adjustProtectedLockAndSheetTabColorInContextMenu method to adjust the value of the
+ * anchor tag which has a span tag inside it.
+ *
+ * @param $elem
+ * @param text
+ */
+function setTextContents($elem, text) {
+    $elem.contents().filter(function() {
+        if (this.nodeType === Node.TEXT_NODE) {
+            this.nodeValue = text;
+        }
+    });
+}
+
+//Get installed plugin version
+function getInstalledVersion() {
+    var installedVersion = $.ajax({
+        url: AJS.contextPath() + "/rest/excellentable/1.0/content/version/installed",
+        dataType: "text",
+        type: "GET"
+    });
+    return installedVersion;
+
+}
+//Get latest marketplace version
+function getLatestVersion() {
+    var latestVersion = $.ajax({
+        url: "https://marketplace.atlassian.com/rest/2/addons/Addteq.Excellentable/versions/latest"
+    });
+    return latestVersion;
+}
+
+function aboutDialog() {
+    var versionMsgHtml = "";
+    jQuery.when(getInstalledVersion(), getLatestVersion()).done(function(r1, r2){
+        /*  The code here will be executed when all two ajax requests resolve.
+         *  response1, response2 are lists of length 2 containing the response text,
+         *  status, and jqXHR object for both ajax calls respectively.
+         */
+        if (compareVersionNumbers(r1[0], r2[0].name) >= 0) {
+            versionMsgHtml = '<p>' + AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.version.up-to-date")
+                               + '&nbsp;' + r1[0] + '</p><hr>';
+        } else {
+            versionMsgHtml = '<p>'+ AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.current.version")+'  ' + r1[0] +'  <br> '+AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.version.update-available")+'</p><hr>';
+        }
+        var aboutDialogHtml = Confluence.Templates.Excellentable.aboutDialog({updateLink: versionMsgHtml});
+        jQuery('body').append(aboutDialogHtml);
+        AJS.dialog2("#euiAboutDialog").show();
+        // Hides the dialog
+        AJS.$("#dialog-close-button").click(function (e) {
+            e.preventDefault();
+            AJS.dialog2("#euiAboutDialog").hide();
+            AJS.$('#euiAboutDialog').remove();
+        });
+    });
+}
+
+function callImportDialog(file) {
+    var importDialogHtml = Confluence.Templates.Excellentable.ImportSheet();
+    jQuery('body').append(importDialogHtml);
+
+    //Loop over the sheets and check if there is a protected sheet anywhere, if yes, then set the flag to true
+    var hasProtectedSheet = false;
+    var hasProtectedCell = false;
+    var spread = jQuery(spreadId).wijspread("spread");
+    if (spread && spread.sheets) {
+        for (var index = 0; index < spread.sheets.length; index++) {
+            var sheet = spread.sheets[index];
+            if (!hasProtectedSheet) {
+                hasProtectedSheet = sheet.getIsProtected();
+            }
+
+            if (!hasProtectedCell) {
+                hasProtectedCell = sheetHasProtectedCell(sheet);
+            }
+        }
+    }
+
+    // If there is EVEN ONE protected sheet, we will NOT show the 'replace sheet' option in 'Import Sheet' Dialog
+    if (hasProtectedSheet || hasProtectedCell) {
+        AJS.$('#euiReplaceExistingDocument').parent().hide();
+        AJS.$('#euiMergeExistingDocument').attr('checked', true);
+    }
+
+    jQuery('#euiImportDialog').on("click", "#euiImportSheetDialogSubmitButton", function() {
+        if ($('#euiReplaceExistingDocument').attr('checked') === "checked") {
+             AJS.dialog2("#euiImportDialog").hide();
+            jQuery('.aui-blanket').css({'z-index': '2500'});
+            Excellentable.import1 = new Excellentable.Import(file, true);
+        } else {
+            AJS.dialog2("#euiImportDialog").hide();
+            jQuery('.aui-blanket').css({'z-index': '2500'});
+            Excellentable.import1 = new Excellentable.Import(file, false);
+        }
+           AJS.dialog2("#euiImportDialog").remove();
+    });
+
+    jQuery('#euiImportDialog').on("click", "#euiImportSheetDialogCloseButton", function() {
+        AJS.dialog2("#euiImportDialog").remove();
+        jQuery('.aui-blanket').css({'z-index': '2500'});
+    });
+
+    AJS.dialog2("#euiImportDialog").show();
+    jQuery('.aui-blanket').css({'z-index': '3004'});
+
+}
+
+var Import = Excellentable.Import = Excellentable.Import || function (file, overWrite, spread, viewImportErrorDialog) {
+    var $self = this;
+    this.file = file;
+    this.overWrite = overWrite;
+    if (this.viewImportErrorDialog === false) {
+        this.viewImportErrorDialog = false;
+    } else {
+        this.viewImportErrorDialog = true;
+    }
+    //3rd argument means call is from somewhere else
+    if(arguments.length === 2) {
+        var importAjax = this.importCall();
+        importAjax.done(function (response) {
+            $self.importData(response);
+        }).fail(function (response) {
+            $self.importFail(response);
+        })
+    } else {
+        this.spread = spread;
+        this.fileExtension = file.name.split(".").pop();
+        this.getFormattedFileName();
+        this.importSheetsStartIndex = 0;
+    }
+};
+Import.prototype.importCall = function () {
+    this.spread = jQuery(spreadId).wijspread("spread");
+    var myFormData = new FormData();
+    this.fileExtension = this.file.name.split(".").pop();
+    this.fileName = {};
+    //Retrieving fileName in case of csv file
+    if (this.fileExtension === "csv") {
+        this.getFormattedFileName();
+    }
+    var spreadVersion = this.spread.toJSON().version;
+    myFormData.append('file', this.file);
+    myFormData.append('version', spreadVersion);
+    this.importSheetsStartIndex = this.overWrite ? 0 : this.spread._availableSheetIndex + 1;
+
+    if (this.file) {
+
+        $.fn.Excellentable.BouncyBallSpinner().show("body", false,
+            AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.spinner.import"));// Import
+        var url = "/rest/excellentable/1.0/import";
+
+        // Handle UTF-8 file dump
+        this.spread.isPaintSuspended(true);
+        try {
+            return $.fn.ExcellentableAjax({
+                postData: myFormData,
+                formUrl: AJS.contextPath() + url,
+                type: "POST",
+                processData: false,
+                contentType: false
+            });
+
+        } catch (e) {
+            //Catch if any problem with AJAX request itself
+            jQuery("body").ExcellentableNotification({
+                title: AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.import.formatType.error.title"),
+                body: "<p>" + AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.import.error") + "</p>"
+            }).showErrorMsg();
+            removeSpinnerAndResumePaint(this.spread, this.importSheetsStartIndex);
+        }
+    }
+};
+Import.prototype.importData = function (data) {
+    try {
+        //Checking if the imported file 'first sheet size exceeded the limit while importing' (XLSX file only) in back-end
+        if (((this.fileExtension === 'xlsx') || (this.fileExtension === 'xls') || (this.fileExtension === 'csv')) && data.errorData.firstSheetExceeded !== undefined) {
+            throw data.errorData.firstSheetExceeded;
+        }
+        // checking file is empty or not
+        if (data.errorData !== undefined && data.errorData.corruptData !== undefined) {
+            throw data.errorData.corruptData;
+        }
+
+        var currentSheetNumber;
+        if (this.overWrite) {//Create new spreadsheet or merge with existing
+            this.spread.clearSheets();
+            currentSheetNumber = 0;
+            this.spread._availableSheetIndex = -1;
+        } else {
+            currentSheetNumber = this.spread._availableSheetIndex + 1;
+        }
+        var initialNumberOfSheets = currentSheetNumber;
+        //Get all the names of sheets already present in the current spread
+        var sheetNames = getNameOfSheets(this.spread.sheets);
+        //Rename all current sheets already present in the spread.
+        renameCurrentSheetsToTempName(this.spread.sheets);
+        /*Tickets - EXC-2623, EXC-2684
+         Loop through all the sheets and create sheets only before import starts
+         Set the name of new sheets being created similar to the file being imported*/
+        var sheet = {};
+        for (var items in data.sheets) {
+            if (data.sheets.hasOwnProperty(items)) {
+                this.spread.addSheet(currentSheetNumber);//Declare new sheet
+                sheet = this.spread.getSheet(currentSheetNumber);
+                sheet._name = data.sheets[items].name;
+                currentSheetNumber++;
+            }
+        }
+        currentSheetNumber = initialNumberOfSheets;
+        for (var currentSheetName in data.sheets) {//Loop through all the sheets and import
+            if (data.sheets.hasOwnProperty(currentSheetName)) {
+                sheet = this.spread.getSheet(currentSheetNumber);
+                sheet.fromJSON(data.sheets[currentSheetName]);//Save imported data to current sheet
+
+                //Set default font style as verdana to row/col header
+                sheet.getColumn(0, $.wijmo.wijspread.SheetArea.rowHeader).font(defaultRowColHeaderFontSize + defaultFontName);
+                sheet.getRow(0, $.wijmo.wijspread.SheetArea.colHeader).font(defaultRowColHeaderFontSize + defaultFontName);
+                this.spread.focus();
+
+                //Adding float objects
+                jQuery('#euiSpreadContentChanged').val("true");
+                if (this.fileExtension !== 'csv' && this.fileExtension !== "html") {
+                    var fo = data.sheets[currentSheetName].floatingObjects;
+                    if (typeof fo !== "undefined") {
+                        for (var j = 0; j < fo.length; j++) {
+                        	sheet.addPicture(fo[j].name, fo[j].src, fo[j].startRow, fo[j].startColumn, fo[j].endRow, fo[j].endColumn);
+                        }
+                    }
+                }
+
+                //Check if the name is unique or not (to the names already present in the workbook)
+                var sheetName = sheet.getName(), newSheetName;
+                //Fix for wrong sheet name is csv, setting sheetName as fileName
+                if (this.fileExtension === "csv") {
+                    sheetName = this.fileName.name;
+                }
+                if (isNotUnique(sheetName, sheetNames)) {
+                    newSheetName = getUniqueName(sheetName, sheetNames);
+                    sheetNames.push(newSheetName);
+                } else {
+                    /*Even if the new name is unique save it current sheetNames array
+                     (As it was not added when the sheet was being created(with import sheet names))*/
+                    sheetNames.push(sheetName);
+                }
+                sheetName = sheet.getName();//Reloaded in case of csv
+                var tableMetaData = this.spread.toJSON();
+                //If default row height and column width of the sheet is not defined in JSON data
+                if (typeof tableMetaData.sheets[sheetName].defaults === "undefined") {
+                    sheet.defaults.rowHeight = defaultRowHeight;
+                    sheet.defaults.colWidth = defaultColWidth;
+                }
+                sheet.setRowHeight(0, sheet.defaults.rowHeight, $.wijmo.wijspread.SheetArea.colHeader);
+                applyHighlighter(this.spread);
+                autoAdjustRowHeight(sheet); //Removed because it was implementing wrap settings of sheets which looked like wrong import
+                adjustEditPortSize(this.spread, sheet);
+                //To make hyperlink cell editable
+                jQuery(dialogId).ExcInsertHyperlinkEvents(undefined, this.spread);
+                //Sets the default font size and style to the imported sheet
+                var defaultStyle = new $.wijmo.wijspread.Style();
+                defaultStyle.font = defaultFontSize + defaultFontName;
+                sheet.setDefaultStyle(defaultStyle, $.wijmo.wijspread.SheetArea.viewport);
+                currentSheetNumber++;
+            }
+        }
+
+        setAllSheetNames(initialNumberOfSheets, sheetNames, this.spread.sheets);
+        /*Trigger enterCell event when we import sheet and focus is on the first cell,
+         to fetch all the formatting from the first cell of the sheet and populate it in the menu bar*/
+        sheet.triggerEnterCell({
+            sheet: sheet, row: sheet.getActiveRowIndex(), col: sheet.getActiveColumnIndex()
+        });
+        this.spread.refresh();
+        bindScrollBarEvents(this.spread);
+        //Import Summary -
+        var errorData = data.errorData;
+        var tempHtml = "";
+        if (this.fileExtension === "csv" && this.fileName.nameRevised) {
+            errorData.nameRevised = AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.import.csv.fileName.error");
+        }
+        //Populate and show ImportErrorDialog
+        if (errorData !== null && errorData !== undefined && Object.keys(errorData).length > 0 && this.viewImportErrorDialog) {//Should not run for HTML
+            //Making HTML List of Import Summary
+            jQuery.each(jQuery(errorData)[0], function (key, data) {
+                if("fontFamily" === key){
+                    tempHtml += "<li>" + AJS.I18n.getText(data, errorData.fontNames) + "</li>\n";
+                } else if ("fontNames" === key){
+                    //Do nothing as fontNames are passed to be used with fontFamily
+                } else {
+                    tempHtml += "<li>" + AJS.I18n.getText(data) + "</li>\n";
+                }
+            });
+            var importErrorDialogHtml = Confluence.Templates.Excellentable.importErrorDialog({errHtml: tempHtml});
+            jQuery('body').append(importErrorDialogHtml);
+            AJS.dialog2("#euiImportErrorDialog").show();
+            // Hides the dialog
+            AJS.$("#euiUnsaveChangesBeforeExportButton").click(function (e) {
+                e.preventDefault();
+                AJS.dialog2("#euiImportErrorDialog").hide();
+                AJS.$('#euiImportErrorDialog').remove();//Remove the current dialog, so for new import - new dialog can be appended
+            });
+        }
+    
+        removeSpinnerAndResumePaint(this.spread, this.importSheetsStartIndex);
+    } catch (e) {
+        //Catch if above parsing fails in .success method (eg - First Sheet Exceeded limit)
+        jQuery("body").ExcellentableNotification({
+            title: AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.import.formatType.error.title"),
+            body: "<p> Import of file \"" + this.file.name + "\" failed.</p>" + "<p> Reason : \"" + AJS.I18n.getText(e) + "\" .</p>",
+            fadeout: false
+        }).showErrorMsg();
+
+        formatError = true;
+
+        jQuery(document).on('aui-message-close', function(){
+            if (formatError) {
+                AJS.dialog2("#euiAttachmentSpread:visible").hide();
+                formatError = false;
+            }
+        });
+        removeSpinnerAndResumePaint(this.spread, this.importSheetsStartIndex);
+    }
+
+    // Send import information to all users
+    ExcellentableTriggerCustomValueChangeEvent(this.spread, 'importfile');
+};
+
+Import.prototype.importFail = function (response) {
+    //Will run if request AJAX fails
+
+    if(response.status === 401) {
+      var message = {
+        body: "<p>" +  AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.logout.errorMessage", AJS.params.baseUrl + '/login.action') + "</p>",
+        fadeout: false
+      };
+    } else {
+      var message = {
+        title: AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.import.formatType.error.title"),
+        body: "<p>" + AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.import.error") + "</p>",
+        fadeout: false
+      };
+    }
+
+    jQuery("body").ExcellentableNotification(message).showErrorMsg();
+    removeSpinnerAndResumePaint(this.spread, this.importSheetsStartIndex);
+};
+
+//Get new fileName if the extension is CSV
+Import.prototype.getFormattedFileName = function(file){
+    var fileName = {};
+    var fileNameArray = this.file.name.split(".");
+    fileNameArray.pop();
+    var name = fileNameArray.join(".");
+    var oldLength = name.length;
+    name = name.replace(/[\[\]\/\\:*?]/g,"");
+    if (name.length > 29){//xlsx allows 31 characters, so if sheet name is repeated we are adding '_1' to it. So it won't cause problem for export.
+        name = name.substring(0,28);
+    }
+    var newLength = name.length;
+    if (oldLength !== newLength){
+        fileName.nameRevised = true;
+    }
+    fileName.name = name;
+    this.fileName =  fileName;
+    return fileName;
+};
+//Restore all names back to orignal
+function setAllSheetNames(initialNumberOfSheets, sheetNames, sheets) {
+    /*First iterate through all the new sheets added as there name may be changed
+     if clashing with sheetNames already present in the workbook*/
+    var k = initialNumberOfSheets;
+    while( k < sheets.length){
+        sheets[k].setName(sheetNames[k]);
+        k++;
+    }
+    //After that restore the names of the sheet that were already present which were given temp name
+    k = 0;
+    while (k < initialNumberOfSheets) {
+        sheets[k].setName(sheetNames[k]);
+        k++;
+    }
+}
+//Give temp name to all sheets already present in the workbook
+function renameCurrentSheetsToTempName(sheets){
+    var k = 0;
+    while( k < sheets.length){
+        sheets[k].setName("zTeZpQaCe94e3921"+k);//Temp Name
+        k++;
+    }
+}
+function reCalculateAllFormulasInSheets(spread){
+    for(var sheetName in spread.sheets){
+        if (!spread.sheets.hasOwnProperty(sheetName)) continue;// skip loop if the property is from prototype
+        spread.sheets[sheetName].recalcAll();
+    }
+}
+function removeSpinnerAndResumePaint(spread, importSheetsStartIndex){
+    try {
+        reCalculateAllFormulasInSheets(spread);
+        if (importSheetsStartIndex === undefined) {
+            importSheetsStartIndex = 0;
+        }
+        spread.setActiveSheetIndex(importSheetsStartIndex);
+        var sheet = spread.getActiveSheet();
+        //Fix for - EXC-2594
+        var data = {'newSheet': sheet, 'oldSheet': sheet};
+        spread.triggerActiveSheetChanged(data);
+    } finally {
+        if(jQuery().ExcellentableTabStrip.update) {
+           jQuery('body').ExcellentableTabStrip.update();   
+        }
+        
+        spread.isPaintSuspended(false);
+        $.fn.Excellentable.BouncyBallSpinner().hide();
+    }
+}
+//Return Name of the sheets in @param sheets array
+function getNameOfSheets(sheets) {
+    var sheetNames = [], k=0;
+    while( k < sheets.length){
+        sheetNames.push(sheets[k]._name);
+        k++;
+    }
+    return sheetNames;
+}
+//Return boolean comapring if the sheetName exist in sheetNames array
+function isNotUnique(sheetName, sheetNames) {
+    if(sheetNames.length === 0){
+        return false;
+    }
+    return sheetNames.indexOf(sheetName) > -1;
+}
+//Confirms if the sheet name is unique and returns unique name e.g Sheet1 will get renamed to Sheet1_1
+function getUniqueName(sheetName, sheetNames){
+    var i = 1;
+    while(isNotUnique((sheetName + "_"+i), sheetNames)){
+        i++;
+    }
+    return sheetName + "_"+i;
+}
+
+function adjustEditPortSize(spread,sheet) {  //Auto adjust column width to cover the canvas
+    var curwidth = 0, ColumnCount = sheet.getColumnCount(), defaultRowHeaderColWidth = sheet._defaultRowHeaderColWidth;
+    var canvasWidth = jQuery(document).find(spreadId).width() - defaultRowHeaderColWidth;
+    for (var c = 0; c < ColumnCount; c++) {
+        curwidth = curwidth + sheet.getColumnWidth(c);
+
+    }
+    if (curwidth < canvasWidth) {
+        var differenceInWidth = (canvasWidth - curwidth), tempWidth = differenceInWidth / ColumnCount;
+        var tempColCount = sheet.getColumnCount();
+        for (var i = 0; i < tempColCount; i++) {
+            var ColWidth = sheet.getColumnWidth(i);
+            var newwidth = ColWidth + tempWidth;
+            sheet.setColumnWidth(i, newwidth);
+        }
+
+    }
+    spread.scrollbarMaxAlign(true);
+    spread.scrollbarShowMax(true);
+    spread.refresh();
+}
+
+function autoAdjustRowHeight(sheet) { //Auto adjust row height and set default style to overflow text
+    sheet.isPaintSuspended(true);
+    var row, selStartColumn = 0, selColLength = sheet.getColumnCount();
+    var selEndcolumn = selColLength + selStartColumn - 1;
+    var totalRowCount = sheet.getRowCount();
+    for (row = 0; row < totalRowCount; row++) {
+        for (var col = selStartColumn; col <= selEndcolumn; col++) {
+            var cellWordWrap = sheet.getCell(row, col, $.wijmo.wijspread.SheetArea.viewport).wordWrap();
+            if (cellWordWrap === true) {
+                sheet.autoFitRow(row);
+                var rowHeight = sheet.getRow(row).height(), extraHeight = 20;
+                sheet.getRow(row).height(rowHeight + extraHeight);
+                break;
+            } else {
+                sheet.allowCellOverflow(true);
+            }
+        }
+    }
+    sheet.isPaintSuspended(false);
+}
+
+function findNoOfSheets(file,fileExtension) {
+    if (fileExtension === "xlsx" || fileExtension == "csv" || fileExtension == "html" || fileExtension === "xls") {
+        callImportDialog(file);
+    } else {
+       jQuery("body").ExcellentableNotification({
+            title: AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.import.formatType.error.title"),
+            body: '<p> ' + AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.import.formatType.error.body",file.name) + ' </p>'
+        }).showErrorMsg();
+    }
+}
+
+function zoomFactor_Changed(value) {
+    var ss = jQuery(spreadId).wijspread("spread");
+    var sheet = ss.getActiveSheet();
+    sheet.zoom(value);
+}
+function selectionChanged(sender, args) {
+    var spread = jQuery(spreadId).wijspread("spread");
+    var sheet = spread.getActiveSheet();
+
+    var content = sheet.getFormula(sheet.getActiveRowIndex(), sheet.getActiveColumnIndex(), $.wijmo.wijspread.SheetArea.viewport);
+    if (!content)
+        content = sheet.getValue(sheet.getActiveRowIndex(), sheet.getActiveColumnIndex(), $.wijmo.wijspread.SheetArea.viewport);
+    else
+        content = "=" + content;
+    if(content != null)
+        jQuery("#euiFormulaBox").val(content);
+    else
+        jQuery("#euiFormulaBox").val("");
+    var position = sheet.getText(0, sheet.getActiveColumnIndex(), $.wijmo.wijspread.SheetArea.colHeader) + sheet.getText(sheet.getActiveRowIndex(), 0, $.wijmo.wijspread.SheetArea.rowHeader);
+    $("#euiPositionBox").val(position);
+}
+
+function updateSheetList() {
+    $("#sheetList").empty();
+    var spread = jQuery(spreadId).wijspread("spread");
+    if (spread && spread.sheets) {
+        for (var index = 0; index < spread.sheets.length; index++) {
+            var sheetName = spread.sheets[index].getName();
+            $("#sheetList").append("<option value='" + sheetName + "'>" + sheetName + "</option>");
+        }
+    }
+}
+
+function setstatus(sheet) {
+    var statusnow = sheet.editorStatus();
+    if (statusnow === $.wijmo.wijspread.EditorStatus.Ready) {
+        $("#euiRapidInputMode").text("READY");
+    } else if (statusnow === $.wijmo.wijspread.EditorStatus.Enter) {
+        $("#euiRapidInputMode").text("ENTER");
+    } else if (statusnow === $.wijmo.wijspread.EditorStatus.Edit) {
+        $("#euiRapidInputMode").text("EDIT");
+    }
+}
+
+// group event handlers
+function rowlabelactive() {
+    $("#showRowGroupLabel").addClass("ui-state-active");
+}
+function rowlabelnoactive() {
+    $("#showRowGroupLabel").removeClass("ui-state-active");
+}
+function collabelactive() {
+    $("#showColGroupLabel").addClass("ui-state-active");
+}
+function collabelnoactive() {
+    $("#showColGroupLabel").removeClass("ui-state-active");
+}
+
+// validation event handlers
+function IsRangeSet() {
+    var validatorComparisonOperator = parseInt($("#euiValidatorComparisonOperator").val());
+
+    if (validatorType == "NumberValidator" || validatorType == "TextLengthValidator") {
+        if ($("#euiTxtValidatorValue1").val().length == 0) {
+            if (validatorComparisonOperator >= 6 && $("#euiTxtValidatorValue2").val().length == 0) {
+                jQuery("body").ExcellentableNotification({title:"You must enter both a Maximum and Minimum."}).showWarningMsg();
+            } else {
+                jQuery("body").ExcellentableNotification({title:"You must enter a Value."}).showWarningMsg();
+            }
+        }
+    } else if (validatorType == "DateValidator") {
+        if ($("#euiTxtValidatorValue1").val().length == 0) {
+            if (validatorComparisonOperator >= 6 && $("#euiTxtValidatorValue2").val().length == 0) {
+                jQuery("body").ExcellentableNotification({title:"You must enter both a End Date and a Start Date."}).showWarningMsg();
+            } else {
+                jQuery("body").ExcellentableNotification({title:"You must enter a date Value."}).showWarningMsg();
+            }
+        }
+    } else if (validatorType == "ListValidator") {
+        if ($("#euiTxtValidatorValue").val().length == 0) {
+            jQuery("body").ExcellentableNotification({title:"You must enter a Source."}).showWarningMsg();
+        }
+    } else if (validatorType == "FormulaListValidator" || validatorType == "FormulaValidator") {
+        if ($("#euiTxtValidatorValue").val().length == 0) {
+           jQuery("body").ExcellentableNotification({title:"You must enter a Formula."}).showWarningMsg();
+        }
+    }
+}
+
+// border event hanlders
+function noborderclick() {
+    $("#euiBorderDialog :checkbox").removeAttr("checked");
+    $("#euiBorder11").css("border", "none");
+    $("#euiBorder12").css("border", "none");
+    $("#euiBorder21").css("border", "none");
+    $("#euiBorder22").css("border", "none");
+    $("#euiBorderTable").css("border", "none");
+}
+function outlineborderclick() {
+    $("#euiBorderDialog :checkbox").removeAttr("checked");
+    $("[id*=Side]").prop("checked", true);
+    $("#euiBorder11").css("border", "1px solid gray");
+    $("#euiBorder12").css("border", "1px solid gray");
+    $("#euiBorder21").css("border", "1px solid gray");
+    $("#euiBorder22").css("border", "1px solid gray");
+    $("#euiBorder11").css("border-right", "none");
+    $("#euiBorder11").css("border-bottom", "none");
+    $("#euiBorder12").css("border-left", "none");
+    $("#euiBorder12").css("border-bottom", "none");
+    $("#euiBorder21").css("border-right", "none");
+    $("#euiBorder21").css("border-top", "none");
+    $("#euiBorder22").css("border-top", "none");
+    $("#euiBorder22").css("border-left", "none");
+    $("#euiBorderTable").css("border", "1px solid gray");
+}
+function allborderclick() {
+    $("#euiBorderDialog :checkbox").prop("checked", true);
+    $("#euiBorder11").css("border", "1px solid gray");
+    $("#euiBorder12").css("border", "1px solid gray");
+    $("#euiBorder21").css("border", "1px solid gray");
+    $("#euiBorder22").css("border", "1px solid gray");
+    $("#euiBorderTable").css("border", "1px solid gray");
+}
+
+// helper functions begin
+function componentToHex(c) {
+    var hex = c.toString(16);
+    return hex.length == 1 ? "0" + hex : hex;
+}
+
+function rgbToHex(r, g, b) {
+    return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+}
+
+function processMinItems($selectionElement, $valueElement) {
+    var type = parseInt($selectionElement.val(), 10),
+            value = "";
+    switch (type) {
+        case 0: // Number
+        case 3: // Percent
+            value = "0";
+            break;
+        case 4: // Percentile
+            value = "10";
+            break;
+        default:
+            value = "";
+            break;
+    }
+    $valueElement.val(value);
+}
+
+function processMidItems($selectionElement, $valueElement) {
+    var type = parseInt($selectionElement.val(), 10),
+            value = "";
+    switch (type) {
+        case 0: // Number
+            value = "0";
+            break;
+        case 3: // Percent
+        case 4: // Percentile
+            value = "50";
+            break;
+        default:
+            value = "";
+            break;
+    }
+    $valueElement.val(value);
+}
+
+function processMaxItems($selectionElement, $valueElement) {
+    var type = parseInt($selectionElement.val(), 10),
+            value = "";
+    switch (type) {
+        case 0: // Number
+            value = "0";
+            break;
+        case 3: // Percent
+            value = "100";
+            break;
+        case 4: // Percentile
+            value = "90";
+            break;
+        default:
+            value = "";
+            break;
+    }
+    $valueElement.val(value);
+}
+
+function getActualRange(range, maxRowCount, maxColCount) {
+    var row = range.row < 0 ? 0 : range.row;
+    var col = range.col < 0 ? 0 : range.col;
+    var rowCount = range.rowCount < 0 ? maxRowCount : range.rowCount;
+    var colCount = range.colCount < 0 ? maxColCount : range.colCount;
+
+    return new $.wijmo.wijspread.Range(row, col, rowCount, colCount);
+}
+function getActualCellRange(cellRange, rowCount, columnCount) {
+    if (cellRange.row == -1 && cellRange.col == -1) {
+        return new $.wijmo.wijspread.Range(0, 0, rowCount, columnCount);
+    }
+    else if (cellRange.row == -1) {
+        return new $.wijmo.wijspread.Range(0, cellRange.col, rowCount, cellRange.colCount);
+    }
+    else if (cellRange.col == -1) {
+        return new $.wijmo.wijspread.Range(cellRange.row, 0, cellRange.rowCount, columnCount);
+    }
+
+    return cellRange;
+}
+
+// font related setting
+function setStyleFont(sheet, styleEle, styleFontName, optionValue1, optionValue2) {
+    var sels = sheet.getSelections();
+    var $styleButton;
+    if(styleFontName == "font-weight"){ //If bold formatting is applied.
+        $styleButton = jQuery("#euiDialog").find('button[name="bold"]');
+    }else if(styleFontName == "font-style"){ //If Italic formatting is applied
+        $styleButton = jQuery("#euiDialog").find('button[name="italic"]');
+    }
+    for (var n = 0; n < sels.length; n++) {
+        var sel = getActualCellRange(sels[n], sheet.getRowCount(), sheet.getColumnCount());
+        for (var r = sel.row; r < sel.row + sel.rowCount; r++) {
+            for (var c = sel.col; c < sel.col + sel.colCount; c++) {
+                var style = sheet.getStyle(r, c);
+                if (!style) {
+                    style = new $.wijmo.wijspread.Style();
+                }
+                if (!style.font) {
+                    var defaultFont = sheet.getDefaultStyle().font;
+                    if (defaultFont) {
+                        style.font = sheet.getDefaultStyle().font;
+                    } else {
+                        style.font = defaultFontSize+defaultFontName;
+                    }
+                }
+                styleEle.style.font = style.font;
+                var styleFont = $(styleEle).css(styleFontName);
+                if (styleFont === optionValue1[0] || styleFont === optionValue1[1]) {
+                    $(styleEle).css(styleFontName, optionValue2);
+                    if ($styleButton !== undefined) {
+                        $styleButton.removeClass("active"); //remove highlighting from respective button
+                    }
+                } else {
+                    $(styleEle).css(styleFontName, optionValue1[0]);
+                    if ($styleButton !== undefined) {
+                        $styleButton.addClass("active"); //apply highlighting to respective button
+                    }
+                }
+
+                style.font = styleEle.style.font;
+                sheet.setStyle(r, c, style);
+            }
+        }
+    }
+}
+
+// screen size
+function screenAdption() {
+    adjustHeight($("#ribbon div[aria-hidden='false']").index() - 1);
+}
+
+/*
+ adjust layout:
+ 1. ribbon content height if needed for the tab with the specified index
+ 2. spread and its container' height
+ */
+function adjustHeight(tabIndex) {
+    var ids = ["picture", "sparklineEx", "setcolor", "dragFill", "jQueryThemes"];
+
+// 1. ribbon content
+    if (tabIndex < ids.length) {
+        var $last = $("#" + ids[tabIndex]),
+                $first = $last.siblings().first(),
+                height = $last.css("height"),
+                height2 = $first.css("height");
+
+        if (height != height2) {
+            $last.siblings().css("height", height);
+        }
+    }
+
+// 2. spread and its container
+    var windowHeight = $(window).height(),
+            //spreadHeight = windowHeight - $("#ribbon").height() - $("#euiFormulaBar").height() - $("#euiStatusBar").height() - 24 - confluenceDialogHeaderHeight;
+    spreadHeight = windowHeight - $("#euiMenuBar").height() - $("#euiFormulaBar").height() - $("#euiStatusBar").height()- confluenceDialogFooterHeight - confluenceDialogHeaderHeight-61;
+
+// adjust height if too small
+    spreadHeight = Math.max(spreadHeight, 120);
+
+    $("#euiControlPanel").height(spreadHeight);
+    jQuery(spreadId).height(spreadHeight);
+
+// sometimes the window height changed for some unknown reason, so check and do adjust
+    var windowHeight2 = $(window).height();
+
+    if (windowHeight2 > windowHeight) {
+        spreadHeight += $(window).height() - windowHeight;
+        $("#euiControlPanel").height(spreadHeight);
+        jQuery(spreadId).height(spreadHeight);
+    }
+
+    jQuery(spreadId).wijspread("refresh");
+}
+
+// sparklineex
+function parseRangeToExpString(range, sp) {
+    var Calc = $.wijmo.wijspread.Calc;
+    return Calc.rangeToFormula(range, 0, 0, Calc.RangeReferenceRelative.allRelative);
+}
+function parseStringToExternalRanges(expString, sheet) {
+    var Calc = $.wijmo.wijspread.Calc;
+    var results = [];
+    var exps = expString.split(",");
+    try {
+        for (var i = 0; i < exps.length; i++) {
+            var range = Calc.formulaToRange(sheet, exps[i]);
+            results.push({"range": range});
+        }
+    }
+    catch (e) {
+        return null;
+    }
+    return results;
+}
+
+//table
+function getTableStyle(styleName) {
+    if (styleName) {
+        return $.wijmo.wijspread.TableStyles[styleName.toLowerCase()]();
+    }
+    return null;
+}
+function getTableName(sheet) {
+    var i = 1,
+            sheets = sheet.parent.sheets,
+            found;
+    while (true) {
+        var name = "table" + i.toString();
+        found = sheets.some(function (checkingSheet) {
+            return checkingSheet.findTableByName(name);
+        });
+        if (!found) {
+            return name;
+        }
+        i++;
+    }
+}
+
+// conditional format dialog
+function createIconCriteriaDOM() {
+    var IconSetType = $.wijmo.wijspread.IconSetType,
+            IconCriterion = $.wijmo.wijspread.IconCriterion,
+            IconValueType = $.wijmo.wijspread.IconValueType;
+    var iconSetType = parseInt($("#euiIconSetType").val(), 10);
+    var iconCriteria = [];
+    if (iconSetType >= IconSetType.ThreeArrowsColored &&
+            iconSetType <= IconSetType.ThreeSymbolsUncircled) {
+        iconCriteria = new Array(2);
+        iconCriteria[0] = new IconCriterion(true, IconValueType.Percent, 33);
+        iconCriteria[1] = new IconCriterion(true, IconValueType.Percent, 67);
+    }
+    else if (iconSetType >= IconSetType.FourArrowsColored &&
+            iconSetType <= IconSetType.FourTrafficLights) {
+        iconCriteria = new Array(3);
+        iconCriteria[0] = new IconCriterion(true, IconValueType.Percent, 25);
+        iconCriteria[1] = new IconCriterion(true, IconValueType.Percent, 50);
+        iconCriteria[2] = new IconCriterion(true, IconValueType.Percent, 75);
+    }
+    else if (iconSetType >= IconSetType.FiveArrowsColored &&
+            iconSetType <= IconSetType.FiveBoxes) {
+        iconCriteria = new Array(4);
+        iconCriteria[0] = new IconCriterion(true, IconValueType.Percent, 20);
+        iconCriteria[1] = new IconCriterion(true, IconValueType.Percent, 40);
+        iconCriteria[2] = new IconCriterion(true, IconValueType.Percent, 60);
+        iconCriteria[3] = new IconCriterion(true, IconValueType.Percent, 80);
+    }
+
+    $("#euiIconCriteriaSetting").empty();
+    $.each(iconCriteria, function (i, v) {
+        var $div = $("<div style='margin-top: 10px'></div>"),
+                $selectOperator = $("<select></select>"),
+                $input = $("<input style='margin-left: 10px'/>"),
+                $selectType = $("<select style='margin-left: 10px'></select>");
+        $selectOperator.html("<option value=1 " + getSelected(v.isGreaterThanOrEqualTo, true) + ">>=</option>" +
+                "<option value=0 " + getSelected(v.isGreaterThanOrEqualTo, false) + ">></option>");
+        $input.val(v.iconValue);
+        $selectType.html("<option value=1 " + getSelected(v.iconValueType, 1) + ">Number</option>" +
+                "<option value=4 " + getSelected(v.iconValueType, 4) + ">Percent</option>" +
+                "<option value=7 " + getSelected(v.iconValueType, 7) + ">Formula</option>" +
+                "<option value=5 " + getSelected(v.iconValueType, 5) + ">Percentile</option>");
+        $div.append($selectOperator).append($input).append($selectType);
+        $("#euiIconCriteriaSetting").append($div);
+    });
+}
+function getSelected(v1, v2) {
+    return v1 === v2 ? "selected='selected'" : "";
+}
+function setEnumTypeOfCF(rule, type) {
+    switch (rule) {
+        case "0":
+            $("#euiRuleText").text("Format only cells with:");
+            $("#euiAndText").hide();
+            $("#euiFormatText").hide();
+            type.empty();
+            type.show();
+            $("#euieuiComparisonOperator1").show();
+            $("#euiValue1").show();
+            $("#euiValue1").val("");
+            $("#euiValue2").hide();
+            $("#euiColorScale").hide();
+            type.append("<option value='0'>EqualsTo</option>");
+            type.append("<option value='1'>NotEqualsTo</option>");
+            type.append("<option value='2'>GreaterThan</option>");
+            type.append("<option value='3'>GreaterThanOrEqualsTo</option>");
+            type.append("<option value='4'>LessThan</option>");
+            type.append("<option value='5'>LessThanOrEqualsTo</option>");
+            type.append("<option value='6'>Between</option>");
+            type.append("<option value='7'>NotBetween</option>");
+            break;
+        case "1":
+            $("#euiRuleText").text("Format only cells with:");
+            $("#euiAndText").hide();
+            $("#euiFormatText").hide();
+            type.empty();
+            type.show();
+            $("#euiComparisonOperator1").show();
+            $("#euiValue1").show();
+            $("#euiValue1").val("");
+            $("#euiValue2").hide();
+            $("#euiColorScale").hide();
+            type.append("<option value='0'>Contains</option>");
+            type.append("<option value='1'>DoesNotContain</option>");
+            type.append("<option value='2'>BeginsWith</option>");
+            type.append("<option value='3'>EndsWith</option>");
+            break;
+        case "2":
+            $("#euiRuleText").text("Format only cells with:");
+            $("#euiAndText").hide();
+            $("#euiFormatText").hide();
+            type.empty();
+            type.show();
+            $("#euiComparisonOperator1").show();
+            $("#euiValue1").hide();
+            $("#euiValue2").hide();
+            $("#euiColorScale").hide();
+            type.append("<option value='0'>Today</option>");
+            type.append("<option value='1'>Yesterday</option>");
+            type.append("<option value='2'>Tomorrow</option>");
+            type.append("<option value='3'>Last7Days</option>");
+            type.append("<option value='4'>ThisMonth</option>");
+            type.append("<option value='5'>LastMonth</option>");
+            type.append("<option value='6'>NextMonth</option>");
+            type.append("<option value='7'>ThisWeek</option>");
+            type.append("<option value='8'>LastWeek</option>");
+            type.append("<option value='9'>NextWeek</option>");
+            break;
+        case "3":
+            $("#euiRuleText").text("Format values where this formula is true:");
+            $("#euiAndText").hide();
+            $("#euiFormatText").show();
+            $("#euiFormatText").text("eg:=COUNTIF($B$1:$B$5,A1).");
+            type.empty();
+            $("#euiComparisonOperator1").hide();
+            $("#euiValue1").show();
+            $("#euiValue1").val("");
+            $("#euiValue2").hide();
+            $("#euiColorScale").hide();
+            break;
+        case "4":
+            $("#euiRuleText").text("Format values that rank in the:");
+            $("#euiAndText").hide();
+            $("#euiFormatText").hide();
+            type.empty();
+            $("#euiComparisonOperator1").show();
+            $("#euiValue1").show();
+            $("#euiValue1").val("10");
+            $("#euiValue2").hide();
+            $("#euiColorScale").hide();
+            type.append("<option value='0'>Top</option>");
+            type.append("<option value='1'>Bottom</option>");
+            break;
+        case "5":
+            $("#euiRuleText").text("Format all:");
+            $("#euiAndText").hide();
+            $("#euiFormatText").show();
+            $("#euiFormatText").text("values in the selected range.");
+            type.empty();
+            $("#euiComparisonOperator1").hide();
+            $("#euiValue1").hide();
+            $("#euiValue2").hide();
+            $("#euiColorScale").hide();
+            break;
+        case "6":
+            $("#euiRuleText").text("Format all:");
+            $("#euiAndText").hide();
+            $("#euiFormatText").show();
+            $("#euiFormatText").text("values in the selected range.");
+            type.empty();
+            $("#euiComparisonOperator1").hide();
+            $("#euiValue1").hide();
+            $("#euiValue2").hide();
+            $("#euiColorScale").hide();
+            break;
+        case "7":
+            $("#euiRuleText").text("Format values that are:");
+            $("#euiAndText").hide();
+            $("#euiFormatText").show();
+            $("#euiFormatText").text("the average for selected range.");
+            type.empty();
+            type.show();
+            $("#euiComparisonOperator1").show();
+            $("#euiValue1").hide();
+            $("#euiValue2").hide();
+            $("#euiColorScale").hide();
+            type.append("<option value='0'>Above</option>");
+            type.append("<option value='1'>Below</option>");
+            type.append("<option value='2'>EqualOrAbove</option>");
+            type.append("<option value='3'>EqualOrBelow</option>");
+            type.append("<option value='4'>Above1StdDev</option>");
+            type.append("<option value='5'>Below1StdDev</option>");
+            type.append("<option value='6'>Above2StdDev</option>");
+            type.append("<option value='7'>Below2StdDev</option>");
+            type.append("<option value='8'>Above3StdDev</option>");
+            type.append("<option value='9'>Below3StdDev</option>");
+            break;
+        case "8":
+            $("#euiRuleText").text("Format all cells based on their values:");
+            $("#euiAndText").hide();
+            $("#euiFormatText").hide();
+            type.empty();
+            type.hide();
+            $("#euiComparisonOperator1").hide();
+            $("#euiValue1").hide();
+            $("#euiValue2").hide();
+            $("#euiColorScale").show();
+            $("#euiMidPoint, #euiMidType, #euiMidValue, #euiMidColor").css("visibility", "hidden");
+            $("#euiMinType").val("1");
+            $("#euiMaxType").val("2");
+            $("#euiMinValue").val("");
+            $("#euiMaxValue").val("");
+            $("#euiMinColor").css("background", "#F8696B");
+            $("#euiMaxColor").css("background", "#63BE7B");
+            break;
+        case "9":
+            $("#euiRuleText").text("Format all cells based on their values:");
+            $("#euiAndText").hide();
+            $("#euiFormatText").hide();
+            type.empty();
+            type.hide();
+            $("#euiComparisonOperator1").hide();
+            $("#euiValue1").hide();
+            $("#euiValue2").hide();
+            $("#euiColorScale").show();
+            $("#euiMidPoint, #euiMidType, #euiMidValue, #euiMidColor").css("visibility", "visible");
+            $("#euiMinType").val("1");
+            $("#euiMidType").val("4");
+            $("#euiMaxType").val("2");
+            $("#euiMinValue").val("");
+            $("#euiMidValue").val("50");
+            $("#euiMaxValue").val("");
+            $("#euiMinColor").css("background-color", "#F8696B");
+            $("#euiMidColor").css("background-color", "#FFEB84");
+            $("#euiMaxColor").css("background-color", "#63BE7B");
+            break;
+        default:
+            $("#euiAndText").hide();
+            type.empty();
+            type.show();
+            $("#euiComparisonOperator1").show();
+            $("#euiValue1").show();
+            $("#euiValue1").val("");
+            $("#euiValue2").hide();
+            $("#euiColorScale").hide();
+            type.append("<option value='0'>EqualsTo</option>");
+            type.append("<option value='1'>NotEqualsTo</option>");
+            type.append("<option value='2'>GreaterThan</option>");
+            type.append("<option value='3'>GreaterThanOrEqualsTo</option>");
+            type.append("<option value='4'>LessThan</option>");
+            type.append("<option value='5'>LessThanOrEqualsTo</option>");
+            type.append("<option value='6'>Between</option>");
+            type.append("<option value='7'>NotBetween</option>");
+            break;
+    }
+}
+
+// DataBar dialog
+function parseValue(value) {
+    if (!value) {
+        return null;
+    }
+
+    if (!isNaN(value) && isFinite(value)) {
+        return parseFloat(value);
+    } else {
+        return value;
+    }
+}
+
+// picture dialog
+function getFloatingObjectName(sheet) {
+    var i = 0;
+    while (true) {
+        var name = "floatingObject" + i.toString();
+        if (!sheet.findFloatingObject(name) && !sheet.findPicture(name)) {
+            return name;
+        }
+        i++;
+    }
+}
+function getiframeDocument($iframe) {
+    var iframeDoc = $iframe[0].contentWindow || $iframe[0].contentDocument;
+    if (iframeDoc.document) {
+        iframeDoc = iframeDoc.document;
+    }
+    return iframeDoc;
+}
+var htmlSpecialCharsRegEx = /[<>&\r\n"']/gm,
+        hexColorValueRegEx = /^#[a-zA-z0-9]{6}$/,
+        rgbColorValueRegEx = /^rgba?\((\d{1,3})\,\s{0,}(\d{1,3})\,\s{0,}(\d{1,3})/;
+
+var htmlSpecialCharsPlaceHolders = {
+    '<': 'lt;',
+    '>': 'gt;',
+    '&': 'amp;',
+    '\r': "#13;",
+    '\n': "#10;",
+    '"': 'quot;',
+    "'": 'apos;' /*single quotes just to be safe*/
+};
+function htmlSpecialCharsEntityEncode(str) {
+    return str.replace(htmlSpecialCharsRegEx, function (match) {
+        return '&' + htmlSpecialCharsPlaceHolders[match];
+    });
+}
+function showLoading() {
+    jQuery(spreadId).css("position", "relative");
+    var width = jQuery(spreadId).width() + 2, height = jQuery(spreadId).height();
+    $("<span id='euiDelaySpan'><span id='icon' style='display:inline-block'></span>Importing...</span>")
+            .css("left", width / 2 - 70)
+            .css("top", height / 2 - 30)
+            .css("position", "absolute")
+            .css("color", "#4f4f4f")
+            .css("background", "#ffffff")
+            .css("border", "1px solid #a8a8a8")
+            .css("border-radius", "3px")
+            .css("-webkit-border-radius", "3px")
+            .css("box-shadow", "0 0 10px rgba(0, 0, 0, 0.25")
+            .css("font-family", "Arial, sans-serif")
+            .css("font-size", "20px")
+            .css("padding", "0.4em")
+            .insertAfter(""+spreadId);
+    $("<div id='euiDelayDiv'></div>")
+            .css("background", "#2D5972")
+            .css("opacity", 0.3)
+            .css("position", "absolute")
+            .css("top", 0)
+            .css("left", 0)
+            .css("width", width)
+            .css("height", height)
+            .insertAfter(""+spreadId);
+}
+function hideLoading() {
+    $("#euiDelayDiv").remove();
+    $("#euiDelaySpan").remove();
+}
+
+function excelImport() {
+    var evt = document.createEvent("MouseEvents");
+    evt.initEvent("click", true, false);
+    document.getElementById("euiOpenFile").dispatchEvent(evt);
+}
+// context menu
+function getCellInSelections(selections, row, col) {
+    var count = selections.length, range;
+    for (var i = 0; i < count; i++) {
+        range = selections[i];
+        if (range.contains(row, col)) {
+            return range;
+        }
+    }
+    return null;
+}
+function getHitTest(pageX, pageY, sheet) {
+
+    /*  Ref: EXC-2717
+     *  When the confluence page is having scrollbar & we have to scroll the confluence page
+     *  to open the excellentable in edit mode on confluence page view mode,
+     *  then top & left offset of spread gets affected
+     *  hence we need to substract top & left offset of window from spread offset.
+     *
+     */
+    var offsetTop = jQuery(spreadId).offset().top - $(window).scrollTop(),
+            offsetLeft = jQuery(spreadId).offset().left - $(window).scrollLeft(),
+            x = pageX - offsetLeft,
+            y = pageY - offsetTop;
+    return sheet.hitTest(x, y);
+}
+function showMergeContextMenu(sheet) {
+    var selections = sheet.getSelections();
+    if (selections && selections.length > 0) {
+        var spans = sheet.getSpans(selections[selections.length - 1], $.wijmo.wijspread.SheetArea.viewport);
+        if (spans && spans.length > 0) {
+            $(".eui-context-merge").hide();
+            $(".eui-context-unmerge").show();
+        } else {
+            $(".eui-context-merge").show();
+            $(".eui-context-unmerge").hide();
+        }
+    }
+}
+
+//show unlink option in the context menu
+function showUnlinkContextMenu(sheet) {
+    jQuery("#euiSpreadContextMenu aui-item-link[name=unlink]").hide();
+    sheet.isPaintSuspended(true);
+    var cellSelections = sheet.getSelections();
+    var sel = cellSelections[0];
+    var rowCount = sel.rowCount;
+    var columnCount = sel.colCount;
+    if (rowCount > 1 || columnCount > 1) { // more than one cell is selected
+        for (var n = 0; n < cellSelections.length; n++) {
+            var actualCellRange = getActualCellRange(cellSelections[n], sheet.getRowCount(), sheet.getColumnCount());
+            for (var i = 0; i < rowCount; i++) {
+                for (var j = 0; j < columnCount; j++) {
+                    var currentCell = sheet.getCell(i + actualCellRange.row, j + actualCellRange.col, $.wijmo.wijspread.SheetArea.viewport);
+                    var cellType = currentCell.cellType();
+                    if (cellType instanceof GcSpread.Sheets.HyperLinkCellType) {
+                        jQuery("#euiSpreadContextMenu aui-item-link[name=unlink]").show();
+                        break;
+                    }
+                }
+            }
+        }
+    } else {
+        var activeCell = sheet.getCell(sheet.getActiveRowIndex(), sheet.getActiveColumnIndex());
+        var cellType = activeCell.cellType();
+        if (cellType instanceof GcSpread.Sheets.HyperLinkCellType) {
+            jQuery("#euiSpreadContextMenu aui-item-link[name=unlink]").show();
+        }
+    }
+    sheet.isPaintSuspended(false);
+}
+function initSpread(spread) {
+    var sheet = spread.getActiveSheet(); // get active worksheet of the wijspread control
+    spread.useWijmoTheme = true;
+    spread.repaint();
+    spread.bind("EnterCell", selectionChanged);
+    //show range group
+    $("#showRowGroup").attr("disabled", true);
+    $("#showColGroup").attr("disabled", true);
+    $("#showRowGroupLabel").attr("disabled", true);
+    $("#showColGroupLabel").attr("disabled", true);
+    $("#showRowGroup").attr("value", "false");
+    $("#showColGroup").attr("value", "false");
+    $("#showRowGroupLabel").addClass("ui-state-disabled");
+    $("#showColGroupLabel").addClass("ui-state-disabled");
+    $("#showRowGroupLabel").bind("mouseup", rowlabelactive);
+    $("#showColGroupLabel").bind("mouseup", collabelactive);
+
+    $("#setTabStripColor").attr("disabled", true);
+    $("#setTabStripColor").addClass("ui-state-disabled");
+    //rapid input mode start
+    setstatus(sheet);
+    spread.bind($.wijmo.wijspread.Events.EditorStatusChanged, function () {
+        setstatus(spread.getActiveSheet());
+    });
+
+    bindMenuBarEvents();
+    bindScrollBarEvents();
+    applyHighlighter();
+    checkFilterIsApplied(sheet);
+    showCommentsview(spread);
+};
+
+/**
+ * Shows the note in view mode.
+ * @param spread
+ */
+function showCommentsview(spread){
+        var commentview = '#eui-comment-dialog';
+		var spreadjscommentpanel='.comment-layoutPanel';
+
+		$(spreadjscommentpanel).bind("DOMNodeInserted",function(event){
+			if ($(this).find('div.gc-spread-host').hasClass('no-user-select')){
+					$(commentview).find('textarea').html($(event.target).html());
+                    latestComment = $(commentview).find('textarea').html($(event.target).html());
+					notebody=$('#eui-comment-note').find('.aui-dialog2-content').html($(event.target).html());
+					if (hovernote){
+                        hovernote.close();
+                    }
+					if (clicknote){
+                        return false;
+                    }
+                    noteFlag.body = $(event.target).html().replace(/\r\n|\r|\n/g,"<br />");
+					hovernote = AJS.flag(noteFlag);
+			}
+		});
+		$(spreadjscommentpanel).bind("DOMNodeRemoved",function(){
+				if (hovernote){
+                    hovernote.close();
+                }
+		});
+}
+
+function checkFilterIsApplied(sheet){
+    var rowFilter = sheet.rowFilter();
+    var $filterBtn = jQuery("#euiMenuBar").find("[name=filter]");
+    if(rowFilter && rowFilter.range !== undefined){ //If rowFilter is applied
+        //If rowFilter selection is blank then remove that filter
+        if(rowFilter.range.rowCount == 0 && rowFilter.range.colCount == 0){
+            sheet.rowFilter(null);
+            rowFilter = sheet.rowFilter();
+        }else{
+            $filterBtn.addClass("active");
+        }
+    }else if (sheet.findTableByName(excTableFilterName) != null || sheet.findTableByName(sheet.getName()+"-"+excTableFilterName) != null) {
+        //If rowFilter is applied which internally uses table-design.
+        // Each TableFilter within a sheet can be identified using exc-table-filter(versions prior to multiSheet support.)
+        // or sheetName-exc-table-filter (For all versions released after MultiSheet support).
+        $filterBtn.addClass("active");
+    }
+}
+
+var validatorType;
+
+var pictureUrl = "";
+var selCellType="TextCell" , tableName="", isTableAdd = false ,isPictureAdd = false,isCommentAdd =  false;
+
+function bindMenuBarEvents() {
+    jQuery(".eui-formatting-dialog").remove(); //Remove all previously added dialogs.
+    validatorType = "AnyValidator";
+    $("#euiValidatorTab1").hide();
+    $("#euiValidatorTab2").hide();
+    $("#euiIsIntTab").hide();
+    $("#euiIsTimeTab").hide();
+
+    selCellType = "TextCell";
+
+    tableName = "";
+    isTableAdd = false;
+    isPictureAdd = false;
+    isCommentAdd = false;
+// theme change
+    $('.premium-themes a, .jqueryui-themes a').click(function () {
+        $("link[title='rocket-jqueryui']").attr("href", $(this).attr("href"));
+        setTimeout(
+                function () {
+                    var ss = jQuery(spreadId).wijspread("spread");
+                    ss.repaint();
+                }, 100);
+
+        return false;
+    });
+
+// data validation
+   // $("#euiDataValidationDialog").wijribbon();
+    $("#euiValidationInputMessge").bind("mousedown", IsRangeSet);
+    $("#euiValidationErrorAlert").bind("mousedown", IsRangeSet);
+    $("#euiValidatorTypes").change(function () {
+        validatorType = $(this).val();
+        switch (validatorType) {
+            case "AnyValidator":
+                $("#euiValidatorTab1").hide();
+                $("#euiIsTimeTab").hide();
+                $("#euiIsIntTab").hide();
+                $("#euiValidatorTab2").hide();
+                $("#euiDataTitle").hide();
+                break;
+            case "DateValidator":
+                $("#euiValidatorTab1").show();
+                $("#euiIsTimeTab").show();
+                $("#euiIsIntTab").hide();
+                $("#euiValidatorTab2").hide();
+                $("#euiRangeStart").text("Start date:");
+                $("#euiRangeEnd").text("End date:");
+                $("#euiDataTitle").show();
+                break;
+            case "FormulaListValidator":
+                $("#euiValidatorTab2").show();
+                $("#euiValidatorTab1").hide();
+                $("#euiRangeValidator").text("Formula:");
+                $("#euiPrompt").text("(e.g: E5:I5)");
+                $("#euiDataTitle").hide();
+                break;
+            case "FormulaValidator":
+                $("#euiValidatorTab2").show();
+                $("#euiValidatorTab1").hide();
+                $("#euiRangeValidator").text("Formula:");
+                $("#euiPrompt").text("(e.g: =ISERROR(FIND(\" \",A1)))");
+                $("#euiDataTitle").hide();
+                break;
+            case "ListValidator":
+                $("#euiValidatorTab2").show();
+                $("#euiValidatorTab1").hide();
+                $("#euiRangeValidator").text("Source");
+                $("#euiPrompt").text("(e.g: 1,2,3)");
+                $("#euiDataTitle").hide();
+                break;
+            case "NumberValidator":
+                $("#euiValidatorTab1").show();
+                $("#euiIsTimeTab").hide();
+                $("#euiIsIntTab").show();
+                $("#euiValidatorTab2").hide();
+                $("#euiRangeStart").text("Minimum:");
+                $("#euiRangeEnd").text("Maximum:");
+                $("#euiDataTitle").show();
+                break;
+            case "TextLengthValidator":
+                $("#euiValidatorTab1").show();
+                $("#euiIsTimeTab").hide();
+                $("#euiIsIntTab").hide();
+                $("#euiValidatorTab2").hide();
+                $("#euiRangeStart").text("Minimum:");
+                $("#euiRangeEnd").text("Maximum:");
+                $("#euiDataTitle").show();
+                break;
+        }
+    });
+    // import file from toolbar button
+    $("#euiOpenFile").bind('change', function () {
+        var file = $("#euiOpenFile").get(0).files[0];
+        var fileExtension = file.name.split(".").pop();
+        findNoOfSheets(file,fileExtension);
+        $("#euiOpenFile").val('');
+    });
+    // import file from drag and drop
+    /*$("").bind("drop", function(evt) {
+        var file = evt.originalEvent.dataTransfer.files[0];
+        if(file.type === "application/vnd.ms-excel" || file.type === "text/csv" || file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
+            findNoOfSheets(file);
+        } else {
+          jQuery('body')
+            .ExcellentableNotification({
+              title: 'Error in Importing of data.',
+              body: "<p>Please input a file which is a csv, xls or xlsx</p>",
+            })
+            .showErrorMsg();
+        }
+    });*/
+    $("#euiChkValidatorIgnoreBlank").change(function () {
+        var ss = jQuery(spreadId).wijspread("spread");
+        var sheet = ss.getActiveSheet();
+        var sels = sheet.getSelections();
+        for (var i = 0; i < sels.length; i++) {
+            var sel = getActualCellRange(sels[i], sheet.getRowCount(), sheet.getColumnCount());
+            for (var r = 0; r < sel.rowCount; r++) {
+                for (var c = 0; c < sel.colCount; c++) {
+                    var dv = sheet.getDataValidator(sel.row + r, sel.col + c);
+                    if (dv) {
+                        dv.ignoreBlank = $(this).prop("checked");
+                    }
+                }
+            }
+        }
+    });
+    $("#euiChkShowError").change(function () {
+        var ss = jQuery(spreadId).wijspread("spread");
+        var checked = $("#euiChkShowError").prop("checked");
+        if (checked) {
+            ss.bind($.wijmo.wijspread.Events.ValidationError, function (event, data) {
+                var dv = data.validator;
+                if (dv) {
+                    jQuery("body").ExcellentableNotification({title:dv.errorMessage}).showErrorMsg();
+                }
+            });
+        } else {
+            ss.unbind($.wijmo.wijspread.Events.ValidationError);
+        }
+    });
+    $("#euiValidatorComparisonOperator").change(function () {
+        var operator = parseInt($(this).val(), 10);
+        if (operator >= 6) { //validatorTypes
+            var isDateValidator = $("#euiValidatorTypes").val() == "DateValidator";
+            $("#euiRangeStart").text(isDateValidator ? "Start Date:" : "Minimum:");
+            $("#euiTxtValidatorValue2").parent().show();
+        } else {
+            $("#euiRangeStart").text("Value: ");
+            $("#euiTxtValidatorValue2").parent().hide();
+        }
+    });
+    $("#euiDataValidationDialog").dialog({
+        autoOpen: false,
+        height: 410,
+        width: 400,
+        modal: true,
+        resizable: false,
+        zIndex: 3005,
+        buttons: {
+            Clear: function () {
+                var ss = jQuery(spreadId).wijspread("spread");
+                var sheet = ss.getActiveSheet();
+                var sels = sheet.getSelections();
+                for (var i = 0; i < sels.length; i++) {
+                    var sel = getActualCellRange(sels[i], sheet.getRowCount(), sheet.getColumnCount());
+                    for (var r = 0; r < sel.rowCount; r++) {
+                        for (var c = 0; c < sel.colCount; c++) {
+                            sheet.setDataValidator(sel.row + r, sel.col + c, null);
+                        }
+                    }
+                }
+                $("#euiValidatorTypes").val("AnyValidator");
+                $("#euiTxtValidatorValue1").val("");
+                $("#euiTxtValidatorValue2").val("");
+                $("#euiTxtValidatorValue").val("");
+                $("#euiValidatorTab1").hide();
+                $("#euiIsTimeTab").hide();
+                $("#euiIsIntTab").hide();
+                $("#euiValidatorTab2").hide();
+                $("#euiTxtMessageTitle").val("");
+                $("#euiTxtMessageMessage").val("");
+                $("#euiValidatorErrorStyles").val("0");
+                $("#euiTxtErrorTitle").val("");
+                $("#euiTxtErrorMessage").val("");
+                validatorType = "AnyValidator";
+                $(this).dialog("close");
+            },
+            OK: function () {
+//setvalidator
+                var gcdv = $.wijmo.wijspread.DefaultDataValidator;
+
+                var ddv = null;
+                var v1 = $("#euiTxtValidatorValue1").val();
+                var v2 = $("#euiTxtValidatorValue2").val();
+                switch (validatorType) {
+                    case "AnyValidator":
+                        ddv = new $.wijmo.wijspread.DefaultDataValidator();
+                        break;
+                    case "DateValidator":
+                        if ($("#euiChkIsTime").prop("checked")) {
+                            ddv = gcdv.createDateValidator(parseInt($("#euiValidatorComparisonOperator").val(), 10),
+                                    isNaN(v1) ? v1 : new Date(v1),
+                                    isNaN(v2) ? v2 : new Date(v2),
+                                    true);
+                        } else {
+                            ddv = gcdv.createDateValidator(parseInt($("#euiValidatorComparisonOperator").val(), 10),
+                                    isNaN(v1) ? v1 : new Date(v1),
+                                    isNaN(v2) ? v2 : new Date(v2),
+                                    false);
+                        }
+                        break;
+                    case "FormulaListValidator":
+                        ddv = gcdv.createFormulaListValidator($("#euiTxtValidatorValue").val());
+                        break;
+                    case "FormulaValidator":
+                        ddv = gcdv.createFormulaValidator($("#euiTxtValidatorValue").val());
+                        break;
+                    case "ListValidator":
+                        ddv = gcdv.createListValidator($("#euiTxtValidatorValue").val());
+                        break;
+                    case "NumberValidator":
+                        if ($("#euiChkIsInteger").prop("checked")) {
+                            ddv = gcdv.createNumberValidator(parseInt($("#euiValidatorComparisonOperator").val(), 10),
+                                    isNaN(v1) ? v1 : parseInt(v1, 10),
+                                    isNaN(v2) ? v2 : parseInt(v2, 10),
+                                    true);
+                        } else {
+                            ddv = gcdv.createNumberValidator(parseInt($("#euiValidatorComparisonOperator").val(), 10),
+                                    isNaN(v1) ? v1 : parseFloat(v1),
+                                    isNaN(v2) ? v2 : parseFloat(v2),
+                                    false);
+                        }
+                        break;
+                    case "TextLengthValidator":
+                        ddv = gcdv.createTextLengthValidator(parseInt($("#euiValidatorComparisonOperator").val(), 10),
+                                isNaN(v1) ? v1 : parseInt(v1, 10),
+                                isNaN(v2) ? v2 : parseInt(v2, 10));
+                        break;
+                }
+
+                if (ddv != null) {
+                    ddv.errorMessage = $("#euiTxtErrorMessage").val();
+                    ddv.errorStyle = parseInt($("#euiValidatorErrorStyles").val(), 10);
+                    ddv.errorTitle = $("#euiTxtErrorTitle").val();
+                    ddv.showErrorMessage = $("#euiChkShowError").prop("checked");
+                    ddv.ignoreBlank = $("#euiChkValidatorIgnoreBlank").prop("checked");
+                    var checked = $("#euiChkShowMessage").prop("checked");
+                    if (checked) {
+                        ddv.inputTitle = $("#euiTxtMessageTitle").val();
+                        ddv.inputMessage = $("#euiTxtMessageMessage").val();
+                    }
+
+                    var ss = jQuery(spreadId).wijspread("spread");
+                    var sheet = ss.getActiveSheet();
+                    sheet.isPaintSuspended(true);
+                    var sels = sheet.getSelections();
+                    for (var i = 0; i < sels.length; i++) {
+                        var sel = getActualCellRange(sels[i], sheet.getRowCount(), sheet.getColumnCount());
+                        for (var r = 0; r < sel.rowCount; r++) {
+                            for (var c = 0; c < sel.colCount; c++) {
+                                sheet.setDataValidator(sel.row + r, sel.col + c, ddv);
+                            }
+                        }
+                    }
+										ExcellentableTriggerCustomValueChangeEvent(ss,'DataValidationDialog');
+                    sheet.isPaintSuspended(false);
+                }
+                $(this).dialog("close");
+            },
+            Cancel: function () {
+                $(this).dialog("close");
+            }
+        },
+        open: function (event, ui) {
+// reset items
+            $("#euiTxtMessageTitle").val("");
+            $("#euiTxtMessageMessage").val("");
+            $("#euiTxtErrorTitle").val("");
+            $("#euiTxtErrorMessage").val("");
+            $("#euiValidatorComparisonOperator").val("6");
+            $("#euiTxtValidatorValue1").val("");
+            $("#euiTxtValidatorValue2").val("");
+            $("#euiValidatorTypes").val("AnyValidator");
+            $("#euiValidatorTypes").change();
+            //$("#euiDataValidationDialog").wijtabs("select", 0);
+        }
+    }).parent().find('.ui-widget-header').removeClass('ui-widget-header');
+//Conditional format
+    $("#euieuiRule1").bind("change", function () {
+        var rule = $("#euiRule1").val();
+        var type = $("#euiComparisonOperator1");
+        setEnumTypeOfCF(rule, type);
+    });
+    $("#euiComparisonOperator1").bind("change", function () {
+        var type = $("#euiComparisonOperator1").val();
+        switch (type) {
+            case "0":
+            case "1":
+            case "2":
+            case "3":
+            case "4":
+            case "5":
+                $("#euiAndText").hide();
+                $("#euiValue2").hide();
+                break;
+            case "6":
+            case "7":
+                $("#euiAndText").show();
+                $("#euiAndText").text("and");
+                $("#euiValue2").show();
+                break;
+            default:
+                $("#euiAndText").hide();
+                $("#euiValue2").hide();
+                break;
+        }
+    });
+    $("#euiIconSetType").bind("change", function () {
+        createIconCriteriaDOM();
+    });
+    $("#euiMinType").bind("change", function () {
+        processMinItems($(event.target), $("#euiMinValue"));
+    });
+    $("#euiMidType").bind("change", function () {
+        processMinItems($(event.target), $("#euiMidValue"));
+    });
+    $("#euiMaxType").bind("change", function () {
+        processMaxItems($(event.target), $("#euiMaxValue"));
+    });
+    $("#euiConditionalFormatDialog").dialog({
+        autoOpen: false,
+        height: 200,
+        width: 400,
+        modal: true,
+        resizable: false,
+        zIndex: 3005,
+        buttons: {
+            OK: function () {
+                var spread1 = jQuery(spreadId).wijspread("spread");
+                var sheet = spread1.getActiveSheet();
+                var sels = sheet.getSelections();
+                var style = new $.wijmo.wijspread.Style();
+                style.backColor = "red";
+                style.foreColor = "green";
+                var value1 = $("#euiValue1").val();
+                var value2 = $("#euiValue2").val();
+                var cfs = sheet.getConditionalFormats();
+                var rule = $("#euiRule1").val();
+                var operator = parseInt($("#euiComparisonOperator1").val(), 10);
+
+                var minType = parseInt($("#euiMinType").val(), 10);
+                var midType = parseInt($("#euiMidType").val(), 10);
+                var maxType = parseInt($("#euiMaxType").val(), 10);
+                var midColor = $("#euiMidColor").css("background-color");
+                var minColor = $("#euiMinColor").css("background-color");
+                var maxColor = $("#euiMaxColor").css("background-color");
+                var midValue = $("#euiMidValue").val();
+                var maxValue = $("#euiMaxValue").val();
+                var minValue = $("#euiMinValue").val();
+
+                switch (rule) {
+                    case "0":
+                        var doubleValue1 = parseFloat(value1);
+                        var doubleValue2 = parseFloat(value2);
+                        cfs.addCellValueRule(operator, isNaN(doubleValue1) ? value1 : doubleValue1, isNaN(doubleValue2) ? value2 : doubleValue2, style, sels);
+                        break;
+                    case "1":
+                        cfs.addSpecificTextRule(operator, value1, style, sels);
+                        break;
+                    case "2":
+                        cfs.addDateOccurringRule(operator, style, sels);
+                        break;
+                    case "3":
+                        try {
+                            cfs.addFormulaRule(value1, style, sels);
+                        }
+                        catch (e) {
+                            cfs.removeRule(cfs.getRule(cfs.count() - 1));
+                            jQuery("body").ExcellentableNotification({title:"Invalid Formula"}).showWarningMsg();
+                        }
+                        break;
+                    case "4":
+                        cfs.addTop10Rule(operator, parseInt(value1, 10), style, sels);
+                        break;
+                    case "5":
+                        cfs.addUniqueRule(style, sels);
+                        break;
+                    case "6":
+                        cfs.addDuplicateRule(style, sels);
+                        break;
+                    case "7":
+                        cfs.addAverageRule(operator, style, sels);
+                        break;
+                    case "8":
+                        cfs.add2ScaleRule(minType, minValue, minColor, maxType, maxValue, maxColor, sels);
+                        break;
+                    case "9":
+                        cfs.add3ScaleRule(minType, minValue, minColor, midType, midValue, midColor, maxType, maxValue, maxColor, sels);
+                        break;
+                    default:
+                        var doubleValue1 = parseFloat(value1);
+                        var doubleValue2 = parseFloat(value2);
+                        cfs.addCellValueRule(operator, isNaN(doubleValue1) ? value1 : doubleValue1, isNaN(doubleValue2) ? value2 : doubleValue2, style, sels);
+                        break;
+                }
+								ExcellentableTriggerCustomValueChangeEvent(spread1,'ConditionalFormatDialog');
+
+                $(this).dialog("close");
+                sheet.repaint();
+            },
+            Cancel: function () {
+                $(this).dialog("close");
+            }
+        },
+        open: function (event, ui) {
+            var isColorScale = $("#euiConditionalFormatDialog").dialog("option", "colorScale");
+            $("#euiColorScaleStyle").css("display", isColorScale ? "inline-block" : "none");
+        }
+    }).parent().find('.ui-widget-header').removeClass('ui-widget-header');
+// data bar dialog related
+    $("#euiMinimumType").bind("change", function () {
+        processMinItems($(event.target), $("#euiMinimumValue"));
+    });
+    $("#euiMaximumType").bind("change", function () {
+        processMinItems($(event.target), $("#euiMaximumValue"));
+    });
+    $("#euiDatabarDialog").dialog({
+        autoOpen: false,
+        height: 480,
+        width: 420,
+        modal: true,
+        resizable: false,
+        zIndex: 3005,
+        buttons: {
+            OK: function () {
+                var spread1 = jQuery(spreadId).wijspread("spread");
+                var sheet = spread1.getActiveSheet();
+                sheet.isPaintSuspended(true);
+
+                var selections = sheet.getSelections();
+                if (selections) {
+                    var ranges = [];
+                    $.each(selections, function (i, v) {
+                        ranges.push(new $.wijmo.wijspread.Range(v.row, v.col, v.rowCount, v.colCount));
+                    });
+                    var cfs = sheet.getConditionalFormats();
+                    var dataBarRule = new $.wijmo.wijspread.DataBarRule();
+                    dataBarRule.ranges = ranges;
+                    dataBarRule.minimumType(parseInt($("#euiMinimumType").val(), 10));
+                    dataBarRule.minimumValue(parseValue($("#euiMinimumValue").val()));
+                    dataBarRule.maximumType(parseInt($("#euiMaximumType").val(), 10));
+                    dataBarRule.maximumValue(parseValue($("#euiMaximumValue").val()));
+                    dataBarRule.gradient($("#euiGradient").prop("checked"));
+                    dataBarRule.color($("#euiColor").css("background-color"));
+                    dataBarRule.showBorder($("#euiShowBorder").prop("checked"));
+                    dataBarRule.borderColor($("#euiBorderColor").css("background-color"));
+                    dataBarRule.dataBarDirection(parseInt($("#euiDataBarDirection").val(), 10));
+                    dataBarRule.negativeFillColor($("#euiNegativeFillColor").css("background-color"));
+                    dataBarRule.useNegativeFillColor($("#euiUseNegativeFillColor").prop("checked"));
+                    dataBarRule.negativeBorderColor($("#euiNegativeBorderColor").css("background-color"));
+                    dataBarRule.useNegativeBorderColor($("#euiUseNegativeBorderColor").prop("checked"));
+                    dataBarRule.axisPosition(parseInt($("#euiAxisPosition").val(), 10));
+                    dataBarRule.axisColor($("#euiAxisColor").css("background-color"));
+                    dataBarRule.showBarOnly($("#euiShowBarOnly").prop("checked"));
+                    cfs.addRule(dataBarRule);
+                }
+								ExcellentableTriggerCustomValueChangeEvent(spread1,'DatabarDialog');
+
+                sheet.isPaintSuspended(false);
+                $(this).dialog("close");
+            },
+            Cancel: function () {
+                $(this).dialog("close");
+            }
+        }
+    });
+// icon set
+    $("#euiIconSetDialog").dialog({
+        autoOpen: false,
+        height: 400,
+        width: 340,
+        modal: true,
+        resizable: false,
+        zIndex: 3005,
+        buttons: {
+            OK: function () {
+                var spread1 = jQuery(spreadId).wijspread("spread");
+                var sheet = spread1.getActiveSheet();
+                sheet.isPaintSuspended(true);
+
+                var selections = sheet.getSelections();
+                if (selections) {
+                    var ranges = [];
+                    $.each(selections, function (i, v) {
+                        ranges.push(new $.wijmo.wijspread.Range(v.row, v.col, v.rowCount, v.colCount));
+                    });
+                    var cfs = sheet.getConditionalFormats();
+                    var iconSetRule = new $.wijmo.wijspread.IconSetRule();
+                    iconSetRule.ranges = ranges;
+                    iconSetRule.iconSetType(parseInt($("#euiIconSetType").val(), 10));
+                    var $divs = $("#euiIconCriteriaSetting div");
+                    var iconCriteria = iconSetRule.iconCriteria();
+                    $.each($divs, function (i, v) {
+                        var isGreaterThanOrEqualTo = parseInt($(v.children[0]).val(), 10) === 1;
+                        var iconValueType = parseInt($(v.children[2]).val(), 10);
+                        var iconValue = $(v.children[1]).val();
+                        if (iconValueType !== $.wijmo.wijspread.IconValueType.Formula) {
+                            iconValue = parseInt(iconValue, 10);
+                        }
+                        iconCriteria[i] = new $.wijmo.wijspread.IconCriterion(isGreaterThanOrEqualTo, iconValueType, iconValue);
+                    });
+                    iconSetRule.reverseIconOrder($("#euiReverseIconOrder").prop("checked"));
+                    iconSetRule.showIconOnly($("#euiShowIconOnly").prop("checked"));
+                    cfs.addRule(iconSetRule);
+                }
+								ExcellentableTriggerCustomValueChangeEvent(spread1,'IconSetDialog');
+
+                sheet.isPaintSuspended(false);
+                $(this).dialog("close");
+            },
+            Cancel: function () {
+                $(this).dialog("close");
+            }
+        }
+    }).parent().find('.ui-widget-header').removeClass('ui-widget-header');
+
+// border dialog
+    $("#euiLeftSide").change(function () {
+        var checked = $("#euiLeftSide").prop("checked");
+        if (checked) {
+            $("#euiBorder11").css("border-left", "1px solid gray");
+            $("#euiBorder21").css("border-left", "1px solid gray");
+            $("#euiBorderTable").css("border-left", "1px solid gray");
+        } else {
+            $("#euiBorder11").css("border-left", "none");
+            $("#euiBorder21").css("border-left", "none");
+            $("#euiBorderTable").css("border-left", "none");
+        }
+    });
+    $("#euiTopSide").change(function () {
+        var checked = $("#euiTopSide").prop("checked");
+        if (checked) {
+            $("#euiBorder11").css("border-top", "1px solid gray");
+            $("#euiBorder12").css("border-top", "1px solid gray");
+            $("#euiBorderTable").css("border-top", "1px solid gray");
+        } else {
+            $("#euiBorder11").css("border-top", "none");
+            $("#euiBorder12").css("border-top", "none");
+            $("#euiBorderTable").css("border-top", "none");
+        }
+    });
+    $("#euiRightSide").change(function () {
+        var checked = $("#euiRightSide").prop("checked");
+        if (checked) {
+            $("#euiBorder12").css("border-right", "1px solid gray");
+            $("#euiBorder22").css("border-right", "1px solid gray");
+            $("#euiBorderTable").css("border-right", "1px solid gray");
+        } else {
+            $("#euiBorder12").css("border-right", "none");
+            $("#euiBorder22").css("border-right", "none");
+            $("#euiBorderTable").css("border-right", "none");
+        }
+    });
+    $("#euiBottomSide").change(function () {
+        var checked = $("#euiBottomSide").prop("checked");
+        if (checked) {
+            $("#euiBorder21").css("border-bottom", "1px solid gray");
+            $("#euiBorder22").css("border-bottom", "1px solid gray");
+            $("#euiBorderTable").css("border-bottom", "1px solid gray");
+        } else {
+            $("#euiBorder21").css("border-bottom", "none");
+            $("#euiBorder22").css("border-bottom", "none");
+            $("#euiBorderTable").css("border-bottom", "none");
+        }
+    });
+    $("#euiHInside").change(function () {
+        var checked = $("#euiHInside").prop("checked");
+        if (checked) {
+            $("#euiBorder11").css("border-bottom", "1px solid gray");
+            $("#euiBorder12").css("border-bottom", "1px solid gray");
+            $("#euiBorder21").css("border-top", "1px solid gray");
+            $("#euiBorder22").css("border-top", "1px solid gray");
+        } else {
+            $("#euiBorder11").css("border-bottom", "none");
+            $("#euiBorder12").css("border-bottom", "none");
+            $("#euiBorder21").css("border-top", "none");
+            $("#euiBorder22").css("border-top", "none");
+        }
+    });
+    $("#euiVInside").change(function () {
+        var checked = $("#euiVInside").prop("checked");
+        if (checked) {
+            $("#euiBorder11").css("border-right", "1px solid gray");
+            $("#euiBorder12").css("border-left", "1px solid gray");
+            $("#euiBorder21").css("border-right", "1px solid gray");
+            $("#euiBorder22").css("border-left", "1px solid gray");
+        } else {
+            $("#euiBorder11").css("border-right", "none");
+            $("#euiBorder12").css("border-left", "none");
+            $("#euiBorder21").css("border-right", "none");
+            $("#euiBorder22").css("border-left", "none");
+        }
+    });
+    $("#euiBorderDialog").dialog({
+        autoOpen: false,
+        height: 450,
+        width: 450,
+        modal: true,
+        resizable: false,
+        zIndex: 3005,
+        create: function () {
+            var activeDialog = jQuery(this).closest('.ui-dialog');
+            activeDialog.find('.ui-dialog-titlebar-close').addClass("aui-icon aui-icon-small aui-iconfont-close-dialog");
+            activeDialog.find('.ui-button').each(function () {
+                var newBtnClass = jQuery(this).attr("class").replace(/ui-/g, "aui-");
+                jQuery(this).attr("class", newBtnClass);
+            });
+            activeDialog.find('.ui-button-text').each(function () {
+                var newBtnTxtClass = jQuery(this).attr("class").replace(/ui-/g, "aui-");
+                jQuery(this).attr("class", newBtnTxtClass);
+            });
+
+        },
+        buttons: {
+            OK: {
+                text: AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.ok"),
+                click: function () {
+                    var spread = jQuery(spreadId).wijspread("spread");
+                    var sheet = spread.getActiveSheet();
+                    sheet.isPaintSuspended(true);
+                    var sels = sheet.getSelections();
+                    var lineBorder = new $.wijmo.wijspread.LineBorder($("#euiLineColor").val(), $.wijmo.wijspread.LineStyle[$("#euiLineStyle").val()]);
+                    for (var n = 0; n < sels.length; n++) {
+                        var sel = getActualCellRange(sels[n], sheet.getRowCount(), sheet.getColumnCount());
+                        sheet.setBorder(sel, lineBorder, {
+                            left: $("#euiLeftSide").prop("checked"),
+                            top: $("#euiTopSide").prop("checked"),
+                            right: $("#euiRightSide").prop("checked"),
+                            bottom: $("#euiBottomSide").prop("checked"),
+                            innerHorizontal: $("#euiHInside").prop("checked"),
+                            innerVertical: $("#euiVInside").prop("checked")
+                        });
+                    }
+					
+                    ExcellentableTriggerCustomValueChangeEvent(spread,'BorderDialog');
+
+                    sheet.isPaintSuspended(false);
+                    $(this).dialog("close");
+                }},
+            Cancel: {
+                text: AJS.I18n.getText('com.addteq.confluence.plugin.excellentable.cancel'),
+                click: function () {
+                    $(this).dialog("close");
+                }}
+        },
+        open: function (event, ui) {
+            $("#euiHInside").removeAttr("checked");
+            $("#euiVInside").removeAttr("checked");
+            $("#euiBorder11").css("border", "none");
+            $("#euiBorder12").css("border", "none");
+            $("#euiBorder21").css("border", "none");
+            $("#euiBorder22").css("border", "none");
+        }
+    }).parent().find('.ui-widget-header').removeClass('ui-widget-header');
+
+// cell type dialog
+    $("#euiCellTypeDialog").dialog({
+        autoOpen: false,
+        height: 310,
+        width: 300,
+        modal: true,
+        resizable: false,
+        zIndex: 3005,
+        buttons: {
+            OK: function () {
+                var spread = jQuery(spreadId).wijspread("spread");
+                var sheet = spread.getActiveSheet();
+                var cellType;
+                switch (selCellType) {
+                    case "TextCell":
+                        cellType = new $.wijmo.wijspread.TextCellType();
+                        break;
+                    case "ComboCell":
+                        cellType = new $.wijmo.wijspread.ComboBoxCellType();
+                        cellType.editorValueType(parseInt($("#euiSelComboCellEditorValueType").val(), 10));
+                        var itemsText = $("#euiTxtComboCellItemsText").val().split(",");
+                        var itemsValue = $("#euiTxtComboCellItemsValue").val().split(",");
+                        var itemsLength = itemsText.length > itemsValue.length ? itemsText.length : itemsValue.length;
+                        var items = [];
+                        for (var count = 0; count < itemsLength; count++) {
+                            var t = itemsText.length > count && itemsText[0] != "" ? itemsText[count] : undefined;
+                            var v = itemsValue.length > count && itemsValue[0] != "" ? itemsValue[count] : undefined;
+                            if (t != undefined && v != undefined) {
+                                items[count] = {text: t, value: v};
+                            }
+                            else if (t != undefined) {
+                                items[count] = {text: t};
+                            } else if (v != undefined) {
+                                items[count] = {value: v};
+                            }
+                        }
+                        cellType.items(items);
+                        break;
+                    case "CheckBoxCell":
+                        cellType = new $.wijmo.wijspread.CheckBoxCellType();
+                        if ($("#euiTxtCheckBoxCellTextCaption").val() != "") {
+                            cellType.caption($("#euiTxtCheckBoxCellTextCaption").val());
+                        }
+                        if ($("#euiTxtCheckBoxCellTextTrue").val() != "") {
+                            cellType.textTrue($("#euiTxtCheckBoxCellTextTrue").val());
+                        }
+                        if ($("#euiTxtCheckBoxCellTextIndeterminate").val() != "") {
+                            cellType.textIndeterminate($("#euiTxtCheckBoxCellTextIndeterminate").val());
+                        }
+                        if ($("#euiTxtCheckBoxCellTextFalse").val() != "") {
+                            cellType.textFalse($("#euiTxtCheckBoxCellTextFalse").val());
+                        }
+                        cellType.textAlign(parseInt($("#euiSelCheckBoxCellAlign").val(), 10));
+                        cellType.isThreeState($("#euiCkbCheckBoxCellIsThreeState").prop("checked"));
+                        break;
+                    case "ButtonCell":
+                        cellType = new $.wijmo.wijspread.ButtonCellType();
+                        if ($("#euiTxtButtonCellMarginLeft").val() != "") {
+                            cellType.marginLeft(parseFloat($("#euiTxtButtonCellMarginLeft").val()));
+                        }
+                        if ($("#euiTxtButtonCellMarginTop").val() != "") {
+                            cellType.marginTop(parseFloat($("#euiTxtButtonCellMarginTop").val()));
+                        }
+                        if ($("#euiTxtButtonCellMarginRight").val() != "") {
+                            cellType.marginRight(parseFloat($("#euiTxtButtonCellMarginRight").val()));
+                        }
+                        if ($("#euiTxtButtonCellMarginBottom").val() != "") {
+                            cellType.marginBottom(parseFloat($("#euiTxtButtonCellMarginBottom").val()));
+                        }
+                        if ($("#euiTxtButtonCellText").val() != "") {
+                            cellType.text($("#euiTxtButtonCellText").val());
+                        }
+                        cellType.buttonBackColor($("#euiTxtButtonCellBackColor").css("background-color"));
+                        break;
+                    case "HyperLinkCell":
+                        cellType = new $.wijmo.wijspread.HyperLinkCellType();
+                        cellType.linkColor($("#euiTxtHyperLinkCellLinkColor").css("background-color"));
+                        cellType.visitedLinkColor($("#euiTxtHyperLinkCellVisitedLinkColor").css("background-color"));
+                        if ($("#euiTxtHyperLinkCellText").val() != "") {
+                            cellType.text($("#euiTxtHyperLinkCellText").val());
+                        }
+                        if ($("#euiTxtHyperLinkCellToolTip").val() != "") {
+                            cellType.linkToolTip($("#euiTxtHyperLinkCellToolTip").val());
+                        }
+                        break;
+                }
+                sheet.isPaintSuspended(true);
+                sheet.suspendEvent();
+                var sels = sheet.getSelections();
+                for (var i = 0; i < sels.length; i++) {
+                    var sel = getActualCellRange(sels[i], sheet.getRowCount(), sheet.getColumnCount());
+                    for (var r = 0; r < sel.rowCount; r++) {
+                        for (var c = 0; c < sel.colCount; c++) {
+                            sheet.setCellType(sel.row + r, sel.col + c, cellType, $.wijmo.wijspread.SheetArea.viewport);
+                        }
+                    }
+                }
+                sheet.resumeEvent();
+								ExcellentableTriggerCustomValueChangeEvent(spread,'CellTypeDialog');
+
+                sheet.isPaintSuspended(false);
+                $(this).dialog("close");
+            },
+            Cancel: function () {
+                $(this).dialog("close");
+            }
+        }
+    }).parent().find('.ui-widget-header').removeClass('ui-widget-header');
+
+// Freeze setting
+    $("#euiFreezeSettingDialog").dialog({
+        autoOpen: false,
+        height: 280,
+        width: 350,
+        modal: true,
+        resizable: false,
+        zIndex: 3005,
+        buttons: {
+            OK: function () {
+                var spread = jQuery(spreadId).wijspread("spread");
+                var sheet = spread.getActiveSheet();
+                sheet.isPaintSuspended(true);
+                sheet.suspendEvent();
+                var frozenRowCount = parseInt($("#euiFrozenRowCount").val(), 10);
+                sheet.setFrozenRowCount(frozenRowCount);
+                var frozenColumnCount = parseInt($("#euiFrozenColumnCount").val(), 10);
+                sheet.setFrozenColumnCount(frozenColumnCount);
+                var frozenTrailingRowCount = parseInt($("#euiFrozenTrailingRowCount").val(), 10);
+                sheet.setFrozenTrailingRowCount(frozenTrailingRowCount);
+                var frozenTrailingColumnCount = parseInt($("#euiFrozenTrailingColumnCount").val(), 10);
+                sheet.setFrozenTrailingColumnCount(frozenTrailingColumnCount);
+								ExcellentableTriggerCustomValueChangeEvent(spread,'FreezeSettingDialog');
+
+                sheet.isPaintSuspended(false);
+                $(this).dialog("close");
+            },
+            Cancel: function () {
+                $(this).dialog("close");
+            }
+        }
+    }).parent().find('.ui-widget-header').removeClass('ui-widget-header');
+//sheet visible
+    $("#sheetList").bind('mouseover', updateSheetList);
+//add picture
+    var file;
+    if (typeof FileReader === 'undefined') {
+        $("#euiFileInput").attr('disabled', 'disabled');
+        $("#euiFileInput1").attr('disabled', 'disabled');
+    } else {
+        $("#euiFileInput").bind('change', function () {
+            file = this.files[0];
+            if (!/image\/\w+/.test(file.type)) {
+                jQuery("body").ExcellentableNotification({title:"The file must be an image"}).showWarningMsg();
+                return false;
+            }
+            readFileAndUpdatePictureUrl(file);
+        });
+        $("#euiFileInput1").bind('change', function () {
+            var file = this.files[0];
+            if (!/image\/\w+/.test(file.type)) {
+                jQuery("body").ExcellentableNotification({title:"The file muse be an image!"}).showWarningMsg();
+                return false;
+            }
+            readFileAndUpdatePictureUrl(file);
+        });
+    }
+
+    function readFileAndUpdatePictureUrl(file) {
+        var reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = function () {
+            pictureUrl = this.result;
+        }
+    }
+
+    AJS.dialog2("#sheet-delete-warning-dialog").on("show", function() {
+        //To avoid simulating multiple clicks for delete sometimes, best to unbind always and then provide function
+        // for click
+        AJS.$("#sheet-delete-confirm-button").unbind().click(function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var activeSheetIndex = spread.getActiveSheetIndex();
+            spread.removeSheet(activeSheetIndex);
+            jQuery('body').ExcellentableTabStrip.update();
+            AJS.dialog2("#sheet-delete-warning-dialog").hide();
+            ExcellentableTriggerCustomValueChangeEvent(spread,'RemoveSheet');
+        });
+    });
+
+// creating insert link icon dialog on click of the link icon present in the insert tab
+	AJS.dialog2("#euiAddHyperlinkDialog").on("show", function() {
+		sheet = spread.getActiveSheet();
+		//clear the cell text of the dialog when activecell is blank
+		var activeCell = sheet.getCell(sheet.getActiveRowIndex(), sheet.getActiveColumnIndex());
+		var cellType = activeCell.cellType();
+		var activeCellText = activeCell.text();
+		if (activeCellText === "") {
+			$(this).find('#eui-link-text').val(activeCell.text());
+			$(this).find('#eui-link').val(activeCell.text());
+		}
+		//if the active cell is not blank
+		else if (cellType instanceof GcSpread.Sheets.HyperLinkCellType) {
+			$(this).find('#eui-link-text').val(activeCell.cellType().text());
+			$(this).find("#eui-link").val(activeCell.cellType().linkToolTip());
+		}
+		// if the active Cell is not blank or cell contains textCellType
+		else if (activeCellText !== "" || cellType instanceof GcSpread.Sheets.TextCellType) {
+			$(this).find('#eui-link-text').val(activeCell.text());
+			$(this).find('#eui-link').val(activeCell.text());
+		}
+		var self=$(this);
+
+		self.on('click','#dialog-submit-button',function(e){
+			createlink(self);
+		});
+	});
+
+
+    var commentDialog = AJS.dialog2("#eui-comment-dialog");
+    commentDialog.on("show", function() {
+
+        //If the note-view-on-click is already present, close it!
+        if (clicknote){
+            clicknote.close();
+        }
+
+        var sheet = spread.getActiveSheet();
+        // temporarily protects the sheet to prevent it from taking focus from comment text box
+        sheet.setIsProtected(true);
+        var commentTextArea = AJS.$("#eui-comment");
+        commentTextArea.val(""); //Blank off the text first before deciding what to add
+
+        //If there is a comment already for that cell, populate the text area with that comment.
+        if (latestComment) {
+            commentTextArea.attr("value", latestComment.text());
+        }
+        var self=AJS.$(this);
+
+        self.on('click', '#eui-comment-dialog-submit-button', function(e) {
+            e.preventDefault();
+            var commentText = commentTextArea.val();
+            if (commentText) {
+                var comment = new GcSpread.Sheets.Comment();
+                comment.text(commentText);
+                sheet.setComment(sheet.getActiveRowIndex(), sheet.getActiveColumnIndex(), comment);
+				ExcellentableTriggerCustomValueChangeEvent(spread,'CommentDialog');
+            }
+            commentDialog.hide();
+        });
+
+    });
+    commentDialog.on("hide", function() {
+        var sheet = spread.getActiveSheet();
+        //removes temporary protection on closing dialog
+        sheet.setIsProtected(false);
+    });
+
+    var is_url = function(str) {
+        regexp =  /^(?:(?:https?|ftp):\/\/)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/\S*)?$/;
+        if (regexp.test(str)){
+          return true;
+        }else{
+          return false;
+        }
+    }
+
+
+    var insertPictureDialog = AJS.dialog2("#euiPictureDialog");
+    insertPictureDialog.on("show", function () {
+
+        $('#euiDialogPictureAddButton').attr('disabled', true);
+        $('#euiFileInput').on('change', function() {
+            if ($(this).val()) {
+                $('#euiDialogPictureAddButton').removeAttr('disabled');
+            } 
+        });
+
+        // To avoid simulating multiple clicks for add picture sometimes,
+        // best to unbind always and then provide function for click
+        AJS.$("#euiDialogPictureAddButton").unbind().click(function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            var spread = jQuery(spreadId).wijspread("spread");
+            var sheet = spread.getActiveSheet();
+            sheet.isPaintSuspended(true);
+
+            //Make an API call to confluence to attach the image to the confluence page.
+            // Allow duplicates to be attached, else the call will fail if the
+            // user attaches the same image again for some reason.
+            var form = new FormData();
+            form.append("file", file);
+            if (AJS.params.pageId != 0) {
+                //If there is a page id, us that to store the attachments
+                var retPictureUrl = attachToConfluencePage(form);
+                if (retPictureUrl) { //If pictureUrl is not blank, then set that as the picture URL of the image
+                    pictureUrl = retPictureUrl;
+                }
+
+            }
+
+
+            var sel = sheet.getSelections()[0];
+
+            if (pictureUrl !== "" && sel) {
+                var cr = getActualRange(sel, sheet.getRowCount(), sheet.getColumnCount());
+                var name = getFloatingObjectName(sheet);
+                //pictureUrl = 'https://cdn.addteq.com/images/website/logos/brand-logo-gray.png';
+                //Above line to experiment that inserting images does support URL links instead of embedding files inside Excellentable and making it bulky.
+
+                sheet.addPicture(name, pictureUrl, cr.row, cr.col)
+                    .borderStyle("solid").borderWidth(0).borderRadius(3);
+                sheet.isPaintSuspended(false);
+            }
+            insertPictureDialog.hide();
+        });
+
+        AJS.$("#euiDialogPictureCancelButton").click(function (e) {
+            e.preventDefault();
+            insertPictureDialog.hide();
+        });
+
+    });
+
+	var createlink = function (thisDialog) {
+		var selector= thisDialog.attr('id');
+		var selectionrange = sheet.getSelections();
+        var hyperLink = new EditableHyperLinkCellType();
+		var textValue = $.trim(thisDialog.find('#eui-link-text').val()); 
+        var urlValue = thisDialog.find('#eui-link').val();
+		var activeCell = sheet.getCell(selectionrange[0].row, selectionrange[0].col);
+		var cellForeColor = activeCell.foreColor();
+
+		if (textValue === "") {
+			textValue = urlValue;
+		}
+		if (urlValue !== "") {
+            //test if a valid url has been entered
+            if(is_url(urlValue)){
+    			var protocalRegex = /^(http:\/|https:\/|https:|http:|http:\/\/|https:\/\/)$/;
+    			if (urlValue.indexOf("http://") !== 0 && urlValue.indexOf("https://") !== 0 && !protocalRegex.test(urlValue)) {
+    				urlValue = "http://" + urlValue;
+    			}
+    			if (cellForeColor !== undefined) {
+    				hyperLink.linkColor(cellForeColor).visitedLinkColor(cellForeColor).text(textValue); //set hyperlink color,visited link color,text for the hyperlink
+    			}else{
+    				hyperLink.linkColor(defaultHyperLinkColor).visitedLinkColor(defaultHyperLinkColor).text(textValue); //set hyperlink color,visited link color,text for the hyperlink
+    			}
+
+    			var regularExpress = /[a-zA-Z]/, 
+                    splitUrlValue = urlValue.split("."), 
+                    lastElement = splitUrlValue[splitUrlValue.length - 1],
+                    firstLetterOfLastElement = lastElement.substr(0, 1), 
+                    firstLetterOfString = urlValue.replace("http://", "").replace("https://", "").substr(0, 1);
+
+    			// if the string contains dot operator
+    			if (urlValue.indexOf(".") > 0 && urlValue !== "http:" && urlValue !== "http://") {
+    				//validating the string first letter is alphabet or it should be symbol # or after dot last element is null
+    				if (regularExpress.test(firstLetterOfLastElement) || firstLetterOfLastElement === "#" || firstLetterOfLastElement === "") {
+    					hyperLink.linkToolTip(urlValue);
+    					activeCell.cellType(hyperLink).value(urlValue);
+    					AJS.dialog2("#"+selector).hide();
+    				} else {
+    					//show error message below the link textbox inside the insert link dialog
+            			jQuery("body").ExcellentableNotification({
+                            title: "Invalid URL. Please insert a proper link value.",
+                            fadeout: false
+                        }).showErrorMsg();
+    				}
+    			} else {
+    				//in case of single string validating the string first letter is alphabet or it should be symbol #
+    				if ((regularExpress.test(firstLetterOfString) || firstLetterOfString === "#") && !protocalRegex.test(urlValue)) {
+    					hyperLink.linkToolTip(urlValue);
+    					activeCell.cellType(hyperLink).value(urlValue);
+    					AJS.dialog2("#"+selector).hide();
+    				} else {
+    				    //show error message below the link textbox inside the insert link dialog
+                        jQuery("body").ExcellentableNotification({
+                            title: "Invalid URL. Please insert a proper link value.",
+                            fadeout: false
+                        }).showErrorMsg();
+    				}
+    			}
+                ExcellentableTriggerCustomValueChangeEvent(spread,'AddHyperlinkDialog');
+            }else {
+                AJS.dialog2("#"+selector).hide();
+                jQuery("body").ExcellentableNotification({
+                    title: "Invalid URL. Please insert a proper link value.",
+                    fadeout: false
+                }).showErrorMsg();
+            }
+		}
+	}
+
+// generate dialog
+    $("#euiGenerateDataDialog").dialog({
+        autoOpen: false,
+        height: "auto",
+        width: "auto",
+        modal: true,
+        title: AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.generate.data"),
+        zIndex: 3005,
+        create: function () {
+            var activeDialog = jQuery(this).closest('.ui-dialog');
+            activeDialog.find('.ui-dialog-titlebar-close').addClass("aui-icon aui-icon-small aui-iconfont-close-dialog");
+            activeDialog.find('.ui-button').each(function () {
+                var newBtnClass = jQuery(this).attr("class").replace(/ui-/g, "aui-");
+                jQuery(this).attr("class", newBtnClass);
+            });
+            activeDialog.find('.ui-button-text').each(function () {
+                var newBtnTxtClass = jQuery(this).attr("class").replace(/ui-/g, "aui-");
+                jQuery(this).attr("class", newBtnTxtClass);
+            });
+        },
+        open: function () {
+            //clear input box
+            jQuery("#euiNoOfRows").val("");
+            jQuery("#euiNoOfColumns").val("");
+            jQuery("input[name='data-types']").prop('checked', false);
+        },
+        buttons: {
+            Cancel: {
+                text: AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.cancel"),
+                id: "generate-data-cancle-btn",
+                click: function () {
+                    jQuery(this).dialog("close");
+                }
+            },
+            Ok: {
+                text: AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.generate"),
+                id: "generate-data-ok-btn",
+                click: function () {
+                    var rowCount = jQuery("#euiNoOfRows").val(), columnCount = jQuery("#euiNoOfColumns").val(),
+                            dataTypeValue = jQuery("input[name='data-types']:checked").val();
+                    if (rowCount === "" || !jQuery.isNumeric(rowCount)) {
+                        rowCount = 50;
+                    }
+                    if (columnCount === "" || !jQuery.isNumeric(columnCount)) {
+                        columnCount = 5;
+                    }
+                    if (dataTypeValue === undefined) {
+                        dataTypeValue = "onlyString";
+                    }
+                    //calling pulgin to generate ramdom data
+                    sheet = spread.getActiveSheet();
+                    sheet.clear(0, 0, sheet.getRowCount(), sheet.getColumnCount(), $.wijmo.wijspread.SheetArea.viewport, $.wijmo.wijspread.StorageType.Style);
+                    jQuery(dialogId).ExcellentableGenerateData({"excellentableId": spreadId, "rowCount": rowCount, "columnCount": columnCount, "dataType": dataTypeValue});
+										ExcellentableTriggerCustomValueChangeEvent(spread,'GenerateDataDialog');
+
+                    jQuery(this).dialog("close");
+                }
+            }
+        }
+    }).parent().find('.ui-widget-header').removeClass('ui-widget-header');
+
+/*****************table dialog events *************/
+		var tabledecoration = {
+			showHeader: function (table,value) { table.showHeader(true); },
+			showFooter: function (table,value) { table.showFooter(value); },
+			highlightFirstColumn: function (table,value) { table.highlightFirstColumn(value); },
+			highlightLastColumn: function (table,value) { table.highlightLastColumn(value); },
+			bandRows: function (table,value) {table.bandRows(value); },
+			bandColumns: function (table,value) { table.bandColumns(value); }
+		};
+
+		$("#euiTableformat img.noformatting").on('click',function () {
+			$(this).parent('div.tableformatpreview').find('.eui-active').removeClass('eui-active');
+			$(this).addClass('eui-active');
+			var spread = jQuery(spreadId).wijspread("spread");
+			var sheet = spread.getActiveSheet();
+
+			try {
+                var tables = findTablesInSelection(sheet);
+				if (tables.length > 0) {
+                    tables.forEach(function(table) {
+					   removeTableFormat(spread, table);
+                    });
+				}
+			} catch (ex) {
+				jQuery("body").ExcellentableNotification({title: ex.message}).showErrorMsg();
+			}
+
+		});
+
+		$("#euiTableformat input, #euiTableformat img.thumbnail").on('click',function (e) {
+				var spread = jQuery(spreadId).wijspread("spread");
+				var sheet = spread.getActiveSheet();
+				var applytable=false;
+                var tables = [];
+				sheet.isPaintSuspended(true);
+				var form=$('#euiTableformat').find('form');
+				if ($(e.target).is('img')){
+					$(this).parent('div').find('.eui-active').removeClass('eui-active');
+                    var tableStyle=form.find('.tableStyle').val($(this).attr('value'));//Variable being used somewhere else
+					$(this).addClass('eui-active');
+                    applytable=true;
+				} else if (form.find('.tableStyle').val() !== "Excellentable") {
+					applytable=true;
+				}
+
+				if (applytable){
+					var formData = JSON.parse(JSON.stringify(form.serializeArray()));
+					var formDataSize=formData.length;
+
+					try {
+                        tables = findTablesInSelection(sheet);
+
+						if (tables.length > 0) {
+                            tables.forEach(function(table) {
+                                table.style(getTableStyle(formData[formDataSize-1].value));
+                            });
+						}else {
+							var cr = sheet.getSelections()[0];
+							cr = getActualRange(cr, sheet.getRowCount(), sheet.getColumnCount());
+							tables.push(sheet.addTable(formData[formDataSize-1].value+getRndInteger(), cr.row, cr.col, cr.rowCount, cr.colCount, getTableStyle(formData[formDataSize-1].value)));
+						}
+
+						ExcellentableTriggerCustomValueChangeEvent(spread,'TableDialog');
+					}
+					catch (ex){
+						jQuery("body").ExcellentableNotification({title: ex.message}).showErrorMsg();
+					}
+
+					for (var key in tabledecoration) {
+						var method=tabledecoration[key].name;
+						var value=form.find("input[name="+key+"]").prop("checked");
+
+                        tables.forEach(function(table){
+                            tabledecoration[method](table,value);
+                        });
+						
+					}
+				}
+				sheet.isPaintSuspended(false);
+		});
+    /**** comment dialog ****/
+    $("#euiCommentDialog").dialog({
+        autoOpen: false,
+        height: 500,
+        width: 420,
+        modal: true,
+        resizable: false,
+        zIndex: 3005,
+        create: function () {
+            var activeDialog = jQuery(this).closest('.ui-dialog');
+            activeDialog.find('.ui-dialog-titlebar-close').addClass("aui-icon aui-icon-small aui-iconfont-close-dialog");
+            activeDialog.find('.ui-button').each(function () {
+                var newBtnClass = jQuery(this).attr("class").replace(/ui-/g, "aui-");
+                jQuery(this).attr("class", newBtnClass);
+            });
+            activeDialog.find('.ui-button-text').each(function () {
+                var newBtnTxtClass = jQuery(this).attr("class").replace(/ui-/g, "aui-");
+                jQuery(this).attr("class", newBtnTxtClass);
+            });
+        },
+        buttons: {
+            OK: {
+                text: AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.ok"),
+                click: function () {
+                    var spread = jQuery(spreadId).wijspread("spread");
+                    var sheet = spread.getActiveSheet();
+                    sheet.isPaintSuspended(true);
+                    var activeRowIndex = sheet.getActiveRowIndex(), activeColumnIndex = sheet.getActiveColumnIndex();
+                    if (isCommentAdd) {
+                        var comment = new $.wijmo.wijspread.Comment();
+                        comment.text($("#euiTxtText").val());
+                        var location = $("#txtLocation").val();
+                        if (location) {
+                            var pos = location.split(",");
+                            if (pos && pos.length === 2) {
+                                comment.location(new $.wijmo.wijspread.Point(parseInt(pos[0]), parseInt(pos[1])));
+                            }
+                        }
+                        comment.width(parseInt($("#txtWidth").val()));
+                        comment.height(parseInt($("#txtHeight").val()));
+                        sheet.setComment(activeRowIndex, activeColumnIndex, comment);
+                    } else {
+                        var comment = sheet.getComment(activeRowIndex, activeColumnIndex);
+                        comment.fontFamily($("#euiTxtFontFamily").val());
+                        comment.fontStyle($("#euiComboBoxFontStyle").val());
+                        comment.fontSize($("#euiTxtFontSize").val());
+                        comment.fontWeight($("#euiTxtFontWeight").val());
+                        comment.borderWidth(parseInt($("#euiTxtBorderWidth").val()));
+                        comment.borderStyle($("#euiComboBoxBorderStyle").val());
+                        comment.borderColor($("#euiTxtBorderColor").css("background-color"));
+                        var padding = $("#euiTxtPadding").val();
+                        if (padding) {
+                            var para = padding.split(",");
+                            if (para.length === 1) {
+                                comment.padding(new $.wijmo.wijspread.Padding(para[0]));
+                            } else if (para.length === 4) {
+                                comment.padding(new $.wijmo.wijspread.Padding(para[0], para[1], para[2], para[3]));
+                            }
+                        }
+                        comment.textDecoration(parseInt($("#euiComboBoxTextDecoration").val()));
+                        comment.opacity(parseFloat($("#euiTxtOpacity").val()) / 100);
+                        comment.foreColor($("#euiTxtForeColor").css("background-color"));
+                        comment.backColor($("#euiTxtBackColor").css("background-color"));
+                        comment.horizontalAlign(parseInt($("#euiComboBoxHorizontal").val()));
+                        comment.displayMode(parseInt($("#euiComboBoxDisplayMode").val()));
+                        comment.zIndex(parseInt($("#euiTxtzIndex").val()));
+                        comment.lockText($("#euiChkLockText").prop('checked'));
+                        comment.dynamicMove($("#euiChkDynamicMove").prop('checked'));
+                        comment.dynamicSize($("#euiChkDynamicSize").prop('checked'));
+                        comment.showShadow($("#euiChkShowShadow").prop('checked'));
+                    }
+										ExcellentableTriggerCustomValueChangeEvent(spread,'CommentDialog');
+
+                    sheet.isPaintSuspended(false);
+                    $(this).dialog("close");
+                }},
+            Remove: {
+                text: AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.remove"),
+                click: function () {
+                    var spread = jQuery(spreadId).wijspread("spread");
+                    var sheet = spread.getActiveSheet();
+                    sheet.isPaintSuspended(true);
+                    var sel = sheet.getSelections()[0];
+                    if (sel) {
+                        var cr = getActualRange(sel, sheet.getRowCount(), sheet.getColumnCount());
+                        sheet.setComment(cr.row, cr.col, null);
+                    }
+                    sheet.isPaintSuspended(false);
+                    $(this).dialog("close");
+                }},
+            Cancel: {
+                text: AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.cancel"),
+                click: function () {
+                    $(this).dialog("close");
+                }}
+        }
+    });
+
+// sparklineEx dialog
+    function sparklineExTypeChanged() {
+        var sparklineEx = $("#euiSparklineExType").val();
+        $("#euiDataRangeInValid").text('');
+        $("#euiLocationRangeInValid").text('');
+        switch (sparklineEx) {
+            case "BULLETSPARKLINE":
+                $("#euiCommonSparkline").hide();
+                $("#euiBullet").show();
+                $("#euiHBar").hide();
+                $("#euiVBar").hide();
+                $("#euiVari").hide();
+                $("#euiBulletMeasure").val("");
+                $("#euiBulletTarget").val("");
+                $("#euiBulletMaxi").val("");
+                $("#euiBulletForecast").val("");
+                $("#euiBulletGood").val("");
+                $("#euiBulletBad").val("");
+                $("#euiBulletTickunit").val("");
+                $("#euiBulletColorScheme").css("background-color", "#A0A0A0");
+                $("#euiBulletVertical").prop("checked", false);
+                break;
+            case "HBARSPARKLINE":
+                $("#euiCommonSparkline").hide();
+                $("#euiBullet").hide();
+                $("#euiHBar").show();
+                $("#euiVBar").hide();
+                $("#euiVari").hide();
+                $("#euiHBarValue").val("");
+                $("#euiHBarColorScheme").css("background-color", "gray");
+                break;
+            case "VBARSPARKLINE":
+                $("#euiCommonSparkline").hide();
+                $("#euiBullet").hide();
+                $("#euiHBar").hide();
+                $("#euiVBar").show();
+                $("#euiVari").hide();
+                $("#euiVBarValue").val("");
+                $("#euiVBarColorScheme").css("background-color", "gray");
+                break;
+            case "VARISPARKLINE":
+                $("#euiCommonSparkline").hide();
+                $("#euiBullet").hide();
+                $("#euiHBar").hide();
+                $("#euiVBar").hide();
+                $("#euiVari").show();
+                $("#euiVariVariance").val("");
+                $("#euiVariReference").val("");
+                $("#euiVariMini").val("");
+                $("#euiVariMaxi").val("");
+                $("#euiVariMark").val("");
+                $("#euiVariTickunit").val("");
+                $("#euiVariColorPositive").css("background-color", "green");
+                $("#euiVariColorNegative").css("background-color", "red");
+                break;
+            default:
+                $("#euiCommonSparkline").show();
+                $("#euiBullet").hide();
+                $("#euiHBar").hide();
+                $("#euiVBar").hide();
+                $("#euiVari").hide();
+                break;
+        }
+    }
+    $("#euiSparklineExType").bind("change", sparklineExTypeChanged);
+    $("#euiSparklineExDialog").dialog({
+        autoOpen: false,
+        height: 320,
+        width: 420,
+        modal: true,
+        resizable: false,
+        zIndex: 3005,
+        create : function(){
+            jQuery(this).closest('.ui-dialog').find('.ui-dialog-titlebar-close').addClass("aui-icon aui-icon-small aui-iconfont-close-dialog");
+        },
+        buttons: {
+            OK: function () {
+                var spread = jQuery(spreadId).wijspread("spread"),
+                        sheet = spread.getActiveSheet(),
+                        sel = sheet.getSelections()[0],
+                        isValid = true,
+                        sparklineEx = $("#euiSparklineExType").val();
+                if (sel) {
+                    var cr = getActualRange(sel, sheet.getRowCount(), sheet.getColumnCount());
+                    var formulaStr = '', row = cr.row, col = cr.col, direction = 0;
+                    switch (sparklineEx) {
+                        case "BULLETSPARKLINE":
+                            var measure = $("#euiBulletMeasure").val(),
+                                    target = $("#euiBulletTarget").val(),
+                                    maxi = $("#euiBulletMaxi").val(),
+                                    good = $("#euiBulletGood").val(),
+                                    bad = $("#euiBulletBad").val(),
+                                    forecast = $("#euiBulletForecast").val(),
+                                    tickunit = $("#euiBulletTickunit").val(),
+                                    colorScheme = $("#euiBulletColorScheme").css("background-color"),
+                                    vertical = $("#euiBulletVertical").prop("checked");
+                            formulaStr = '=' + sparklineEx + '(' + measure + ',' + target + ',' + maxi + ',' + good + ',' + bad + ',' + forecast + ',' + tickunit + ',' + '"' + colorScheme + '"' + ',' + vertical + ')';
+                            sheet.setFormula(row, col, formulaStr);
+                            break;
+                        case "HBARSPARKLINE":
+                            var value = $("#euiHBarValue").val(),
+                                    colorScheme = $("#euiHBarColorScheme").css("background-color");
+                            formulaStr = '=' + sparklineEx + '(' + value + ',' + '"' + colorScheme + '"' + ')';
+                            sheet.setFormula(row, col, formulaStr);
+                            break;
+                        case "VBARSPARKLINE":
+                            var value = $("#euiVBarValue").val(),
+                                    colorScheme = $("#euiVBarColorScheme").css("background-color");
+                            formulaStr = '=' + sparklineEx + '(' + value + ',' + '"' + colorScheme + '"' + ')';
+                            sheet.setFormula(row, col, formulaStr);
+                            break;
+                        case "VARISPARKLINE":
+                            var variance = $("#euiVariVariance").val(),
+                                    reference = $("#euiVariReference").val(),
+                                    mini = $("#euiVariMini").val(),
+                                    maxi = $("#euiVariMaxi").val(),
+                                    mark = $("#euiVariMark").val(),
+                                    tickunit = $("#euiVariTickunit").val(),
+                                    legend = $("#euiVariLegend").prop("checked"),
+                                    colorPositive = $("#euiVariColorPositive").css("background-color"),
+                                    colorNegative = $("#euiVariColorNegative").css("background-color"),
+                                    vertical = $("#euiVariVertical").prop("checked");
+                            formulaStr = '=' + sparklineEx + '(' + variance + ',' + reference + ',' + mini + ',' + maxi + ',' + mark + ',' + tickunit + ',' + legend + ',' + '"' + colorPositive + '"' + ',' + '"' + colorNegative + '"' + ',' + vertical + ')';
+                            sheet.setFormula(row, col, formulaStr);
+                            break;
+                        case "CASCADESPARKLINE":
+                        case "PARETOSPARKLINE":
+                            var dataRangeStr = $("#euiDataRange").val(),
+                                    locationRangeStr = $("#euiLocationRange").val(),
+                                    dataRangeObj = parseStringToExternalRanges(dataRangeStr, sheet),
+                                    locationRangeObj = parseStringToExternalRanges(locationRangeStr, sheet),
+                                    vertical = false,
+                                    dataRange, locationRange;
+                            if (dataRangeObj && dataRangeObj.length > 0 && dataRangeObj[0].range) {
+                                dataRange = dataRangeObj[0].range;
+                            }
+                            if (locationRangeObj && locationRangeObj.length > 0 && locationRangeObj[0].range) {
+                                locationRange = locationRangeObj[0].range;
+                            }
+                            if (locationRange && locationRange.rowCount < locationRange.colCount) {
+                                vertical = true;
+                            }
+                            if (!dataRange) {
+                                isValid = false;
+                                $("#euiDataRangeInValid").text('Range is invalid!');
+                            }
+                            if (!locationRange) {
+                                isValid = false;
+                                $("#euiLocationRangeInValid").text('Range is invalid!');
+                            }
+                            if (isValid) {
+                                var pointCount = dataRange.rowCount * dataRange.colCount,
+                                        i = 1;
+                                for (var r = locationRange.row; r < locationRange.row + locationRange.rowCount; r++) {
+                                    for (var c = locationRange.col; c < locationRange.col + locationRange.colCount; c++) {
+                                        if (i <= pointCount) {
+                                            formulaStr = '=' + sparklineEx + '(' + dataRangeStr + ',' + i + ',,,,,,' + vertical + ')';
+                                            sheet.setFormula(r, c, formulaStr);
+                                            i++;
+                                        }
+                                    }
+                                }
+                            }
+                            break;
+                        case "LINESPARKLINE":
+                        case "COLUMNSPARKLINE":
+                        case "WINLOSSSPARKLINE":
+                            if (cr.rowCount === 1) {
+                                direction = 1;
+                            } else if (cr.colCount === 1) {
+                                direction = 0;
+                            } else {
+                                $("#euiDataRangeInValid").text('Range should be in a single row or column.');
+                                isValid = false;
+                            }
+                        default:
+                            var dataRangeStr = $("#euiDataRange").val(),
+                                    locationRangeStr = $("#euiLocationRange").val(),
+                                    dataRangeObj = parseStringToExternalRanges(dataRangeStr, sheet),
+                                    locationRangeObj = parseStringToExternalRanges(locationRangeStr, sheet),
+                                    dataRange, locationRange;
+                            if (dataRangeObj && dataRangeObj.length > 0 && dataRangeObj[0].range) {
+                                dataRange = dataRangeObj[0].range;
+                            }
+                            if (locationRangeObj && locationRangeObj.length > 0 && locationRangeObj[0].range) {
+                                locationRange = locationRangeObj[0].range;
+                            }
+
+                            if (isValid) {
+                                $("#euiDataRangeInValid").text('');
+                                $("#euiLocationRangeInValid").text('');
+                            }
+
+                            if (!dataRange) {
+                                isValid = false;
+                                $("#euiDataRangeInValid").text('Range is invalid!');
+                            }
+                            if (!locationRange) {
+                                isValid = false;
+                                $("#euiLocationRangeInValid").text('Range is invalid!');
+                            }
+                            if (isValid) {
+                                if (sparklineEx === "LINESPARKLINE") {
+                                    formulaStr = '=' + sparklineEx + '(' + dataRangeStr + ',' + direction + ')';
+                                } else if (sparklineEx === "COLUMNSPARKLINE") {
+                                    formulaStr = '=' + sparklineEx + '(' + dataRangeStr + ',' + direction + ')';
+                                } else if (sparklineEx === "WINLOSSSPARKLINE") {
+                                    formulaStr = '=' + sparklineEx + '(' + dataRangeStr + ',0' + direction + ')';
+                                } else {
+                                    formulaStr = '=' + sparklineEx + '(' + dataRangeStr + ')';
+                                }
+                                row = locationRange.row;
+                                col = locationRange.col;
+                                sheet.setFormula(row, col, formulaStr);
+                            }
+                            break;
+                    }
+                }
+                if (isValid) {
+                    $(this).dialog("close");
+                }
+								ExcellentableTriggerCustomValueChangeEvent(spread,'SparklineExDialog');
+            },
+            Cancel: function () {
+                $(this).dialog("close");
+            }
+        }
+    }).parent().find('.ui-widget-header').removeClass('ui-widget-header');
+    //Variable below captures all the menubar buttons and links
+    var clickItems = "button.eui, span.eui[role=\"button\"], #euiMenuBar button,.eui-dropdown a,#euiSpreadContextMenu aui-item-link," +
+        " aui-item-link:not(#euiDropdownSave,#euiDropdownExit), .floatingobject-container";
+    jQuery(document).off("click",clickItems);
+    // ribbon
+    jQuery(document).on("click", clickItems,function(e,cmd){
+            e.preventDefault();
+            e.stopPropagation();
+            if(cmd == undefined) cmd={};
+            cmd.commandName = jQuery(this).attr("name");
+            if(cmd.commandName != undefined){
+                var spread = jQuery(spreadId).wijspread("spread");
+                executeCommand(spread, cmd);
+                hideSpreadContextMenu();
+            }
+    });
+
+	jQuery("#euiControlPanel").on("contextmenu", function(){
+		$(this).find('button.eui-picture-control').trigger( "click" );
+	});
+
+    //To disappear context menu when clicked anywhere on page.
+    jQuery("#euiDialog").click(function () {
+        hideSpreadContextMenu();
+    });
+
+    //Toggle "Delete Sheet" menu item from the "File" dropdown depending on whether the sheet count is 1 or not
+    jQuery(document).on("click", '#euiMenuBar button[aria-controls="euiFileDropdown"]', function() {
+        if (spread.getSheetCount() === 1) {
+            AJS.$("#euiDeleteSheet").hide();
+        } else {
+            AJS.$("#euiDeleteSheet").show();
+        }
+
+    });
+
+// color dialog
+    $("#euiSelectedColor").on('change keydown paste input', function () {
+        var color = $(this).val();
+        $("#euiColorChart td.selected").removeClass("selected");
+        if (hexColorValueRegEx.test(color)) {
+            color = color.toUpperCase();
+            $("#euiColorChart td[bgColor='" + color + "'").addClass("selected");
+            $("#euiColorSample").css("background-color", color);
+        }
+    });
+
+//context menu
+    hideSpreadContextMenu();
+    var sheetArea = $.wijmo.wijspread.SheetArea.viewport,
+            isHideContextMenu = false;
+    jQuery(spreadId).mouseup(function (e) {
+    // hide context menu when the mouse down on SpreadJS
+        if (e.button !== 2) {
+            hideSpreadContextMenu();
+        }
+    });
+
+    //Event EditEnd to remove formatting from string
+    var spread = jQuery(spreadId).wijspread("spread");
+    spread.bind($.wijmo.wijspread.Events.EditEnd, function (e, cellInfo) {
+        var sheet = spread.getActiveSheet();
+        var activeCell = sheet.getCell(cellInfo.row, cellInfo.col);
+        if (activeCell.formatter()) {
+            if(activeCell.formatter().indexOf("%") > 0 && activeCell.text() == "" && jQuery.isNumeric(cellInfo.editingText)){ //PLUG-2932: In percent formatted blank cell, value should not get converted in multiple of 100.
+                setTimeout(function(){
+                    activeCell.value(cellInfo.editingText/100);
+                },1);
+            }
+            //To check horizontal align is already set to activeCell Ref: EXC-2327
+            if (activeCell.hAlign() != undefined) {
+                return;
+            }
+            if (!jQuery.isNumeric(cellInfo.editingText)) {
+                activeCell.hAlign($.wijmo.wijspread.HorizontalAlign.left);
+            } else {
+                activeCell.hAlign($.wijmo.wijspread.HorizontalAlign.right);
+            }
+        }
+    });
+
+    jQuery(spreadId).find("#vp").unbind('contextmenu');
+    jQuery(spreadId).find("#vp").bind('contextmenu', function (e) {
+
+// move the context menu to the position of the mouse point
+        var clientX = e.clientX,clientY = e.clientY;
+        var spread = jQuery(spreadId).wijspread("spread");
+        var sheet = spread.getActiveSheet();
+        var target = getHitTest(clientX, clientY, sheet);
+        isHideContextMenu = false;
+        sheetAreaHitTest = target.hitTestType;
+        if (target.hitTestType === $.wijmo.wijspread.SheetArea.colHeader) {
+            if (getCellInSelections(sheet.getSelections(), -1, target.col) === null) {
+                sheet.setSelection(-1, target.col, sheet.getRowCount(), 1);
+            }
+            if (target.row !== undefined && target.col !== undefined) {
+                $(".eui-context-header").show();
+                $(".eui-context-cell").show();
+
+                showProtectCellContextMenu(sheet);
+                showMergeContextMenu(sheet);
+            }
+        } else if (target.hitTestType === $.wijmo.wijspread.SheetArea.rowHeader) {
+            if (getCellInSelections(sheet.getSelections(), target.row, -1) === null) {
+                sheet.setSelection(target.row, -1, 1, sheet.getColumnCount());
+            }
+            if (target.row !== undefined && target.col !== undefined) {
+                $(".eui-context-header").show();
+                $(".eui-context-cell").show();
+                showProtectCellContextMenu(sheet);
+                showMergeContextMenu(sheet);
+            }
+        } else if (target.hitTestType === $.wijmo.wijspread.SheetArea.viewport) {
+            if (getCellInSelections(sheet.getSelections(), target.row, target.col) === null) {
+                sheet.clearSelection();
+                sheet.endEdit();
+                sheet.setActiveCell(target.row, target.col);
+            }
+            if (target.row !== undefined && target.col !== undefined) {
+                $(".eui-context-header").hide();
+                $(".eui-context-cell").show();
+                showProtectCellContextMenu(sheet);
+                showMergeContextMenu(sheet);
+            } else {
+                isHideContextMenu = true;
+            }
+        } else if (target.hitTestType === $.wijmo.wijspread.SheetArea.corner) {
+            sheet.setSelection(-1, -1, sheet.getRowCount(), sheet.getColumnCount());
+            if (target.row !== undefined && target.col !== undefined) {
+                $(".eui-context-header").hide();
+                $(".eui-context-cell").show();
+            }
+        }
+        //auto adjust the height of the contextMenu dialog
+        var left = e.clientX, top = e.clientY, screenWidth = jQuery(window).width(), screenHeight = jQuery(window).height(),
+        contentMenuHeight = jQuery("#euiSpreadContextMenu").height(),contentMenuWidth= jQuery("#euiSpreadContextMenu").width();
+        if(left + contentMenuWidth > screenWidth){
+           left = clientX - contentMenuWidth;
+        }
+        if(top + contentMenuHeight > screenHeight){
+           top = clientY - contentMenuHeight;
+        }
+        //calling method show unlink option in the context menu
+        showUnlinkContextMenu(sheet);
+        jQuery(contextMenuId).css({"position":"fixed","left":left,"top":top, "display": "inline", "z-index": 3104});
+        AJS.dialog2(contextMenuId).show();
+        jQuery('.aui-blanket').hide();
+
+        jQuery("#euiSheetTabContextMenu").hide();
+        return false;
+    });
+    jQuery(document).off('contextmenu');
+    jQuery(document).on('contextmenu', ".wijmo-wijmenu", function (e) {
+        e.preventDefault();
+    });
+
+    /*
+     * If any Excellentable related custom dialog opened then add euiOverlay Id to the existing .ui-widget-overlay element.
+     * This is to fix Overlay related issue on custom dialogs used in ET.
+     */
+    jQuery(document).off("dialogopen",".eui-formatting-dialog");
+    jQuery(document).on("dialogopen",".eui-formatting-dialog", function (event, ui) {
+        jQuery(".ui-widget-overlay").attr("id","euiOverlay");
+    });
+}
+function removeTableFormat(spread, table) {
+    var sheet = spread.getActiveSheet();
+    var startRow = table.startRow(), startColumn = table.startColumn();
+    var jsonData = spread.toJSON();
+    var sheetKeys = Object.keys(jsonData.sheets)[spread.getActiveSheetIndex()];
+    var data = jsonData.sheets[sheetKeys].data.dataTable, dataText = "";
+    /*
+     * Refer: EXC-908: sheet.removeTable(table) removes table design along with the data.
+     * hence as a workaround we are resizing the table and then cache the original data and restore the data after remove the table.
+     */
+    var rowCnt = 1,footerRowIndex, footerFirstCellValue;
+    var tableHasFooter = false;
+    if (table.showFooter() === true) {
+        tableHasFooter = true;
+        footerRowIndex = table.endRow();
+        footerFirstCellValue = sheet.getValue(table.endRow(), startColumn);
+        rowCnt++;
+    }
+
+    var leftTopCellValue = [];
+    for (var i = rowCnt-1; i >= 0; i--) {
+        leftTopCellValue[i] = sheet.getValue(startRow + i, startColumn);
+    }
+    sheet.resizeTable(table, new GcSpread.Sheets.Range(startRow, startColumn, rowCnt, 1));
+    sheet.removeTable(table);
+
+    if (typeof data !== "undefined") {
+        for (var i = rowCnt-1 ; i >= 0; i--) {
+            if (typeof data[startRow + i] != "undefined" && data[startRow + i][startColumn] != null) {
+                dataText = data[startRow + i][startColumn].value;
+                if (dataText !== "") {
+                    sheet.setValue(parseInt(startRow + i), startColumn, leftTopCellValue[i]);
+                }
+            }
+        }
+        if (tableHasFooter) {
+            sheet.setValue(footerRowIndex, startColumn, footerFirstCellValue);
+        }
+    }
+}
+
+function removeTableFilter(spread,table){
+    removeTableFormat(spread, table);
+}
+function excelExport(exportType){
+    jQuery('#euiDialog').find('.exportToExcel').trigger("click",exportType);
+}
+function bindScrollBarEvents(currentSpread){
+
+    var ns = $.wijmo.wijspread;
+    var spread1 = currentSpread || jQuery(spreadId).wijspread("spread"); // get instance of wijspread control
+    var activeSheet = spread1.getActiveSheet();
+
+    spread1.bind(ns.Events.TopRowChanged, function (sender, args) {
+        activeSheet = spread1.getActiveSheet();
+        var rowCount = activeSheet.getRowCount();
+        var lastRow = activeSheet.getViewportBottomRow(1)+1;
+            if(lastRow >= rowCount){
+          activeSheet.addRows(rowCount,10);
+        }
+    });
+}
+
+var getBorderProperties= function(Excellentable){
+	var sheet=Excellentable.sheet;
+	var selections=Excellentable.selections;
+	var row= (selections.length === 0) ? 0 : selections[0].row;
+	var col= (selections.length === 0) ? 0 : selections[0].col;
+    var rowCount = (selections.length === 0) ? 1 : selections[0].rowCount;
+    var colCount = (selections.length === 0) ? 1 : selections[0].colCount;
+	var color=["#52b052"];
+	var type=[1];
+
+    var borderLeft = sheet.getCell(row,col).borderLeft();
+	var borderTop = sheet.getCell(row,col).borderTop();
+
+	var borderInnerHorizontal = sheet.getCell(row,col).borderBottom();
+	var borderInnerVertical = sheet.getCell(row,col).borderRight();
+
+	var borderBottom = sheet.getCell(row+rowCount-1,col).borderBottom();
+	var borderRight = sheet.getCell(row+rowCount-1,col+colCount-1).borderRight();
+
+	var testforstyle=function(border){
+		var style;
+		if (!border) {
+    		style=false;
+		}else if ( border.style === 0){
+			style=false;
+		}else {
+			style=border;
+			color.push(border.color);
+			type.push(border.style);
+		}
+		return style;
+	}
+
+	//var defaultattributes={color:"#d2d2d2",style:0};
+	var defaultattributes=false;
+	borders = {style:
+		{
+			left:testforstyle(borderLeft)||defaultattributes,
+			right: testforstyle(borderRight)||defaultattributes,
+			top : testforstyle(borderTop)||defaultattributes,
+			bottom: testforstyle(borderBottom)||defaultattributes,
+			innerHorizontal : testforstyle(borderInnerHorizontal)||defaultattributes,
+			innerVertical : testforstyle(borderInnerVertical)||defaultattributes
+		},
+		color:color[color.length-1],
+		type:type[type.length-1]
+	}
+	return borders;
+}
+
+function applyBorderHighlighter(sheet, args) {  //Re-populate border menu on selection of cell which already has a border
+    var $topBorderType = $("#euiBorder11, #euiBorder12, #euiBorderTable"),
+        $rightBorderType = $("#euiBorder12, #euiBorder22, #euiBorderTable"),
+        $bottomBorderType = $("#euiBorder21, #euiBorder22, #euiBorderTable"),
+        $leftBorderType = $("#euiBorder11, #euiBorder21, #euiBorderTable"),
+        $topSide = $("#euiTopSide"),
+        $rightSide = $("#euiRightSide"),
+        $bottomSide = $("#euiBottomSide"),
+        $leftSide = $("#euiLeftSide"),
+        borderTop = sheet.getCell(args.row, args.col).borderTop(),
+        borderRight = sheet.getCell(args.row, args.col).borderRight(),
+        borderBottom = sheet.getCell(args.row, args.col).borderBottom(),
+        borderLeft = sheet.getCell(args.row, args.col).borderLeft(),
+        borderPosition = [borderTop, borderRight, borderBottom, borderLeft];
+    $('#euiLineColor').val('black');
+    $('#euiLineStyle').val('Empty');
+    $leftSide.prop("checked", false);
+    $rightSide.prop("checked", false);
+    $topSide.prop("checked", false);
+    $bottomSide.prop("checked", false);
+    //for border color and style
+    $.each(borderPosition, function (index, value) {
+        if (typeof value !== "undefined") {
+            $('#euiLineColor').val(value.color);
+            $('#euiLineStyle').val($.wijmo.wijspread.LineStyle[value.style]);
+            return false;
+        }
+    });
+    //for border type checkbox
+    if (typeof borderLeft !== "undefined") {
+        $leftSide.prop("checked", true);
+    }
+    if (typeof borderRight !== "undefined") {
+        $rightSide.prop("checked", true);
+    }
+    if (typeof borderTop !== "undefined") {
+        $topSide.prop("checked", true);
+    }
+    if (typeof borderBottom !== "undefined") {
+        $bottomSide.prop("checked", true);
+    }
+    //for border type diagram
+    $topSide.prop("checked") ? $topBorderType.css("border-top", "1px solid gray") : $topBorderType.css("border-top", "none");
+    $rightSide.prop("checked") ? $rightBorderType.css("border-right", "1px solid gray") : $rightBorderType.css("border-right", "none");
+    $bottomSide.prop("checked") ? $bottomBorderType.css("border-bottom", "1px solid gray") : $bottomBorderType.css("border-bottom", "none");
+    $leftSide.prop("checked") ? $leftBorderType.css("border-left", "1px solid gray") : $leftBorderType.css("border-left", "none");
+}
+function applyHighlighter(spread) {
+    var spread = spread || jQuery(spreadId).wijspread("spread");
+    //highlight customization in toolbox on click of cell
+    var fontNameArray = [
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.alegreya"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.alegreyabold"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.alegreyaitalic"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.amaticsc"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.amaticscbold"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.arial"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.arialblack"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.arialblackitalic"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.breeserif"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.calibri"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.calibribold"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.calibriitalic"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.cambria"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.cambriabold"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.cambriaitalic"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.century"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.centurybold"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.centuryitalic"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.comicsansms"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.comicsansmsbold"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.couriernew"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.garamond"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.garamondbold"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.garamonditalic"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.georgia"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.georgiabold"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.georgiaitalic"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.impact"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.merriweather"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.merriweatherbold"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.merriweatheritalic"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.permanentmarker"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.pinyonscript"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.playfairdisplay"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.playfairdisplaybold"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.playfairdisplayitalic"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.roboto"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.robotobold"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.robotoitalic"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.robotomono"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.robotomonobold"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.robotomonoitalic"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.tahoma"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.tahomabold"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.timesnewroman"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.trebuchetms"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.trebuchetmsbold"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.trebuchetmsitalic"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.ultra"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.varelaround"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.verdana"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.verdanabold"),
+        AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.font.verdanaitalic")
+    ];
+
+    spread.bind($.wijmo.wijspread.Events.EnterCell, function(sender, args) {
+    	var sheet = spread.getActiveSheet(); // get active worksheet of the wijspread control
+        var $fontNameBtn = $("a[name=fontname]"),
+            $fontSizeBtn = $("a[name=fontsize]"),
+            $boldBtn = $("button[name=bold]"),
+            $italicBtn = $("button[name=italic]"),
+            $currencyBtn = $("button[name=currency]"),
+            $percentBtn = $("button[name=percentage]"),
+            $underlineBtn = $("button[name=underline]"),
+            $strikeThroughBtn = $("button[name=strikethrough]"),
+            $numberBtn = $("button[name=number]"),
+            $wrapTextBtn = $("button[name=wraptext]"),
+            $fontSizeBtnValue = $fontSizeBtn,
+            $filterBtn = $("button[name=filter]"),
+            cellFont = sheet.getCell(args.row, args.col).font(), //get font setting of a cell
+            cellFormatter = sheet.getCell(args.row, args.col).formatter(), //get applied formatter of a cell
+            options = sheet.getCell(args.row, args.col).textDecoration(),
+            wordWrap = sheet.getCell(args.row, args.col, $.wijmo.wijspread.SheetArea.viewport).wordWrap(),
+            cellBackColor = sheet.getCell(args.row, args.col).backColor(),
+            cellForeColor = sheet.getCell(args.row, args.col).foreColor(),
+            halign = sheet.getCell(args.row, args.col).hAlign(),
+            valign = sheet.getCell(args.row, args.col).vAlign(),
+
+            /*  Each TableFilter within a sheet can be identified using exc-table-filter(versions prior to multiSheet support.)
+                or sheetName-exc-table-filter (For all versions released after MultiSheet support). */
+            tableFilter = sheet._tableManager.findByName(sheet.getName() + "-" + excTableFilterName)
+                          || sheet._tableManager.findByName(excTableFilterName);
+
+        $fontSizeBtn.text("10");
+        $fontNameBtn.text("Verdana");
+        tableFilter != null ? $filterBtn.addClass("active") : $filterBtn.removeClass("active");
+
+        if (cellFont !== undefined) {
+            var sizeInPx = ""+cellFont.match(/[\d.]+px[\s/]/);
+            // for font size
+            if (sizeInPx !== "" + null) {
+                var sizeValue = sizeInPx.substr(0, sizeInPx.indexOf("px"));
+                var size = "" + Math.round(3 / 4 * sizeValue);
+            } else {
+                var sizeInPt = ""+cellFont.match(/[\d.]+pt[\s/]/);
+                size = sizeInPt.substr(0, sizeInPt.indexOf("pt"));
+            }
+            $fontSizeBtn.text(size);
+            //for font name
+            jQuery.grep(fontNameArray, function (value, key) {
+                if (cellFont.indexOf(value) > -1) {
+                    var fontName = value.trim();
+                    if (fontName === "") {
+                        fontName = defaultFontName;
+                    }
+                    $fontNameBtn.text(fontName);
+                }
+            });
+        }
+
+        //for bold
+        if ((typeof cellFont !== "undefined" && cellFont.toString().indexOf("700") > -1) || (typeof cellFont !== "undefined" && cellFont.toString().indexOf("bold") > -1)) {
+            $boldBtn.addClass("active");
+        } else {
+            $boldBtn.removeClass("active");
+        }
+        //for italic
+        if (typeof cellFont !== "undefined" && cellFont.toString().indexOf("italic") > -1) {
+            $italicBtn.addClass("active");
+        } else {
+            $italicBtn.removeClass("active");
+        }
+        //for currency
+        if (typeof cellFormatter !== "undefined" && cellFormatter.indexOf("$") > -1) {
+            $currencyBtn.addClass("active");
+        } else {
+            $currencyBtn.removeClass("active");
+        }
+        //for percentage
+        if (typeof cellFormatter !== "undefined" && cellFormatter.indexOf("%") > -1) {
+            $percentBtn.addClass("active");
+        } else {
+            $percentBtn.removeClass("active");
+        }
+        //for wrap text
+        $("#euiWrapSelect span").attr("class","");
+
+        if (wordWrap == false){
+        	$("#euiWrapSelect span").addClass("icon-icomoon icon-textwrapunder");
+        }
+        else if (wordWrap == true) {
+            $("#euiWrapSelect span").addClass("icon-icomoon icon-textwrap");
+        }
+        else{
+        	$("#euiWrapSelect span").addClass("icon-icomoon icon-textwrapover");
+        }
+        /*for number formatting
+         * "#,##" --> Google spreadsheet representation for number formatting
+         * "0.00" --> Excel representation for number formatting
+         */
+        if (cellFormatter !== undefined && cellFormatter.substring(0, 4) == "#,##" || cellFormatter == "0.00") {
+            $numberBtn.addClass("active");
+        } else {
+            $numberBtn.removeClass("active");
+        }
+        // Horizontal Alignment
+        HorizontalAlign.setIcon(halign);
+
+        // Vertical Alignment
+        VerticalAlign.setIcon(valign);
+
+        //for text color
+        if (typeof cellForeColor !== "undefined") {
+            $('.eui-font-color-highlight').css('cssText', 'background-color:' + cellForeColor + '!important;');
+        } else {
+            $('.eui-font-color-highlight').css('cssText', 'background-color:#34495e !important;');
+        }
+        //for background color
+        if (typeof cellBackColor !== "undefined") {
+            $('.eui-back-color-highlight').css('cssText', 'background-color:' + cellBackColor + '!important;');
+            $('#euiMenubarBackcolorButtonDrop').css('cssText', 'color:' + cellBackColor + '!important;');//To Change color of drop also
+        } else {
+            $('.eui-back-color-highlight').css('cssText', 'background-color:white !important;');
+            $('#euiMenubarBackcolorButtonDrop').css('cssText', 'color:RGB(52,73,94) !important;');//Default color for drop
+        }
+        //for text decorations
+        switch (options) {
+            case 1:
+                $underlineBtn.addClass("active");
+                $strikeThroughBtn.removeClass("active");
+                break;
+            case 2:
+                $strikeThroughBtn.addClass("active");
+                $underlineBtn.removeClass("active");
+                break;
+            case 3:
+                $strikeThroughBtn.addClass("active");
+                $underlineBtn.addClass("active");
+                break;
+            case 4:
+                $underlineBtn.removeClass("active");
+                $strikeThroughBtn.removeClass("active");
+                break;
+            case 5:
+                $underlineBtn.addClass("active");
+                $strikeThroughBtn.removeClass("active");
+                break;
+            case 6:
+                $strikeThroughBtn.addClass("active");
+                $underlineBtn.removeClass("active");
+                break;
+            case 7:
+                $strikeThroughBtn.addClass("active");
+                $underlineBtn.addClass("active");
+                break;
+            default:
+                $underlineBtn.removeClass("active");
+                $strikeThroughBtn.removeClass("active");
+                break;
+        }
+        applyBorderHighlighter(sheet, args);
+    });
+}
+function applyFormatting(cmd){
+    var spread = jQuery(spreadId).wijspread("spread"),
+        sheet = spread.getActiveSheet();
+    switch (cmd.commandName) {
+        case "insertcol":
+            var activeColumn = sheet.getActiveColumnIndex();
+            var ns = $.wijmo.wijspread,
+                fromRange = new ns.Range(-1, activeColumn+1, -1, 1),
+                toRanges = [new ns.Range(-1, activeColumn, -1, 1)];
+            var clipboardCopyPasteAction = new ns.UndoRedo.ClipboardPasteUndoAction(sheet, sheet, sheet, { fromRange: fromRange, pastedRanges: toRanges, isCutting: false, clipboardText: "" },
+                ns.ClipboardPasteOptions.Formatting);
+            clipboardCopyPasteAction.execute(sheet);
+            break;
+        case "insertcolright":
+            var activeColumn = sheet.getActiveColumnIndex();
+            var ns = $.wijmo.wijspread,
+                fromRange = new ns.Range(-1, activeColumn, -1, 1),
+                toRanges = [new ns.Range(-1, activeColumn+1, -1, 1)];
+            var clipboardCopyPasteAction = new ns.UndoRedo.ClipboardPasteUndoAction(sheet, sheet, sheet, { fromRange: fromRange, pastedRanges: toRanges, isCutting: false, clipboardText: "" },
+                ns.ClipboardPasteOptions.Formatting);
+            clipboardCopyPasteAction.execute(sheet);
+            break;
+        case "insertrow":
+            var activeRow = sheet.getActiveRowIndex();
+            var ns = $.wijmo.wijspread,
+                fromRange = new ns.Range(activeRow+1, - 1, 1, - 1),
+                toRanges = [new ns.Range(activeRow, - 1, 1, - 1)];
+            var clipboardCopyPasteAction = new ns.UndoRedo.ClipboardPasteUndoAction(sheet, sheet, sheet, { fromRange: fromRange, pastedRanges: toRanges, isCutting: false, clipboardText: "" },
+                ns.ClipboardPasteOptions.Formatting);
+            clipboardCopyPasteAction.execute(sheet);
+            break;
+        case "insertrowbelow":
+            var activeRow = sheet.getActiveRowIndex();
+            var ns = $.wijmo.wijspread,
+                fromRange = new ns.Range(activeRow, - 1, 1, - 1),
+                toRanges = [new ns.Range(activeRow+1, - 1, 1, - 1)];
+            var clipboardCopyPasteAction = new ns.UndoRedo.ClipboardPasteUndoAction(sheet, sheet, sheet, { fromRange: fromRange, pastedRanges: toRanges, isCutting: false, clipboardText: "" },
+                ns.ClipboardPasteOptions.Formatting);
+            clipboardCopyPasteAction.execute(sheet);
+            break;
+    }
+}
+function hideSpreadContextMenu() {
+    $(contextMenuId).hide();
+    $(document).off("mousedown.contextmenu");
+}
+function textWrapping(sheet, wMethod, wordWrap, classWrap) {
+    $("#euiWrapSelect span").attr("class", classWrap);
+    sheet.isPaintSuspended(true);
+    var sels = sheet.getSelections();
+
+    for (var n = 0; n < sels.length; n++) {
+
+        var range = getActualRange(sels[n], sheet.getRowCount(), sheet.getColumnCount()),
+                colEnd = range.col + range.colCount,
+                rowEnd = range.row + range.rowCount;
+
+        for (var j = range.row; j < rowEnd; j++) {
+            for (var i = range.col; i < colEnd; i++) {
+                var currCell = sheet.getCell(j, i),
+                    nextCell = sheet.getCell(j, i + 1),
+                    prevCell = sheet.getCell(j, i - 1),
+                    nextCellText = nextCell.text().trim(),
+                    prevCellText = prevCell.text().trim();
+
+                if (wMethod == "overflowtext") {
+                    if (nextCellText == "") {
+                        nextCell.text(undefined);
+                    }
+                    if (prevCellText == "") {
+                        prevCell.text(undefined);
+                    }
+                }
+                else if (wMethod == "wraptext") {
+                    nextCell.text(nextCellText);
+                    prevCell.text(prevCellText);
+                }
+                else {
+                    nextCell.text(nextCellText + " ");
+                    prevCell.text(prevCellText + " ");
+                }
+                currCell.wordWrap(wordWrap);
+            }
+            sheet.autoFitRow(j);
+            if (sheet.getRow(j).height() < 25) {
+                sheet.getRow(j).height(25);
+            }
+        }
+    }
+    sheet.isPaintSuspended(false);
+    jQuery("#euiMenuBar").find("button[name=" + wMethod + "]").addClass("active");//highlight wrap text button
+}
+
+function executeCommand(spread, cmd){
+    var sheet = spread.getActiveSheet(),
+        $excellentableMenubar = jQuery("#euiMenuBar");
+
+
+    // The following operations are permitted even if the sheet is protected. Other than the below,
+        // if the sheet is protected, then do not allow to run any command.
+        var protectSafeCommands = ['help', 'bug', 'feature', 'functionlist', 'keyboardshortcuts', 'about', 'excellentableprintarea',
+            'importexcel', 'exportasxlsx', 'exportascsv', 'exportasjson', 'exportashtml', 'protectsheet', 'unlockimage','protectcell', 'copy'];
+
+        // The following operations are permitted even if the current selection is protected. Other than the below,
+        // if the current selection is protected, then do not allow to run any command.
+        var protectSelectionSafeCommands = ['help', 'bug', 'feature', 'functionlist', 'keyboardshortcuts', 'about', 'excellentableprintarea',
+            'importexcel', 'exportasxlsx', 'exportascsv', 'exportasjson', 'exportashtml', 'protectsheet', 'protectcell',
+            'copy', 'insertcol', 'insertcolright', 'insertrow', 'insertrowbelow', 'picture', "comment",
+            'freezepane', 'unfreeze', 'rowheader', 'columnheader','gridlines', 'sortaz', 'sortza', 'group', 'ungroup', 'rangeSort','filter'];
+
+        if (!protectSafeCommands.includes(cmd.commandName) && protectedCheck(sheet)) {
+            return false;
+        }
+
+        if (!protectSelectionSafeCommands.includes(cmd.commandName) && protectedSelectionCheck(sheet, sheet.getSelections().pop())) {
+            return false;
+        }
+
+        sheet.isPaintSuspended(true);
+
+    switch (cmd.commandName) {
+        case "cut":
+            $.wijmo.wijspread.SpreadActions.cut.call(sheet);
+            break;
+                case "copy":
+                    $.wijmo.wijspread.SpreadActions.copy.call(sheet);
+                    document.execCommand("copy");
+                    break;
+                case "paste":
+                    sheet.clipBoardOptions($.wijmo.wijspread.ClipboardPasteOptions.All);
+                    $.wijmo.wijspread.SpreadActions.paste.call(sheet);
+                    break;
+                case "pastevaluesonly":
+                    sheet.clipBoardOptions($.wijmo.wijspread.ClipboardPasteOptions.Values);
+                    $.wijmo.wijspread.SpreadActions.paste.call(sheet);
+                        setTimeout(function (){
+                            sheet.clipBoardOptions($.wijmo.wijspread.ClipboardPasteOptions.All);
+                        },100)
+                    break;
+                case "pasteformatsonly":
+                    sheet.clipBoardOptions($.wijmo.wijspread.ClipboardPasteOptions.Formatting);
+                    $.wijmo.wijspread.SpreadActions.paste.call(sheet);
+                        setTimeout(function (){
+                            sheet.clipBoardOptions($.wijmo.wijspread.ClipboardPasteOptions.All);
+                        },100)
+                    break;
+                case "Pastallexceptborders":
+                    sheet.clipBoardOptions($.wijmo.wijspread.ClipboardPasteOptions.All);
+                    $.wijmo.wijspread.SpreadActions.paste.call(sheet);
+                    setTimeout(function (){
+                        var sels = sheet.getSelections();
+                        for (var n = 0; n < sels.length; n++) {
+                            var sel = getActualCellRange(sels[n], sheet.getRowCount(), sheet.getColumnCount());
+                            var cells = sheet.getCells(sel.row, sel.col, sel.row + sel.rowCount - 1, sel.col + sel.colCount - 1);
+                            cells.borderBottom("").borderLeft("").borderRight("").borderTop("");
+                        }
+                        sheet.clipBoardOptions($.wijmo.wijspread.ClipboardPasteOptions.All);
+                    }, 100)
+
+                    break;
+                case "pasteformulaonly":
+                    sheet.clipBoardOptions($.wijmo.wijspread.ClipboardPasteOptions.All);
+                    $.wijmo.wijspread.SpreadActions.paste.call(sheet);
+                    setTimeout(function (){
+                        var sels = sheet.getSelections();
+                        for (var n = 0; n < sels.length; n++) {
+                            var sel = getActualCellRange(sels[n], sheet.getRowCount(), sheet.getColumnCount());
+                            sheet.clear(sel.row, sel.col, sel.rowCount, sel.colCount, $.wijmo.wijspread.SheetArea.viewport, $.wijmo.wijspread.StorageType.Style);
+                        }
+                        sheet.clipBoardOptions($.wijmo.wijspread.ClipboardPasteOptions.All);
+                    }, 100)
+                    break;
+                case "tabstop":
+                    var sels = sheet.getSelections();
+                    for (var n = 0; n < sels.length; n++) {
+                        var sel = getActualCellRange(sels[n], sheet.getRowCount(), sheet.getColumnCount()),
+                                isTabStop = sheet.getCell(sel.row, sel.col, $.wijmo.wijspread.SheetArea.viewport).tabStop();
+                        if (isTabStop === false) {
+                            isTabStop = true;
+                        } else {
+                            isTabStop = false;
+                        }
+                        sheet.getCells(sel.row, sel.col, sel.row + sel.rowCount - 1, sel.col + sel.colCount - 1, $.wijmo.wijspread.SheetArea.viewport).tabStop(isTabStop);
+                    }
+                    break;
+
+                case "overflowtext":
+                	textWrapping(sheet, "overflowtext", undefined, "icon-icomoon icon-textwrapover");
+                    break;
+                case "wraptext":
+                	textWrapping(sheet, "wraptext", true, "icon-icomoon icon-textwrap");
+                    break;
+                case "cliptext":
+                	textWrapping(sheet, "cliptext", false, "icon-icomoon  icon-textwrapunder");
+                    break;
+                case "bold":
+                case "italic":
+                    var styleEle = document.getElementById("euiColorSample");
+                    if (cmd.commandName == "bold") {
+                        setStyleFont(sheet, styleEle, "font-weight", ["700", "bold"], "400");
+                    } else if (cmd.commandName == "italic") {
+                        setStyleFont(sheet, styleEle, "font-style", ["italic"], "normal");
+                    }
+                    break;
+
+				case "borders":
+					var BORDERTYPES = {
+						1 : 'thin',
+						2 : 'medium',
+						3 : 'dashed',
+						4 : 'dotted',
+						5 : 'thick',
+						7 : 'hair',
+						8 : 'mediumDashed',
+						9 : 'dashDot',
+						10 : 'mediumDashDot',
+						11 : 'dashDotDot',
+						12 : 'mediumDashDotDot'
+                    };
+
+                    var borders = getBorderProperties(ExcellentableResourceInit(spreadId));
+                    var borderstyle = borders.style;
+                    var bordercontainer = '#euiBorderFormat';
+                    var border = {
+                        type:  BORDERTYPES[borders.type],
+                        color: '#52b052',
+                        defaultcolor: '#d2d2d2',
+                        defaultLine : $.wijmo.wijspread.LineStyle.thin,
+                        recentcolor:[]
+                    };
+
+                    var hasLineChanged = function (line) {
+                        return line && (line.color.toLowerCase() !== border.defaultcolor || line.style !== 1);
+                    };
+		
+					border.lines = {
+						left: hasLineChanged(borderstyle.left),
+						right:hasLineChanged(borderstyle.right),
+						top: hasLineChanged(borderstyle.top),
+						bottom: hasLineChanged(borderstyle.bottom),
+						innerHorizontal: hasLineChanged(borderstyle.innerHorizontal),
+						innerVertical: hasLineChanged(borderstyle.innerVertical)
+				    };
+						
+                    for (key in borderstyle) {
+                        if (borderstyle.hasOwnProperty(key)) {
+                            var line = borderstyle[key];
+                            if (line) {
+                                if (line.color.toLowerCase() !== border.defaultcolor) {
+                                    border.color = line.color;
+                                }
+
+                                if (line.style !== 1 && line.style !== BORDERTYPES[1]) {
+                                    border.type = BORDERTYPES[line.style];
+                                }
+                            }
+                        }
+                    }
+
+					var borderdialog= AJS.dialog2(bordercontainer);
+
+					//sets each individual line in the border picker to the appropriate status 'active' or 'default'
+					$(bordercontainer).find('[for=border]').each(function(){
+						var active=$(this).attr('data-src');
+
+						if (border.lines[active] === false){
+							$(this).attr('class','default');
+						}
+						else{
+							$(this).attr('class','active');
+						}
+					});
+
+					var newBorderStyle = 'eui-border ' + border.type;
+                    $(bordercontainer).find('button#euiLineStyle svg, #euisvgtable').attr('class', newBorderStyle);
+					var csstemplate='<style data-name="borderColorPicker">button#euiLineStyle line, svg#euisvgtable.eui-border .active, aui-item-link.eui-border-type line{stroke:'+border.color+' !important;}</style>';
+					$('head').append(csstemplate);
+
+			        borderdialog.show();
+
+					$(bordercontainer).find('#euisvgtable').off('click load','line.eui-background').on('click load','line.eui-background',function(){
+						var active=$(this).attr('data-src');
+						border.lines[active] = !border.lines[active];
+						if (border.lines[active] === false){
+							$(this).siblings('[data-src='+active+']').attr('class','default');
+						}
+						else{
+							$(this).siblings('[data-src='+active+']').attr('class','active');
+						}
+                        setborders(border);
+						
+					});
+
+					$('aui-item-link.eui-border-type a').on('click',function(){
+						var stylesvg=$(this).find('svg');
+						$('.tablecontainer svg#euisvgtable, button#euiLineStyle svg').attr('class', 'eui-border '+stylesvg.find('line').attr('class'));
+						border.type=stylesvg.find('line').attr('class');
+						setborders(border);
+					});
+
+                    $(bordercontainer).find('#euiBorderClear').on('click', function() {
+                        var defaultBorder = {
+                            color: '#52b052',
+                            defaultcolor: '#d2d2d2',
+                            type: BORDERTYPES[1],
+                            recentcolor:[],
+                            lines: {
+                                bottom: false,
+                                innerHorizontal: false,
+                                innerVertical: false,
+                                left: false,
+                                right: false,
+                                top: false
+                            }
+                        };
+
+						//set border picker, style picker and color picker to default values
+						$(bordercontainer).find('[for=border]').attr('class', 'default');
+						$(bordercontainer).find('#euiLineStyle svg').attr('class', 'eui-border');
+						$(bordercontainer).find("#togglePaletteOnly").spectrum("set", defaultBorder.color);
+
+						setborders(defaultBorder);
+					});
+
+					$("#togglePaletteOnly").spectrum({
+						showPaletteOnly: true,
+						togglePaletteOnly: false,
+						clickoutFiresChange: true,
+						togglePaletteMoreText: 'more',
+						togglePaletteLessText: 'less',
+						hideAfterPaletteSelect:true,
+						color: border.color,
+						palette: [
+							["#000","#444","#666","#999","#ccc","#eee","#f3f3f3","#fff"],
+							["#f00","#f90","#ff0","#0f0","#0ff","#00f","#90f","#f0f"],
+							["#f4cccc","#fce5cd","#fff2cc","#d9ead3","#d0e0e3","#cfe2f3","#d9d2e9","#ead1dc"],
+							["#ea9999","#f9cb9c","#ffe599","#b6d7a8","#a2c4c9","#9fc5e8","#b4a7d6","#d5a6bd"],
+							["#e06666","#f6b26b","#ffd966","#93c47d","#76a5af","#6fa8dc","#8e7cc3","#c27ba0"],
+							["#c00","#e69138","#f1c232","#6aa84f","#45818e","#3d85c6","#674ea7","#a64d79"],
+							["#900","#b45f06","#bf9000","#38761d","#134f5c","#0b5394","#351c75","#741b47"],
+							["#600","#783f04","#7f6000","#274e13","#0c343d","#073763","#20124d","#4c1130"]
+						],
+						change: function(color){
+							var hexcolor=color.toHexString();
+							border.color= hexcolor;
+							setborders(border);
+						}
+					});
+					var setborders=function(border){
+						//remove old style templates from HEAD
+						$('style[data-name="borderColorPicker"]').remove();
+
+						var ExcellentableObj=ExcellentableResourceInit(spreadId);
+						ExcellentableObj.sheet.isPaintSuspended(true);
+						var lineBorder = new $.wijmo.wijspread.LineBorder(border.color, $.wijmo.wijspread.LineStyle[border.type]);
+						var defaultLineBorder = new $.wijmo.wijspread.LineBorder(border.defaultcolor, border.defaultLine);
+						var csstemplate='<style data-name="borderColorPicker">button#euiLineStyle line, svg#euisvgtable.eui-border .active, aui-item-link.eui-border-type line{stroke:'+border.color+' !important;}</style>';
+                        $('head').append(csstemplate);
+
+						for (var n = 0; n < ExcellentableObj.selections.length; n++) {
+							var sel = getActualCellRange(ExcellentableObj.selections[n], ExcellentableObj.sheet.getRowCount(), ExcellentableObj.sheet.getColumnCount());
+							ExcellentableObj.sheet.setBorder(sel, defaultLineBorder , {all:true});
+                        };
+
+						for (var n = 0; n < ExcellentableObj.selections.length; n++) {
+							var sel = getActualCellRange(ExcellentableObj.selections[n], ExcellentableObj.sheet.getRowCount(), ExcellentableObj.sheet.getColumnCount());
+							ExcellentableObj.sheet.setBorder(sel, lineBorder, {
+								left: border.lines.left,
+								top: border.lines.top,
+								right: border.lines.right,
+								bottom: border.lines.bottom,
+								innerHorizontal: border.lines.innerHorizontal,
+								innerVertical: border.lines.innerVertical
+							});
+						};
+
+                        ExcellentableTriggerCustomValueChangeEvent(spread,'BorderDialog');
+                        ExcellentableObj.sheet.isPaintSuspended(false);
+					}; //end of set borders
+					break;
+                case "backcolor":
+                    sheet.isPaintSuspended(true);
+                    var sels = sheet.getSelections();
+                    for (var n = 0; n < sels.length; n++) {
+                        var sel = getActualCellRange(sels[n], sheet.getRowCount(), sheet.getColumnCount());
+                        sheet.getCells(sel.row, sel.col, sel.row + sel.rowCount - 1, sel.col + sel.colCount - 1, $.wijmo.wijspread.SheetArea.viewport).backColor(cmd.color);
+                        var cellBackColor = sheet.getCell(sel.row, sel.col).backColor();
+
+                        $('.eui-back-color-highlight').css('cssText', 'background-color:' + cellBackColor + '!important;');
+                        $('#euiMenubarBackcolorButtonDrop').css('cssText', 'color:' + cellBackColor + '!important;');
+                    }
+                    
+                    ExcellentableTriggerCustomValueChangeEvent(spread,'ColorDialog');
+                    sheet.isPaintSuspended(false);
+                    break;
+                case "fontcolor":
+                    sheet.isPaintSuspended(true);
+                    var sels = sheet.getSelections();
+                    for (var n = 0; n < sels.length; n++) {
+                        var sel = getActualCellRange(sels[n], sheet.getRowCount(), sheet.getColumnCount());
+                        sheet.getCells(sel.row, sel.col, sel.row + sel.rowCount - 1, sel.col + sel.colCount - 1, $.wijmo.wijspread.SheetArea.viewport).foreColor(cmd.color);
+                        for (var i = 0; i < sel.rowCount; i++) {
+                            for (var j = 0; j < sel.colCount; j++) {
+                                var cell = sheet.getCell(i + sel.row, j + sel.col, $.wijmo.wijspread.SheetArea.viewport);
+                                var cellType = cell.cellType();
+                                if (cellType instanceof GcSpread.Sheets.HyperLinkCellType) {
+                                    cellType._linkColor = cmd.color;
+                                    cellType._visitedLinkColor = cmd.color;
+                                }
+                            }
+                        }
+                        var cellForeColor = sheet.getCell(sel.row, sel.col).foreColor();
+                        $('.eui-font-color-highlight').css('cssText', 'background-color:' + cellForeColor + '!important;');
+                    }
+
+                    ExcellentableTriggerCustomValueChangeEvent(spread,'ColorDialog');
+                    sheet.isPaintSuspended(false);
+                    break;
+                case "underline":
+                    var sels = sheet.getSelections(),
+                            underline = $.wijmo.wijspread.TextDecorationType.Underline;
+                    for (var n = 0; n < sels.length; n++) {
+                        var sel = getActualCellRange(sels[n], sheet.getRowCount(), sheet.getColumnCount()),
+                                textDecoration = sheet.getCell(sel.row, sel.col, $.wijmo.wijspread.SheetArea.viewport).textDecoration();
+                        if ((textDecoration & underline) === underline) {
+                            textDecoration = textDecoration - underline;
+                            $('.aui-iconfont-editor-underline').parent('button').removeClass("active"); //Remove highlighting from underline button
+                        } else {
+                            textDecoration = textDecoration | underline;
+                            $('.aui-iconfont-editor-underline').parent('button').addClass("active"); //highlight underline button
+                        }
+                        sheet.getCells(sel.row, sel.col, sel.row + sel.rowCount - 1, sel.col + sel.colCount - 1, $.wijmo.wijspread.SheetArea.viewport).textDecoration(textDecoration);
+                    }
+
+                    break;
+                case "currency":
+                    jQuery(spreadId).ETDataTypeFormatting(sheet,{type : "currency"});
+                    break;
+                case "percentage" :
+                    jQuery(spreadId).ETDataTypeFormatting(sheet,{type : "percent"});
+                    break;
+                case "decrementdecimal":
+                    jQuery(spreadId).ETDataTypeFormatting(sheet,{type : "decrementDecimal"});
+                    break;
+                case "incrementdecimal":
+                    jQuery(spreadId).ETDataTypeFormatting(sheet,{type : "incrementDecimal"});
+                    break;
+	                case "clearformatting":
+                    var sels = sheet.getSelections(); //get selected cells
+                    for (var n = 0; n < sels.length; n++) {
+                        var sel = getActualCellRange(sels[n], sheet.getRowCount(), sheet.getColumnCount());
+                        sheet.clear(sel.row, sel.col, sel.rowCount, sel.colCount, $.wijmo.wijspread.SheetArea.viewport, $.wijmo.wijspread.StorageType.Style);
+                        var cell;
+                        var i, j;
+                        var startRow = sel.row,
+                            endRow = sel.row + sel.rowCount - 1,
+                            startCol = sel.col,
+                            endCol = sel.col + sel.colCount - 1;
+                        for (i = endRow; i >= startRow; i--) {
+                            for (j = endCol; j >= startCol; j--) {
+                                cell = sheet.getCell(i, j);
+                                //If cell has date value then applying date format and alignment and removing only the cell styles
+                                if (cell.value() instanceof Date) {
+                                    cell.formatter("M/d/yyyy").hAlign($.wijmo.wijspread.HorizontalAlign.right);
+
+                                }
+                            }
+                        }
+                    }
+                    //If default row height and column width is not defined
+                    if (typeof typeof sheet.defaults === "undefined") {
+                        sheet.defaults.rowHeight = 25;
+                        sheet.defaults.colWidth = 150;
+                    }
+                    sheet.getRows(startRow, endRow, $.wijmo.wijspread.SheetArea.viewport).height(sheet.defaults.rowHeight);
+                    sheet.getColumns(startCol, endCol, $.wijmo.wijspread.SheetArea.viewport).width(sheet.defaults.colWidth);
+                    break;
+                case "excellentableprintarea" :
+                	var visible = jQuery("#euiPrintArea").is(":visible" );
+                    jQuery("#euiPrintArea").toggle();
+                    spread.showHorizontalScrollbar(visible);
+                    break;
+                case "strikethrough":
+                    var sels = sheet.getSelections(),
+                            lineThrough = $.wijmo.wijspread.TextDecorationType.LineThrough;
+                    for (var n = 0; n < sels.length; n++) {
+                        var sel = getActualCellRange(sels[n], sheet.getRowCount(), sheet.getColumnCount()),
+                                textDecoration = sheet.getCell(sel.row, sel.col, $.wijmo.wijspread.SheetArea.viewport).textDecoration();
+                        if ((textDecoration & lineThrough) === lineThrough) {
+                            textDecoration = textDecoration - lineThrough;
+                            $excellentableMenubar.find('button[name=strikethrough]').removeClass("active"); //remove highlighting from strikethrough button
+                        } else {
+                            textDecoration = textDecoration | lineThrough;
+                            $excellentableMenubar.find('button[name=strikethrough]').addClass("active"); //highlight strikethrough button
+                        }
+                        sheet.getCells(sel.row, sel.col, sel.row + sel.rowCount - 1, sel.col + sel.colCount - 1, $.wijmo.wijspread.SheetArea.viewport).textDecoration(textDecoration);
+                    }
+                    break;
+                case "number":
+                    jQuery(spreadId).ETDataTypeFormatting(sheet, {type: "number", format:"#,##0.00"});
+                    break;
+								case "general":
+										jQuery(spreadId).ETDataTypeFormatting(sheet, {type: "number", format:""});
+										break;
+								case "accounting":
+										jQuery(spreadId).ETDataTypeFormatting(sheet, {type: "number", format:"$ #,##0.00;$ (#,##0.00);$ \"-\"??;@"});
+										break;
+								case "shortdate":
+		                jQuery(spreadId).ETDataTypeFormatting(sheet, {type: "number", format:"m/d/yyyy"});
+		                break;
+								case "longdate":
+										jQuery(spreadId).ETDataTypeFormatting(sheet, {type: "number", format:"dddd, mmmm dd, yyyy"});
+										break;
+								case "time":
+										jQuery(spreadId).ETDataTypeFormatting(sheet, {type: "number", format:"h:mm:ss AM/PM"});
+										break;
+								case "fraction":
+		                jQuery(spreadId).ETDataTypeFormatting(sheet, {type: "number", format:"# ?/?"});
+		                break;
+								case "scientific":
+										jQuery(spreadId).ETDataTypeFormatting(sheet, {type: "number", format:"0.00E+00"});
+										break;
+								case "text":
+										jQuery(spreadId).ETDataTypeFormatting(sheet, {type: "number", format:"@"});
+										break;
+                case "merge":
+                    var sels = sheet.getSelections();
+                        for (var n = 0; n < sels.length; n++) {
+                            var sel = getActualCellRange(sels[n], sheet.getRowCount(), sheet.getColumnCount());
+                            sheet.addSpan(sel.row, sel.col, sel.rowCount, sel.colCount);
+                        }
+                    break;
+                case "unmerge":
+                    var sels = sheet.getSelections();
+                    for (var n = 0; n < sels.length; n++) {
+                        var sel = getActualCellRange(sels[n], sheet.getRowCount(), sheet.getColumnCount());
+                        if (sheet.getSpans(sel, $.wijmo.wijspread.SheetArea.viewport).length > 0) {
+                            for (var i = 0; i < sel.rowCount; i++) {
+                                for (var j = 0; j < sel.colCount; j++) {
+                                    sheet.removeSpan(i + sel.row, j + sel.col);
+                                }
+                            }
+                        }
+                    }
+                    break;
+                case "justifyleft":
+                case "justifycenter":
+                case "justifyright":
+                    var align = $.wijmo.wijspread.HorizontalAlign.left;
+                    if (cmd.commandName == "justifycenter")
+                        align = $.wijmo.wijspread.HorizontalAlign.center;
+                    if (cmd.commandName == "justifyright")
+                        align = $.wijmo.wijspread.HorizontalAlign.right;
+                    var sels = sheet.getSelections();
+                    for (var n = 0; n < sels.length; n++) {
+                        var sel = getActualCellRange(sels[n], sheet.getRowCount(), sheet.getColumnCount());
+                        sheet.getCells(sel.row, sel.col, sel.row + sel.rowCount - 1, sel.col + sel.colCount - 1, $.wijmo.wijspread.SheetArea.viewport).hAlign(align);
+                    }
+                    HorizontalAlign.setIcon(align);
+
+                    break;
+                case "alignTop":
+                case "alignMiddle":
+                case "alignBottom":
+                    var align = $.wijmo.wijspread.VerticalAlign.center;
+                    if (cmd.commandName == "alignTop")
+                        align = $.wijmo.wijspread.VerticalAlign.top;
+                    if (cmd.commandName == "alignBottom")
+                        align = $.wijmo.wijspread.VerticalAlign.bottom;
+                    var sels = sheet.getSelections();
+                    for (var n = 0; n < sels.length; n++) {
+                        var sel = getActualCellRange(sels[n], sheet.getRowCount(), sheet.getColumnCount());
+                        sheet.getCells(sel.row, sel.col, sel.row + sel.rowCount - 1, sel.col + sel.colCount - 1, $.wijmo.wijspread.SheetArea.viewport).vAlign(align);
+                    }
+                    VerticalAlign.setIcon(align);
+                    break;
+                case "increaseindent":
+                case "decreaseindent":
+                    var sels = sheet.getSelections();
+                    var offset = 1;
+                    if (cmd.commandName == "decreaseindent")
+                        offset = -1;
+                    for (var n = 0; n < sels.length; n++) {
+                        var sel = getActualCellRange(sels[n], sheet.getRowCount(), sheet.getColumnCount());
+                        for (var i = 0; i < sel.rowCount; i++) {
+                            for (var j = 0; j < sel.colCount; j++) {
+                                var indent = sheet.getCell(i + sel.row, j + sel.col, $.wijmo.wijspread.SheetArea.viewport).textIndent();
+                                if (isNaN(indent))
+                                    indent = 0;
+                                var targetIndent = indent + offset;
+                                if(targetIndent >= 0){
+                                    sheet.getCell(i + sel.row, j + sel.col, $.wijmo.wijspread.SheetArea.viewport).textIndent(targetIndent);
+                                }
+                            }
+                        }
+                    }
+                    break;
+                case "insert":
+                    if (sheetAreaHitTest === $.wijmo.wijspread.SheetArea.colHeader) {
+                        sheet.addColumns(sheet.getActiveColumnIndex()+1, 1);
+                    } else if (sheetAreaHitTest === $.wijmo.wijspread.SheetArea.rowHeader) {
+                       sheet.addRows(sheet.getActiveRowIndex()+1, 1);
+                    }
+                    break;
+                case "insertcol":
+                    sheet.addColumns(sheet.getActiveColumnIndex(), 1);
+                    sheet.getColumn(sheet._activeColIndex).textIndent(1).vAlign($.wijmo.wijspread.VerticalAlign.center);
+                    applyFormatting(cmd);
+                    break;
+                case "insertcolright":
+                    sheet.addColumns(sheet.getActiveColumnIndex()+1, 1);
+                    sheet.getColumn(sheet._activeColIndex+1).textIndent(1).vAlign($.wijmo.wijspread.VerticalAlign.center);
+                    applyFormatting(cmd);
+                    break;
+                case "insertrow":
+                    sheet.addRows(sheet.getActiveRowIndex(), 1);
+                    sheet.getRow(sheet._activeRowIndex).textIndent(1).vAlign($.wijmo.wijspread.VerticalAlign.center);
+                    applyFormatting(cmd);
+                    break;
+                case "insertrowbelow":
+                    sheet.addRows(sheet.getActiveRowIndex()+1, 1);
+                    sheet.getRow(sheet._activeRowIndex+1).textIndent(1).vAlign($.wijmo.wijspread.VerticalAlign.center);
+                    applyFormatting(cmd);
+                    break;
+                case "delete":
+                    /**
+                     * Will only delete whole row and columns selected for all the ranges selected
+                     * Won't do anything when
+                     *     Multiple cells are selected and none of them are row and column headers
+                     *     When whole sheet is selected, by selecting cell -1,-1
+                     */
+                    var allSelections = sheet.getSelections();
+                    var currentSelection;
+                    for (var i = 0; i < allSelections.length; i++) {
+                        currentSelection = allSelections[i];
+                        if (currentSelection.row === 0) {
+                            //Column header is selected
+                            sheet.deleteColumns(currentSelection.col, currentSelection.colCount);
+                        } else if (currentSelection.col === 0) {
+                            //Row header is selected
+                            sheet.deleteRows(currentSelection.row, currentSelection.rowCount);
+                        }
+                    }
+                    break;
+                case "deleterow":
+                    sheet.deleteRows(sheet.getActiveRowIndex(), 1);
+                    break;
+                case "deletecol":
+                    sheet.deleteColumns(sheet.getActiveColumnIndex(), 1);
+                    break;
+                case "highlightcell":
+                    $("#euiRule1 option:eq(0)").attr("selected", "selected");
+                    $("#euiRule1").empty();
+                    $("#euiRule1").show();
+                    $("#euiRule1").append("<option value='0'>Cell Value</option>");
+                    $("#euiRule1").append("<option value='1'>Specific Text</option>");
+                    $("#euiRule1").append("<option value='2'>Date Occurring</option>");
+                    $("#euiRule1").append("<option value='5'>Unique</option>");
+                    $("#euiRule1").append("<option value='6'>Duplicate</option>");
+                    var rule = "0";
+                    var type = $("#euiComparisonOperator1");
+                    setEnumTypeOfCF(rule, type);
+                    $("#euiConditionalFormatDialog").dialog("option", {height: 200, width: 379, colorScale: false});
+                    $("#euiConditionalFormatDialog").dialog("open");
+                    break;
+                case "topbottom":
+                    $("#euiRule1 option:eq(1)").attr("selected", "selected");
+                    $("#euiRule1").empty();
+                    $("#euiRule1").show();
+                    $("#euiRule1").append("<option value='4'>Top10</option>");
+                    $("#euiRule1").append("<option value='7'>Average</option>");
+                    var rule = "4";
+                    var type = $("#euiComparisonOperator1");
+                    setEnumTypeOfCF(rule, type);
+                    $("#euiConditionalFormatDialog").dialog("option", {height: 200, width: 256, colorScale: false});
+                    $("#euiConditionalFormatDialog").dialog("open");
+                    break;
+                case "colorscale":
+                    $("#euiRule1 option:eq(2)").attr("selected", "selected");
+                    $("#euiRule1").empty();
+                    $("#euiRule1").show();
+                    $("#euiRule1").append("<option value='8'>2-Color Scale</option>");
+                    $("#euiRule1").append("<option value='9'>3-Color Scale</option>");
+                    var rule = "8";
+                    var type = $("#euiComparisonOperator1");
+                    setEnumTypeOfCF(rule, type);
+                    $("#euiConditionalFormatDialog").dialog("option", {height: 300, width: 409, colorScale: true});
+                    $("#euiConditionalFormatDialog").dialog("open");
+                    break;
+                case "otherofconditionalformat":
+                    $("#euiRule1 option:eq(3)").attr("selected", "selected");
+                    $("#euiRule1").empty();
+                    $("#euiRule1").show();
+                    $("#euiRule1").append("<option value='3'>FormulaRule</option>");
+                    var rule = "3";
+                    var type = $("#euiComparisonOperator1");
+                    setEnumTypeOfCF(rule, type);
+                    $("#euiConditionalFormatDialog").dialog("option", {height: 200, width: 380, colorScale: false});
+                    $("#euiConditionalFormatDialog").dialog("open");
+                    break;
+                case "databar":
+                    $("#euiDatabarDialog").dialog("open");
+                    break;
+                case "iconset":
+                    $("#euiIconSetType").val("0");
+                    createIconCriteriaDOM();
+                    $("#euiIconSetDialog").dialog("open");
+                    break;
+                case "removeconditionalformats":
+                    var cfs = sheet.getConditionalFormats();
+                    var row = sheet.getActiveRowIndex(), col = sheet.getActiveColumnIndex();
+                    var rules = cfs.getRules(row, col);
+                    $.each(rules, function (i, v) {
+                        cfs.removeRule(v);
+                    });
+                    sheet.isPaintSuspended(false);
+                    break;
+				case "tableformat":
+					var tableform=$('#euiTableformat');
+                    var tables = findTablesInSelection(sheet);
+					AJS.dialog2("#euiTableformat").show();
+
+					if (tables.length > 0){
+                        if(tables.length > 1){
+                            jQuery("body").ExcellentableNotification({
+                                title: AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.tables.multiple.selected"),
+                                fadeout: false
+                            }).showWarningMsg();
+                        }
+
+                        tables.forEach(function(table) {
+                            var styleName = table.style().name();
+                            tableform.find("#euiShowHeader").attr("checked", table.showHeader());
+                            tableform.find("#euiShowFooter").attr("checked", table.showFooter());
+                            tableform.find("#euiHighlightFirstColumn").attr("checked", table.highlightFirstColumn());
+                            tableform.find("#euiHighlightLastColumn").attr("checked", table.highlightLastColumn());
+                            tableform.find("#euiBandRows").attr("checked", table.bandRows());
+                            tableform.find("#euiBandColumns").attr("checked", table.bandColumns());
+                            tableform.find('input.tableStyle').val(styleName);
+                            tableform.find("img").removeClass('eui-active');
+                            tableform.find("img."+styleName).addClass('eui-active');
+                            jQuery('img.'+styleName)[0].scrollIntoView();
+                        });
+						
+					} else{
+						tableform.find('input').attr("checked", false)
+						tableform.find("img").removeClass('eui-active');
+						tableform.find('input.tableStyle').val('');
+					}
+				break;
+                case 'addlink':
+                    AJS.dialog2("#euiAddHyperlinkDialog").show();
+                    break;
+                case "unlink":
+                    sheet.isPaintSuspended(true);
+                    var cellSelections = sheet.getSelections();
+                    for (var n = 0; n < cellSelections.length; n++) {
+                        var actualCellRange = getActualCellRange(cellSelections[n], sheet.getRowCount(), sheet.getColumnCount());
+                        for (var i = 0; i < actualCellRange.rowCount; i++) {
+                            for (var j = 0; j < actualCellRange.colCount; j++) {
+                                var activeCell = sheet.getCell(i + actualCellRange.row, j + actualCellRange.col, $.wijmo.wijspread.SheetArea.viewport);
+                                var cellType = activeCell.cellType();
+                                if (cellType instanceof GcSpread.Sheets.HyperLinkCellType) {
+                                    var cellUrl = cellType._linkToolTip;
+                                    var cellText = cellType._text;
+                                    var textCellType = new GcSpread.Sheets.TextCellType();
+                                    if (cellText !== "") {
+                                        activeCell.text(cellText).cellType(textCellType);
+                                    } else {
+                                        activeCell.cellType(textCellType);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    sheet.isPaintSuspended(false);
+                    break;
+                case "picture":
+                    AJS.dialog2("#euiPictureDialog").show();
+                    AJS.$("#euiFileInput").val("");
+                    isPictureAdd = true;
+                    break;
+                case "sortaz":
+                case "sortza":
+                    var sels = sheet.getSelections();
+                    for (var n = 0; n < sels.length; n++) {
+                        var sel = getActualCellRange(sels[n], sheet.getRowCount(), sheet.getColumnCount());
+                        sheet.sortRange(sel.row, sel.col, sel.rowCount, sel.colCount, true, [
+                            {index: sel.col, ascending: cmd.commandName == "sortaz"}
+                        ]);
+                    }
+                    break;
+
+                case "rangeSort":
+                    var sel = sheet.getSelections()[0],
+                        row = (sel.row < 0) ? 0 : sel.row,
+                        col = (sel.col < 0) ? 0 : sel.col,
+                        selRowCount = sel.rowCount,
+                        totalOptions = col + sel.colCount,
+                        srTableCt = 0;
+                        var columns = [];
+                        for (var i = col; i < totalOptions; i++) {
+                            columns[i] = sheet.getValue(0, i, $.wijmo.wijspread.SheetArea.colHeader);
+                        }
+
+                        jQuery('body').append(Confluence.Templates.Excellentable.SortRangeDialog({
+                            columns: columns
+                        }));
+                        var sortRangeDialog = AJS.dialog2(sortRangeDialogId).show();
+                        var $dialogObj = sortRangeDialog.$el;
+                        $dialogObj.on("click","#euiDialogSaveChangesOkButton",function () {
+                            var sortInfo = [];
+                            $dialogObj.find(".eui-sr-table").each(function () {
+                                var sortIndex = parseInt(jQuery(this).find(".eui-sort-index").val());
+                                var asc = jQuery(this).find(".eui-sort-type-asc").is(":checked");
+                                sortInfo.push({index: sortIndex, ascending: asc});
+                            });
+
+                            if ($dialogObj.find("input[name='hasHeader']").is(":checked")) {
+                                row++;
+                                selRowCount = sel.rowCount - 1;
+                            }
+
+                            sheet.sortRange(row, col, selRowCount, sel.colCount, true, sortInfo);
+                            sortRangeDialog.remove();
+                        });
+
+                        $dialogObj.on("click","#euiSrAddCol",function () {
+                            srTableCt++;
+                            var del = "<span id='rmThenBy" + srTableCt + "' class='thenby aui-icon aui-icon-small aui-iconfont-delete'></span>";
+                            $dialogObj.find("#euiSrTables").append(
+                                Confluence.Templates.Excellentable.SortRangeDialogSRTable({
+                                    label: del + AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.then.by"),
+                                    srTableCnt: srTableCt,
+                                    columns: columns
+                                })
+                            );
+                        });
+
+                        $dialogObj.on("click",".thenby",function () {
+                            jQuery(this).closest(".eui-sr-table").remove();
+                        });
+
+                        // Hides the dialog
+                        $dialogObj.on("click","#euiDialogSaveChangesCancelButton",function (e) {
+                            e.preventDefault();
+                            sortRangeDialog.remove();
+                        });
+            break;
+                case "filter":
+                    if (isSingleCellSelection(sheet) && protectedSelectionCheck(sheet, sheet.getSelections().pop())) {
+                      break;
+                    }
+
+                    if (isTheFirstCellOfSelectionProtected(sheet, sheet.getSelections()[0])) {
+                        AJS.$(document).ExcellentableNotification(
+                            {
+                                title:AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.context.menu.protect.cells.error"),
+                                fadeout: false
+                            }
+                        ).showErrorMsg();
+                        sheet.isPaintSuspended(false);
+                        break;
+                    }
+
+
+                    var $filterBtn = $excellentableMenubar.find("[name=filter]");
+                    sheet = spread.getActiveSheet();
+                    /*  Each TableFilter within a sheet can be identified using exc-table-filter(versions prior to multiSheet support.)
+                        or sheetName-exc-table-filter (For all versions released after MultiSheet support). */
+                    var excTableFilter = sheet._tableManager.findByName(excTableFilterName)
+                                         || sheet._tableManager.findByName(sheet.getName() + "-" + excTableFilterName);
+                    var currentRange = sheet.getSelections()[0];
+                    //If any rowFilter is already applied
+                    if (sheet.rowFilter() && typeof sheet.rowFilter().range !== "undefined") {
+                        $filterBtn.removeClass("active");
+                        sheet.rowFilter(null);
+                    }
+                    else if (excTableFilter !== null) { //remove existing table filter
+                        $filterBtn.removeClass("active");
+                        removeTableFilter(spread, excTableFilter);
+                    }
+                    else {
+                        try{
+                        currentRange = getActualRange(currentRange, sheet.getRowCount(), sheet.getColumnCount());
+                            var tableStyle = new GcSpread.Sheets.TableStyle();
+                            var headerRowStyle = new GcSpread.Sheets.TableStyleInfo();
+                            headerRowStyle.font = "bold "+defaultFontSize+defaultFontName;
+                            tableStyle.headerRowStyle(headerRowStyle);
+                            if(currentRange.row === -1){ //If colHeader is selected
+                                currentRange.row = 0;
+                            }
+                            if(currentRange.col === -1){ //If rowHeader is selected
+                                currentRange.col = 0;
+                            }
+                            /*  Each TableFilter within a sheet can be identified using sheetName-exc-table-filter (For all versions released after MultiSheet support). */
+                            sheet.addTable(sheet.getName()+"-"+excTableFilterName, currentRange.row, currentRange.col, currentRange.rowCount, currentRange.colCount, tableStyle);
+                            $filterBtn.addClass("active");
+                        }catch (ex) {
+                           jQuery("body").ExcellentableNotification({title:ex.message}).showErrorMsg();
+                        }
+
+                    }
+                    break;
+                case "undo":
+                    GcSpread.Sheets.SpreadActions.undo.apply(sheet);
+                    break;
+                case "redo":
+                    GcSpread.Sheets.SpreadActions.redo.apply(sheet);
+                    break;
+                case "group":
+                    var sels = sheet.getSelections();
+                    var sel = sels[0];
+
+                    if (sel.col == -1) // row selection
+                    {
+                        var groupExtent = new $.wijmo.wijspread.UndoRedo.GroupExtent(sel.row, sel.rowCount);
+                        var action = new $.wijmo.wijspread.UndoRedo.RowGroupUndoAction(sheet, groupExtent);
+                        spread.doCommand(action);
+                        $("#showRowGroup").attr("disabled", false);
+                        if ($("#showRowGroup").attr("value") == "true") {
+                            $("#showRowGroupLabel").unbind("mouseup", rowlabelnoactive);
+                        }
+                        $("#showRowGroup").attr("value", "true");
+                        $("#showRowGroupLabel").attr("disabled", false);
+                        $("#showRowGroupLabel").removeClass("ui-state-disabled");
+                        $("#showRowGroupLabel").unbind("mouseup", rowlabelactive);
+                        sheet.showRowRangeGroup(true);
+                    }
+                    else if (sel.row == -1) // column selection
+                    {
+                        var groupExtent = new $.wijmo.wijspread.UndoRedo.GroupExtent(sel.col, sel.colCount);
+                        var action = new $.wijmo.wijspread.UndoRedo.ColumnGroupUndoAction(sheet, groupExtent);
+                        spread.doCommand(action);
+                        $("#showColGroup").attr("disabled", false);
+                        if ($("#showColGroup").attr("value") == "true") {
+                            $("#showColGroupLabel").unbind("mouseup", collabelnoactive);
+                        }
+                        $("#showColGroup").attr("value", "true");
+                        $("#showColGroupLabel").attr("disabled", false);
+                        $("#showColGroupLabel").removeClass("ui-state-disabled");
+                        $("#showColGroupLabel").unbind("mouseup", collabelactive);
+                        sheet.showColumnRangeGroup(true);
+                    }
+                    else // cell range selection
+                    {
+                        jQuery("body").ExcellentableNotification({
+                            title: AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.select.row.or.col")
+                        }).showWarningMsg();
+                    }
+                    break;
+                case "ungroup":
+                    var sels = sheet.getSelections();
+                    var sel = sels[0];
+
+                    if (sel.col == -1 && sel.row == -1) // sheet selection
+                    {
+                        sheet.rowRangeGroup.ungroup(0, sheet.getRowCount());
+                        sheet.colRangeGroup.ungroup(0, sheet.getColumnCount());
+                    }
+                    else if (sel.col == -1) // row selection
+                    {
+//sheet.rowRangeGroup.ungroup(sel.row, sel.rowCount);
+                        var groupExtent = new $.wijmo.wijspread.UndoRedo.GroupExtent(sel.row, sel.rowCount);
+                        var action = new $.wijmo.wijspread.UndoRedo.RowUngroupUndoAction(sheet, groupExtent);
+                        spread.doCommand(action);
+                        if (sheet.rowRangeGroup.getMaxLevel() < 0) {
+                            $("#showRowGroup").attr("disabled", true);
+                            $("#showRowGroup").attr("value", "true");
+                            $("#showRowGroupLabel").attr("disabled", true);
+                            $("#showRowGroupLabel").addClass("ui-state-disabled");
+                            $("#showRowGroupLabel").bind("mouseup", rowlabelnoactive);
+                        }
+                    }
+                    else if (sel.row == -1) // column selection
+                    {
+//sheet.colRangeGroup.ungroup(sel.col, sel.colCount);
+                        var groupExtent = new $.wijmo.wijspread.UndoRedo.GroupExtent(sel.col, sel.colCount);
+                        var action = new $.wijmo.wijspread.UndoRedo.ColumnUngroupUndoAction(sheet, groupExtent);
+                        spread.doCommand(action);
+                        if (sheet.colRangeGroup.getMaxLevel() < 0) {
+                            $("#showColGroup").attr("disabled", true);
+                            $("#showColGroup").attr("value", "true");
+                            $("#showColGroupLabel").attr("disabled", true);
+                            $("#showColGroupLabel").addClass("ui-state-disabled");
+                            $("#showColGroupLabel").bind("mouseup", collabelnoactive);
+                        }
+                    }
+                    else // cell range selection
+                    {
+                        jQuery("body").ExcellentableNotification({
+                            title: AJS.I18n.getText("com.addteq.confluence.plugin.excellentable.select.row.or.col")
+                        }).showWarningMsg();
+                    }
+                    break;
+                case "showdetail":
+                case "hidedetail":
+                    var sels = sheet.getSelections();
+                    var sel = sels[0];
+
+                    if (sel.col == -1 && sel.row == -1) // sheet selection
+                    {
+                    }
+                    else if (sel.col == -1) // row selection
+                    {
+                        for (var i = 0; i < sel.rowCount; i++) {
+                            var rgi = sheet.rowRangeGroup.find(sel.row + i, 0);
+                            if (rgi) {
+                                sheet.rowRangeGroup.expand(rgi.level, cmd.commandName == "showdetail");
+                            }
+                        }
+                    }
+                    else if (sel.row == -1) // column selection
+                    {
+                        for (var i = 0; i < sel.colCount; i++) {
+                            var rgi = sheet.colRangeGroup.find(sel.col + i, 0);
+                            if (rgi) {
+                                sheet.colRangeGroup.expand(rgi.level, cmd.commandName == "showdetail");
+                            }
+                        }
+                    }
+                    else // cell range selection
+                    {
+                    }
+                    break;
+                case "showrowrangegroup":
+                    if (!$("#showRowGroup").attr("disabled")) {
+                        sheet.showRowRangeGroup($("#showRowGroup").prop("checked"));
+                    }
+                    break;
+                case "showcolrangegroup":
+                    if (!$("#showColGroup").attr("disabled")) {
+                        sheet.showColumnRangeGroup($("#showColGroup").prop("checked"));
+                    }
+                    break;
+                case "datavalidation":
+                    $("#euiDataValidationDialog").dialog("open");
+                    break;
+                case "circleinvaliddata":
+                    spread.highlightInvalidData(true);
+                    break;
+                case "clearvalidationcircles":
+                    spread.highlightInvalidData(false);
+                    break;
+                case "textboxcelltype":
+                    $("#euiComboCellOptions").hide();
+                    $("#euiCheckBoxCellOptions").hide();
+                    $("#euiButtonCellOptions").hide();
+                    $("#euiHyperlinkCellOptions").hide();
+                    var cellType = new $.wijmo.wijspread.TextCellType();
+                    sheet.suspendEvent();
+                    var sels = sheet.getSelections();
+                    for (var i = 0; i < sels.length; i++) {
+                        var sel = getActualCellRange(sels[i], sheet.getRowCount(), sheet.getColumnCount());
+                        for (var r = 0; r < sel.rowCount; r++) {
+                            for (var c = 0; c < sel.colCount; c++) {
+                                sheet.setCellType(sel.row + r, sel.col + c, cellType, $.wijmo.wijspread.SheetArea.viewport);
+                            }
+                        }
+                    }
+                    sheet.resumeEvent();
+                    break;
+                case "comboboxcelltype":
+                    $("#euiComboCellOptions").show();
+                    $("#euiCheckBoxCellOptions").hide();
+                    $("#euiButtonCellOptions").hide();
+                    $("#euiHyperlinkCellOptions").hide();
+                    $("#euiSelComboCellEditorValueType").val("0");
+                    $("#euiTxtComboCellItemsText").val("");
+                    $("#euiTxtComboCellItemsValue").val("");
+                    $("#euiCellTypeDialog").dialog("open");
+                    selCellType = "ComboCell";
+                    break;
+                case "checkboxcelltype":
+                    $("#euiComboCellOptions").hide();
+                    $("#euiCheckBoxCellOptions").show();
+                    $("#euiButtonCellOptions").hide();
+                    $("#euiHyperlinkCellOptions").hide();
+                    $("#euiTxtCheckBoxCellTextCaption").val("");
+                    $("#euiTxtCheckBoxCellTextTrue").val("");
+                    $("#euiTxtCheckBoxCellTextIndeterminate").val("");
+                    $("#euiTxtCheckBoxCellTextFalse").val("");
+                    $("#euiSelCheckBoxCellAlign").val("0");
+                    $("#euiCkbCheckBoxCellIsThreeState").prop("checked", false);
+                    $("#euiCellTypeDialog").dialog("open");
+                    selCellType = "CheckBoxCell";
+                    break;
+                case "buttoncelltype":
+                    $("#euiComboCellOptions").hide();
+                    $("#euiCheckBoxCellOptions").hide();
+                    $("#euiButtonCellOptions").show();
+                    $("#euiHyperlinkCellOptions").hide();
+                    $("#euiTxtButtonCellMarginLeft").val("");
+                    $("#euiTxtButtonCellMarginTop").val("");
+                    $("#euiTxtButtonCellMarginRight").val("");
+                    $("#euiTxtButtonCellMarginBottom").val("");
+                    $("#euiTxtButtonCellText").val("");
+                    $("#euiTxtButtonCellBackColor").css("background-color", "#707070");
+                    $("#euiCellTypeDialog").dialog("open");
+                    selCellType = "ButtonCell";
+                    break;
+                case "hyperlinkcelltype":
+                    $("#euiComboCellOptions").hide();
+                    $("#euiCheckBoxCellOptions").hide();
+                    $("#euiButtonCellOptions").hide();
+                    $("#euiHyperlinkCellOptions").show();
+                    $("#euiTxtHyperLinkCellLinkColor").css("background-color", "#0066CC");
+                    $("#euiTxtHyperLinkCellVisitedLinkColor").css("background-color", "#3399FF");
+                    $("#euiTxtHyperLinkCellText").val("");
+                    $("#euiTxtHyperLinkCellToolTip").val("");
+                    $("#euiCellTypeDialog").dialog("open");
+                    selCellType = "HyperLinkCell";
+                    break;
+                case "alloweditorreservedlocations":
+                    sheet.allowEditorReservedLocations($("#alleditorreserved").attr("checked") === "checked" ? true : false);
+                    break;
+                case "ClearCellType":
+                    var sels = sheet.getSelections();
+                    for (var i = 0; i < sels.length; i++) {
+                        var sel = getActualCellRange(sels[i], sheet.getRowCount(), sheet.getColumnCount());
+                        sheet.clear(sel.row, sel.col, sel.rowCount, sel.colCount, $.wijmo.wijspread.SheetArea.viewport, $.wijmo.wijspread.StorageType.Style);
+                    }
+                    break;
+                case "comment":
+                    var spread = jQuery(spreadId).wijspread("spread");
+                    var sheet = spread.getActiveSheet();
+                    latestComment = sheet.getComment(sheet.getActiveRowIndex(), sheet.getActiveColumnIndex());
+                    AJS.dialog2("#eui-comment-dialog").show();
+                    break;
+                case "protectcell":
+                   var sheet = spread.getActiveSheet(),
+                       activeCell = sheet.getCell(sheet.getActiveRowIndex(), sheet.getActiveColumnIndex());
+                    toggleCellRangeProtect(sheet);
+                    break;
+                case "sparklineex":
+                    var sel = sheet.getSelections()[0],
+                            formularType = "LINESPARKLINE",
+                            dataRange = "";
+                    if (sel) {
+                        var cr = getActualRange(sel, sheet.getRowCount(), sheet.getColumnCount());
+                        if (cr) {
+                            var formula = sheet.getFormula(cr.row, cr.col, $.wijmo.wijspread.SheetArea.viewport);
+                            if (formula !== null && formula !== undefined) {
+                                var formulaIndex = formula.indexOf('(');
+                                formularType = formula.substring(0, formulaIndex);
+                            } else {
+                                dataRange = parseRangeToExpString(cr, spread);
+                            }
+                        }
+                    }
+                    $("#euiDataRange").val(dataRange);
+                    $("#euiLocationRange").val('');
+                    $("#euiSparklineExType").val(formularType);
+                    sparklineExTypeChanged();
+                    $("#euiSparklineExDialog").dialog("open");
+                    break;
+                case "rowheader":
+                    var rowHeader = sheet.getColumn(0, $.wijmo.wijspread.SheetArea.rowHeader);
+                    if(rowHeader.backColor()!=="crimson"){
+                        rowHeader.backColor("crimson").foreColor("white");
+                    }
+                    else{
+                       rowHeader.backColor("").foreColor("");
+                    }
+                    break;
+                case "columnheader":
+                    var columnHeader = sheet.getRow(0, $.wijmo.wijspread.SheetArea.colHeader);
+                    if(columnHeader.backColor()!=="crimson"){
+                        columnHeader.backColor("crimson").foreColor("white");
+                    }
+                    else{
+                        columnHeader.backColor("").foreColor("");
+                    }
+                    break;
+                case "gridlines":
+                    var vGridLine = sheet.gridline.showVerticalGridline;
+                    var hGridLine = sheet.gridline.showHorizontalGridline;
+                    sheet.setGridlineOptions({showVerticalGridline: !vGridLine, showHorizontalGridline: !hGridLine});
+                    break;
+                case "tabstrip":
+                    spread.tabStripVisible(!spread.tabStripVisible());
+                    break;
+                case "newtab":
+                    spread.newTabVisible(!spread.newTabVisible());
+                    break;
+                case "showhorizontalscrollbar":
+                    var hScrollbar = spread.showHorizontalScrollbar();
+                    spread.showHorizontalScrollbar(!hScrollbar);
+                    break;
+                case "showverticalscrollbar":
+                    var vScrollbar = spread.showVerticalScrollbar();
+                    spread.showVerticalScrollbar(!vScrollbar);
+                    break;
+                case "scrollbarMaxAlign":
+                    var scrollMaxAlign = spread.scrollbarMaxAlign();
+                    spread.scrollbarMaxAlign(!scrollMaxAlign);
+                    break;
+                case "scrollbarShowMax":
+                    var scrollShowMax = spread.scrollbarShowMax();
+                    spread.scrollbarShowMax(!scrollShowMax);
+                    break;
+                case "freezepane":
+                    sheet.setFrozenRowCount(sheet.getActiveRowIndex());
+                    sheet.setFrozenColumnCount(sheet.getActiveColumnIndex());
+                    break;
+                case "unfreeze":
+                    sheet.setFrozenRowCount(0);
+                    sheet.setFrozenColumnCount(0);
+                    sheet.setFrozenTrailingRowCount(0);
+                    sheet.setFrozenTrailingColumnCount(0);
+                    break;
+                case "freezesetting":
+                    $("#euiFreezeSettingDialog").dialog("open");
+                    $("#euiFrozenColumnCount").val(sheet.getFrozenColumnCount());
+                    $("#euiFrozenRowCount").val(sheet.getFrozenRowCount());
+                    $("#euiFrozenTrailingColumnCount").val(sheet.getFrozenTrailingColumnCount());
+                    $("#euiFrozenTrailingRowCount").val(sheet.getFrozenTrailingRowCount());
+                    break;
+                case "enableUseWijmoTheme":
+                    if ($("#wijmothemecheck").prop("checked")) {
+                        $("#setTabStripColor").attr("disabled", false);
+                        $("#setTabStripColor").removeClass("ui-state-disabled");
+                        spread.useWijmoTheme = false;
+                        spread.repaint();
+                    } else {
+                        $("#setTabStripColor").attr("disabled", true);
+                        $("#setTabStripColor").addClass("ui-state-disabled");
+                        spread.useWijmoTheme = true;
+                        spread.repaint();
+                    }
+                    break;
+                case "hideselection":
+                    spread.hideSelection($("#hideSelection").prop("checked"));
+                    break;
+                case "isr1c1":
+                    var result = $("#isR1C1").prop("checked");
+                    if (result) {
+                        spread.referenceStyle($.wijmo.wijspread.ReferenceStyle.R1C1);
+                    }
+                    else {
+                        spread.referenceStyle($.wijmo.wijspread.ReferenceStyle.A1);
+                    }
+                    break;
+                case "canuserdragdrop":
+                    var result = $("#canUserDragDrop").prop("checked");
+                    sheet.canUserDragDrop(result);
+                    break;
+                case "canuserdragfill":
+                    var result = $("#canUserDragFill").prop("checked");
+                    sheet.canUserDragFill(result);
+                    break;
+                case "canusereditformula":
+                    var result = $("#canUserEditFormula").prop("checked");
+                    spread.canUserEditFormula(result);
+                    break;
+                case "showdragdroptip":
+                    var dragDrop = $("#showDragDropTip").prop("checked");
+                    spread.showDragDropTip(dragDrop);
+                    break;
+                case "showdragfilltip":
+                    var dragFill = $("#showDragFillTip").prop("checked");
+                    spread.showDragFillTip(dragFill);
+                    break;
+                case "autofitwithheadertext":
+                    var autoFit = $("#autoFitWithHeaderText").prop("checked") ? $.wijmo.wijspread.AutoFitType.CellWithHeader : $.wijmo.wijspread.AutoFitType.Cell;
+                    spread.autoFitType(autoFit);
+                    break;
+                case "allowsheetreorder":
+                    var isAllow = $("#allowSheetReorder").prop("checked");
+                    spread.allowSheetReorder(isAllow);
+                    break;
+                case "sheetvisible":
+                    var sheetName = $("#sheetList").val();
+                    if (sheetName && sheetName !== '') {
+                        var visibleSheet = spread.getSheetFromName(sheetName);
+                        if (visibleSheet && typeof (visibleSheet.visible) === 'function') {
+                            var visible = visibleSheet.visible();
+                            visibleSheet.visible(!visible);
+                        }
+                    }
+                    break;
+                case "cutcopyindicatorvisible":
+                    var isVisible = $("#cutCopyIndicatorVisible").prop("checked");
+                    spread.cutCopyIndicatorVisible(isVisible);
+                    break;
+                case "usetouchlayout":
+                    var isUseTouch = $("#useTouchLayout").prop("checked");
+                    spread.useTouchLayout(isUseTouch);
+                    break;
+                case "showDragFillSmartTag":
+                    var dragFillSmartTag = $("#showDragFillSmartTag").prop("checked");
+                    spread.showDragFillSmartTag(dragFillSmartTag);
+                    break;
+                case "importexcel":
+                    excelImport();
+                    break;
+                case "exportasxlsx":
+                    excelExport("xlsx");
+                    break;
+                case "exportascsv":
+                    excelExport("csv");
+                    break;
+                case "exportasjson" :
+                    excelExport("json");
+                    break;
+                case "exportashtml" :
+                    excelExport("html");
+                    break;
+                case "generatedata":
+                    $("#euiGenerateDataDialog").dialog("open");
+                    break;
+                case 'help':
+                    window.open("https://nebula.addteq.com/display/EXC/Excellentable", '_blank');
+                    break;
+                case 'bug':
+                    window.open("https://jira.addteq.com/servicedesk/customer/portal/17/create/103", '_blank');
+                    break;
+                case 'feature':
+                    window.open("https://jira.addteq.com/servicedesk/customer/portal/17/create/102", '_blank');
+                    break;
+                case 'functionlist':
+                    window.open("https://nebula.addteq.com/display/EXC/Using+Formulas", '_blank');
+                    break;
+                case 'keyboardshortcuts':
+                    window.open("https://nebula.addteq.com/display/EXC/Excellentable+Keyboard+shortcuts", '_blank');
+                    break;
+                case 'sum':
+                case 'average':
+                case 'max':
+                case 'min':
+                case 'count':
+                    jQuery(dialogId).ExcellentableFormulaFunction({"type":cmd.commandName});
+                    break;
+                case 'more':
+                    window.open("https://nebula.addteq.com/display/EXC/Using+Formulas", '_blank');
+                    break;
+                case 'about':
+                    aboutDialog();
+                    break;
+                case 'editimage':
+                    var pictureDialog2 = AJS.dialog2("#euiPictureEditDialog");
+                    $("#euiPictureEditDialog").removeClass('hidden');
+                    pictureDialog2.show()
+
+                    var pictures = sheet.getPictures(),
+                        hasPictureSelected = false,
+                        picture;
+                    for (var index = 0, len = pictures.length; index < len; index++) {
+                        var item = pictures[index];
+                        if (item && item.isSelected()) {
+                            hasPictureSelected = true;
+                            picture = item;
+                            break;
+                        }
+                    }
+
+                    //Get the palette ready for Spectrum library
+                    var palette = [
+                        ["#000","#444","#666","#999","#ccc","#eee","#f3f3f3","#fff"],
+                        ["#f00","#f90","#ff0","#0f0","#0ff","#00f","#90f","#f0f"],
+                        ["#f4cccc","#fce5cd","#fff2cc","#d9ead3","#d0e0e3","#cfe2f3","#d9d2e9","#ead1dc"],
+                        ["#ea9999","#f9cb9c","#ffe599","#b6d7a8","#a2c4c9","#9fc5e8","#b4a7d6","#d5a6bd"],
+                        ["#e06666","#f6b26b","#ffd966","#93c47d","#76a5af","#6fa8dc","#8e7cc3","#c27ba0"],
+                        ["#c00","#e69138","#f1c232","#6aa84f","#45818e","#3d85c6","#674ea7","#a64d79"],
+                        ["#900","#b45f06","#bf9000","#38761d","#134f5c","#0b5394","#351c75","#741b47"],
+                        ["#600","#783f04","#7f6000","#274e13","#0c343d","#073763","#20124d","#4c1130"]
+                    ];
+
+                    // Call the spectrum library to show possible background colors, setting default background
+                    // selected as white
+                    var backColorSelected, borderColorSelected; //variables to hold colors selected thru palette
+
+                    AJS.$("#euiPictureBackColor").spectrum({
+                        showPaletteOnly: true,
+                        togglePaletteOnly:true,
+                        showAlpha: true,
+                        color: picture.backColor(),
+                        clickoutFiresChange: true,
+                        togglePaletteMoreText: 'more',
+                        togglePaletteLessText: 'less',
+                        hideAfterPaletteSelect:true,
+                        palette: palette,
+                        change: function(color){
+                            var rgbacolor=color.toRgbString();
+                            backColorSelected=rgbacolor;
+                        }
+                    });
+
+                    // Call the spectrum library to show possible border colors, setting default border color
+                    // selected as black
+                    AJS.$("#euiPictureBorderColor").spectrum({
+                        showPaletteOnly: true,
+                        togglePaletteOnly: false,
+                        color: picture.borderColor(),
+                        clickoutFiresChange: true,
+                        togglePaletteMoreText: 'more',
+                        togglePaletteLessText: 'less',
+                        hideAfterPaletteSelect:true,
+                        palette: palette,
+                        change: function(color){
+                            var hexcolor=color.toHexString();
+                            borderColorSelected=hexcolor;
+                        }
+                    });
+
+                    $("#euiDynamicMove").attr("checked", picture.dynamicMove());
+                    $("#euiDynamicSize").attr("checked", picture.dynamicSize());
+                    $("#euiPictureBorderWidth").val(picture.borderWidth());
+                    $("#euiPictureBorderRadius").val(picture.borderRadius());
+                    var borderStyle = picture.borderStyle();
+                    $("#euiPictureBorderStyle option[value='" + borderStyle + "']").attr("selected", true);
+                    var pictureStretch = picture.pictureStretch();
+                    $("#euiPictureStretch option[value='" + pictureStretch + "']").attr("selected", true);
+                    isPictureAdd = false;
+
+                    //Update Button Code
+                    AJS.$("#euiPictureEditDialogUpdateButton").click(function() {
+                        var spread = AJS.$(spreadId).wijspread("spread");
+                        var sheet = spread.getActiveSheet();
+                        sheet.isPaintSuspended(true);
+                        var pictures = sheet.getPictures(),
+                            backColor = backColorSelected;
+
+                        for (var index = 0, len = pictures.length; index < len; index++) {
+                            var picture = pictures[index];
+                            if (picture && picture.isSelected()) {
+                                picture.backColor(backColor);
+                            }
+                        }
+                        //Picture endRow and endCol are being set after current function, so running spread update event asynchronous
+                        //setTimeout(function(){ ExcellentableTriggerCustomValueChangeEvent(spread,'PictureDialog'); }, 10);
+                        sheet.isPaintSuspended(false);
+                        pictureDialog2.hide();
+                        $("#euiPictureEditDialog").addClass('hidden');
+                    });
+
+                    pictureDialog2.on("hide", function() {
+                        $("#euiPictureEditDialog").addClass('hidden');
+                    });
+
+                    break;
+                case "removeimage":
+                    var spread = jQuery(spreadId).wijspread("spread");
+                    var sheet = spread.getActiveSheet();
+                    sheet.isPaintSuspended(true);
+                    var pictures = sheet.getPictures(),
+                        pictureNames = [];
+                    for (var index = 0, len = pictures.length; index < len; index++) {
+                        var picture = pictures[index];
+                        if (picture && picture.isSelected()) {
+                            pictureNames.push(picture.name());
+                        }
+                    }
+                    for (var i = 0, len = pictureNames.length; i < len; i++) {
+                        sheet.removePicture(pictureNames[i]);
+                    }
+                    sheet.isPaintSuspended(false);
+                    break;
+                case "lockimage":
+                    var __ret = getSelectedPicture();
+                    var sheet = __ret.sheet;
+                    var picture = __ret.picture;
+                    picture.allowMove(false);
+                    picture.allowResize(false);
+                    jQuery('.eui-picture-resize-indicator').addClass('locked');
+                    break;
+                case "unlockimage":
+                    var __ret = getSelectedPicture();
+                    var sheet = __ret.sheet;
+                    var picture = __ret.picture;
+                    picture.allowMove(true);
+                    picture.allowResize(true);
+                    jQuery('.eui-picture-resize-indicator').removeClass('locked');
+                    break;
+                case "smallerimagesize":
+                    var data = getSelectedPicture();
+                    var pictureHeight = data.picture.height();
+                    var pictureWidth = data.picture.width();
+                    var newPictureHeight = pictureHeight / 1.28;
+                    var newPictureWidth =  pictureWidth / 1.28;
+                    data.picture.height(newPictureHeight);
+                    data.picture.width(newPictureWidth);
+                    break;
+                case "largerimagesize":
+                    var data = getSelectedPicture();
+                    var pictureHeight = data.picture.height();
+                    var pictureWidth = data.picture.width();
+                    var newPictureHeight = pictureHeight * 1.28;
+                    var newPictureWidth = pictureWidth * 1.28;
+                    data.picture.height(newPictureHeight);
+                    data.picture.width(newPictureWidth);
+                    break;
+                case "originalimagesize":
+                    resetToOriginalImageSize();
+                    break;
+                case "conditionalFormatting":
+                    $('#euiConditionalFormatDialog').dialog("open");
+                    console.log("conditionalFormatting");
+                    break;
+                default:
+                    if (cmd.commandName.substr(0, 1) == "f") {
+                        var styleEle = document.getElementById("euiColorSample");
+                        if (cmd.commandName.substr(0, 2) == "fn") {
+                            var fontFamily = document.getElementsByName(cmd.commandName)[0].text;
+                            setStyleFont(sheet, styleEle, "font-family", [fontFamily], fontFamily);
+                            $excellentableMenubar.find('a[name=fontname]').text(fontFamily); //highlight bold button
+                        }
+                        if (cmd.commandName.substr(0, 2) == "fs") {
+                            var fontSize = document.getElementsByName(cmd.commandName)[0].text+"pt";
+                            setStyleFont(sheet, styleEle, "font-size", [fontSize], fontSize);
+                            $excellentableMenubar.find('a[name=fontsize]').text(fontSize.slice(0,-2)); //highlight bold button
+                        }
+                    } else if (cmd.commandName.substr(0, 1) == "s") {
+                        if (cmd.commandName.substr(0, 2) == "sp") {
+                            var policy = 2;
+                            if (document.getElementById(cmd.commandName)["title"] == "Single") {
+                                policy = 0;
+                            } else if (document.getElementById(cmd.commandName)["title"] == "Range") {
+                                policy = 1;
+                            } else if (document.getElementById(cmd.commandName)["title"] == "MultiRange") {
+                                policy = 2;
+                            }
+                            sheet.selectionPolicy(policy);
+                        }
+                        if (cmd.commandName.substr(0, 2) == "su") {
+                            var unit = 0;
+                            if (document.getElementById(cmd.commandName)["title"] == "Cell") {
+                                unit = 0;
+                            } else if (document.getElementById(cmd.commandName)["title"] == "Row") {
+                                unit = 1;
+                            } else if (document.getElementById(cmd.commandName)["title"] == "Column") {
+                                unit = 2;
+                            }
+                            sheet.selectionUnit(unit);
+                        }
+                    } else if (cmd.commandName.substr(0, 1) == "t") {
+                        if (cmd.commandName.substr(0, 2) == "ts") {
+                            var scrollTip = 2;
+                            if (document.getElementById(cmd.commandName)["title"] == "None") {
+                                scrollTip = 0;
+                            } else if (document.getElementById(cmd.commandName)["title"] == "Horizontal") {
+                                scrollTip = 1;
+                            } else if (document.getElementById(cmd.commandName)["title"] == "Vertical") {
+                                scrollTip = 2;
+                            } else if (document.getElementById(cmd.commandName)["title"] == "Both") {
+                                scrollTip = 3;
+                            }
+                            spread.showScrollTip(scrollTip);
+                        }
+                        if (cmd.commandName.substr(0, 2) == "tr") {
+                            var resizeTip = 0;
+                            if (document.getElementById(cmd.commandName)["title"] == "None") {
+                                resizeTip = 0;
+                            } else if (document.getElementById(cmd.commandName)["title"] == "Column") {
+                                resizeTip = 1;
+                            } else if (document.getElementById(cmd.commandName)["title"] == "Row") {
+                                resizeTip = 2;
+                            } else if (document.getElementById(cmd.commandName)["title"] == "Both") {
+                                resizeTip = 3;
+                            }
+                            spread.showResizeTip(resizeTip);
+                        }
+                    } else if (cmd.commandName.substr(0, 1) == "d") {
+                        if (cmd.commandName.substr(0, 2) == "df") {
+                            var autoFillType = $.wijmo.wijspread.AutoFillType.Auto;
+                            if (document.getElementById(cmd.commandName)["title"] == "CopyCells") {
+                                autoFillType = $.wijmo.wijspread.AutoFillType.CopyCells;
+                            } else if (document.getElementById(cmd.commandName)["title"] == "FillSeries") {
+                                autoFillType = $.wijmo.wijspread.AutoFillType.FillSeries;
+                            } else if (document.getElementById(cmd.commandName)["title"] == "FillFormattingOnly") {
+                                autoFillType = $.wijmo.wijspread.AutoFillType.FillFormattingOnly;
+                            } else if (document.getElementById(cmd.commandName)["title"] == "FillWithoutFormatting") {
+                                autoFillType = $.wijmo.wijspread.AutoFillType.FillWithoutFormatting;
+                            } else if (document.getElementById(cmd.commandName)["title"] == "Auto") {
+                                autoFillType = $.wijmo.wijspread.AutoFillType.Auto;
+                            }
+                            spread.defaultDragFillType(autoFillType);
+                        }
+                    } else {
+                        jQuery("body").ExcellentableNotification({title:cmd.commandName}).showWarningMsg();
+                    }
+
+                    break;
+            }
+
+        /* The border command doesn't actually change anything, it only opens the dialog.
+           The command that actually changes the border is the "Border Dialog" one -
+           therefore triggering the value change for the "borders" command is unnecessary. */
+
+        var nonChangingCommands = ['borders'];
+        if (!nonChangingCommands.includes(cmd.commandName)) {
+            ExcellentableTriggerCustomValueChangeEvent(spread,cmd.commandName);
+        }
+        sheet.isPaintSuspended(false);
+}
+
+function ExcellentableTriggerCustomValueChangeEvent (spread,action){
+	var sheet = spread.getActiveSheet();
+	var selectionrange = sheet.getSelections();
+	var firstSelectedCell = (selectionrange.length === 0) ? sheet.getCell(0,0) : sheet.getCell(selectionrange[0].row, selectionrange[0].col);
+	var firstSelectedCellOriginalValue = firstSelectedCell.value();
+
+    spread._trigger(GcSpread.Sheets.Events.ValueChanged,{
+      col : sheet.getActiveColumnIndex() ,
+      newValue  : firstSelectedCellOriginalValue,
+      oldValue  : firstSelectedCellOriginalValue,
+      row : sheet.getActiveRowIndex() ,
+      sheet : sheet,
+      sheetName : sheet.getName(),
+      customEventTriggeredFromMenuBar : true,
+      action : action
+    });
+}
+
+
+function EditableHyperLinkCellType() {
+}
+EditableHyperLinkCellType.prototype = new ns.HyperLinkCellType(); //new CellType which is inherited from HyperLinkCellType. So it has same features from its parent class.
+//overriden the functions of EditableHyperLinkCellType
+EditableHyperLinkCellType.prototype.createEditorElement = function (context) {
+    return ns.TextCellType.prototype.createEditorElement.apply(this, context);
+},
+EditableHyperLinkCellType.prototype.activateEditor = function (editorContext, cellStyle, cellRect, context) {
+        ns.TextCellType.prototype.activateEditor.apply(this, arguments);
+},
+EditableHyperLinkCellType.prototype.updateEditor = function (editorContext, cellStyle, cellRect, context) {
+        ns.TextCellType.prototype.updateEditor.apply(this, arguments);
+},
+EditableHyperLinkCellType.prototype.deactivateEditor = function (editorContext, context) {
+        ns.TextCellType.prototype.deactivateEditor.apply(this, arguments);
+},
+EditableHyperLinkCellType.prototype.getEditorValue = function (editorContext, context) {
+        return ns.TextCellType.prototype.getEditorValue.apply(this, arguments);
+},
+EditableHyperLinkCellType.prototype.setEditorValue = function (editorContext, value, context) {
+        ns.TextCellType.prototype.setEditorValue.apply(this, arguments);
+},
+EditableHyperLinkCellType.prototype.isImeAware = function (context) {
+        return true;
+},
+EditableHyperLinkCellType.prototype.focus = function (editorContext, context) {
+        return ns.TextCellType.prototype.focus.apply(this, arguments);
+};
+
+function getRndInteger() {
+    return Math.floor(Math.random() * 1000);
+};
+
+function ExcellentableResourceInit(spreadId){
+	var spread = jQuery(spreadId).wijspread("spread");
+	var sheet = spread.getActiveSheet();
+	var selections = sheet.getSelections();
+	var returnvariable= {
+		"spread": spread,
+		"sheet": sheet,
+		"selections": selections
+	}
+
+	return returnvariable;
+}
+
+function getSelectedPicture() {
+    var spread = jQuery(spreadId).wijspread("spread");
+    var sheet = spread.getActiveSheet();
+
+    var pictures = sheet.getPictures(),
+        hasPictureSelected = false,
+        picture;
+    for (var index = 0, len = pictures.length; index < len; index++) {
+        var item = pictures[index];
+        if (item && item.isSelected()) {
+            hasPictureSelected = true;
+            picture = item;
+            break;
+        }
+    }
+
+    return {spread: spread, sheet: sheet, picture: picture};
+
+}
+
+function resetToOriginalImageSize() {
+    var __ret = getSelectedPicture();
+    var picture = __ret.picture;
+    var newPictureHeight = picture.getOriginalHeight();
+    var newPictureWidth = picture.getOriginalWidth();
+    picture.height(newPictureHeight);
+    picture.width(newPictureWidth);
+    return picture;
+}

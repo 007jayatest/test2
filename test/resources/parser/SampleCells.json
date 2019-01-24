@@ -1,0 +1,42 @@
+{
+  "normal": {
+    "value": "normal value",
+    "_description": "This has no style whatsoever (hAlign is automatic, not manually added)",
+    "style": {
+      "hAlign": 0,
+      "autoFormatter": {
+        "customerCultureName": "en-US"
+      }
+    }
+  },
+
+  "allBorders": {
+    "value": 2,
+    "_description": "This has 4 borders, color Black, line style Thick (5)",
+    "style": {
+      "backColor": "#ACFA58",
+      "hAlign": 3,
+      "vAlign": 1,
+      "font": "13.3333px/16px Verdana",
+      "textIndent": 1,
+      "imeMode": 1,
+      "borderLeft": {
+        "color": "Black",
+        "style": 5
+      },
+      "borderRight": {
+        "color": "Black",
+        "style": 5
+      },
+      "borderTop": {
+        "color": "Black",
+        "style": 5
+      },
+      "borderBottom": {
+        "color": "Black",
+        "style": 5
+      }
+    },
+    "formula": "SUM(B1,A2)"
+  }
+}

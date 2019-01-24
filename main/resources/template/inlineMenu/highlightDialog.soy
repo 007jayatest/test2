@@ -1,0 +1,24 @@
+{namespace Confluence.HighlightDialogs.Templates}
+
+/**
+ * Create Highlight Dialog content
+ *
+ * @param highlightedText
+ * @param numOccurrences
+ * @param searchIndex
+ */
+{template .createDialogContent}
+
+    <div class="dialog-header">
+        <h2>{getText('com.addteq.confluence.plugin.excellentable.highlight.dialog.header.text')}</h2>
+    </div>
+    <div>
+        <p>{getText('com.addteq.confluence.plugin.excellentable.highlight.instruction')}<p>
+    </div>
+    <div class="buttons-group eui-insert-exc-button-group">
+        <input type="hidden" value='{$highlightedText}' id="euiHighlightedText"/>
+        <input type="hidden" value={$numOccurrences} id="euiNumOccurrences"/>
+        <input type="hidden" value={$searchIndex} id="euiIndex"/>
+        <button class="aui-button" id="euiInsertExcInlineBtn" style="margin-right:14px">Create</button>
+    </div>
+{/template}

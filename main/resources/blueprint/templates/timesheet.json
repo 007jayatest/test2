@@ -1,0 +1,676 @@
+{
+  "version": "9.40.20161.5",
+  "tabStripVisible": true,
+  "newTabVisible": true,
+  "showScrollTip": 3,
+  "showVerticalScrollbar": false,
+  "scrollbarMaxAlign": true,
+  "grayAreaBackColor": "Transparent",
+  "sheets": {
+    "Time sheet": {
+      "name": "Time sheet",
+      "selections": {
+        "0": {
+          "row": 9,
+          "rowCount": 1,
+          "col": 5,
+          "colCount": 1
+        }
+      },
+      "defaults": {
+        "rowHeight": 25,
+        "colWidth": 150,
+        "rowHeaderColWidth": 40,
+        "colHeaderRowHeight": 20
+      },
+      "columns": [
+        {
+          "resizable": true,
+          "dirty": null
+        },
+        {
+          "resizable": true,
+          "dirty": null
+        },
+        {
+          "resizable": true,
+          "dirty": null
+        },
+        {
+          "resizable": true,
+          "dirty": null
+        },
+        {
+          "resizable": true,
+          "dirty": null
+        },
+        {
+          "resizable": true,
+          "dirty": null
+        },
+        {
+          "resizable": true,
+          "dirty": null
+        },
+        {
+          "resizable": true
+        },
+        {
+          "resizable": true
+        },
+        {
+          "resizable": true
+        },
+        {
+          "resizable": true
+        },
+        {
+          "resizable": true
+        },
+        {
+          "resizable": true
+        },
+        {
+          "resizable": true
+        },
+        {
+          "resizable": true
+        },
+        {
+          "resizable": true
+        },
+        {
+          "resizable": true
+        },
+        {
+          "resizable": true
+        },
+        {
+          "resizable": true
+        },
+        {
+          "resizable": true
+        },
+        {
+          "resizable": true
+        },
+        {
+          "resizable": true
+        },
+        {
+          "resizable": true
+        },
+        {
+          "resizable": true
+        },
+        {
+          "resizable": true
+        }
+      ],
+      "rows": [
+        {
+          "resizable": true,
+          "dirty": null,
+          "size": 22
+        },
+        {
+          "resizable": true,
+          "dirty": null
+        },
+        {
+          "resizable": true,
+          "dirty": null
+        },
+        {
+          "resizable": true,
+          "dirty": null
+        },
+        {
+          "resizable": true,
+          "dirty": null
+        },
+        {
+          "resizable": true,
+          "dirty": null
+        },
+        {
+          "resizable": true,
+          "dirty": null
+        },
+        {
+          "resizable": true,
+          "dirty": null
+        },
+        {
+          "resizable": true,
+          "dirty": null
+        },
+        {
+          "resizable": true,
+          "dirty": null
+        },
+        {
+          "resizable": true,
+          "dirty": null
+        },
+        {
+          "resizable": true,
+          "dirty": null
+        },
+        {
+          "resizable": true,
+          "dirty": null
+        },
+        {
+          "resizable": true,
+          "dirty": null
+        },
+        {
+          "resizable": true,
+          "dirty": null
+        },
+        {
+          "resizable": true,
+          "dirty": null
+        },
+        {
+          "resizable": true,
+          "dirty": null
+        },
+        {
+          "resizable": true,
+          "dirty": null
+        },
+        {
+          "resizable": true,
+          "dirty": null
+        },
+        {
+          "resizable": true,
+          "dirty": null
+        },
+        {
+          "resizable": true,
+          "dirty": null
+        }
+      ],
+      "rowCount": 100,
+      "columnCount": 26,
+      "spans": [
+        {
+          "row": 8,
+          "rowCount": 1,
+          "col": 2,
+          "colCount": 2
+        },
+        {
+          "row": 20,
+          "rowCount": 1,
+          "col": 4,
+          "colCount": 3
+        }
+      ],
+      "selectionBackColor": "transparent",
+      "selectionBorderColor": "#52b052",
+      "activeRow": 9,
+      "activeCol": 5,
+      "gridline": {
+        "color": "rgb(208, 215, 229)",
+        "showVerticalGridline": false,
+        "showHorizontalGridline": false
+      },
+      "allowCellOverflow": true,
+      "theme": "Office2007",
+      "colHeaderRowInfos": [
+        {
+          "size": 25
+        }
+      ],
+      "rowHeaderData": {
+        "columnDataArray": [
+          {
+            "style": {
+              "backColor": "crimson",
+              "foreColor": "white",
+              "font": "14.6667px Verdana"
+            }
+          }
+        ],
+        "defaultDataNode": {
+          "style": {
+            "themeFont": "Body"
+          }
+        }
+      },
+      "colHeaderData": {
+        "rowDataArray": [
+          {
+            "style": {
+              "backColor": "crimson",
+              "foreColor": "white",
+              "font": "14.6667px Verdana"
+            }
+          }
+        ],
+        "defaultDataNode": {
+          "style": {
+            "themeFont": "Body"
+          }
+        }
+      },
+      "data": {
+        "dataTable": {
+          "0": {
+            "0": {
+              "value": "Parker Tech",
+              "style": {
+                "font": "bold 16px Verdana"
+              }
+            }
+          },
+          "1": {
+            "0": {
+              "value": "74 Lincoln Green Lane"
+            }
+          },
+          "2": {
+            "0": {
+              "value": "Church Stoke, PA 19402"
+            }
+          },
+          "3": {
+            "0": {
+              "value": "(123) 456-7890"
+            }
+          },
+          "5": {
+            "0": {
+              "value": "Time Sheet"
+            }
+          },
+          "7": {
+            "0": {
+              "value": "Name"
+            },
+            "2": {
+              "value": "Timeframe"
+            },
+            "5": {
+              "value": "Submitted on"
+            }
+          },
+          "8": {
+            "0": {
+              "value": "Employee name"
+            },
+            "2": {
+              "value": "Week of 9/14/15 - 9/18/15"
+            },
+            "5": {
+              "value": 42265
+            }
+          },
+          "11": {
+            "1": {
+              "value": "Mon",
+              "formula": "TEXT(B13,\"DDD\")"
+            },
+            "2": {
+              "value": "Tue",
+              "formula": "TEXT(C13,\"DDD\")"
+            },
+            "3": {
+              "value": "Wed",
+              "formula": "TEXT(D13,\"DDD\")"
+            },
+            "4": {
+              "value": "Thu",
+              "formula": "TEXT(E13,\"DDD\")"
+            },
+            "5": {
+              "value": "Fri",
+              "formula": "TEXT(F13,\"DDD\")"
+            }
+          },
+          "12": {
+            "1": {
+              "value": "/OADate(42261)/",
+              "style": {
+                "hAlign": 2,
+                "formatter": "M/d/yyyy",
+                "autoFormatter": {
+                  "formatCached": "M/d/yyyy",
+                  "customerCultureName": "en-US"
+                }
+              }
+            },
+            "2": {
+              "value": 42262,
+              "style": {
+                "hAlign": 2,
+                "formatter": "M/d/yyyy"
+              },
+              "formula": "B13+1"
+            },
+            "3": {
+              "value": 42263,
+              "style": {
+                "hAlign": 2,
+                "formatter": "M/d/yyyy"
+              },
+              "formula": "C13+1"
+            },
+            "4": {
+              "value": 42264,
+              "style": {
+                "hAlign": 2,
+                "formatter": "M/d/yyyy"
+              },
+              "formula": "D13+1"
+            },
+            "5": {
+              "value": 42265,
+              "style": {
+                "hAlign": 2,
+                "formatter": "M/d/yyyy"
+              },
+              "formula": "E13+1"
+            },
+            "6": {
+              "value": "Totals"
+            }
+          },
+          "13": {
+            "0": {
+              "value": "Project A"
+            },
+            "1": {
+              "value": 1
+            },
+            "2": {
+              "value": 2.5
+            },
+            "3": {
+              "value": 2
+            },
+            "5": {
+              "value": 1
+            },
+            "6": {
+              "value": 6.5,
+              "formula": "SUM(B14:F14)"
+            }
+          },
+          "14": {
+            "0": {
+              "value": "Project B"
+            },
+            "2": {
+              "value": 2.5
+            },
+            "4": {
+              "value": 5
+            },
+            "5": {
+              "value": 2
+            },
+            "6": {
+              "value": 9.5,
+              "formula": "SUM(B15:F15)"
+            }
+          },
+          "15": {
+            "0": {
+              "value": "Project C"
+            },
+            "1": {
+              "value": 6
+            },
+            "2": {
+              "value": 3
+            },
+            "3": {
+              "value": 3.5
+            },
+            "4": {
+              "value": 0.5
+            },
+            "5": {
+              "value": 5
+            },
+            "6": {
+              "value": 18,
+              "formula": "SUM(B16:F16)"
+            }
+          },
+          "16": {
+            "0": {
+              "value": "Project D"
+            },
+            "1": {
+              "value": 1
+            },
+            "3": {
+              "value": 4
+            },
+            "6": {
+              "value": 5,
+              "formula": "SUM(B17:F17)"
+            }
+          },
+          "18": {
+            "0": {
+              "value": "Total hrs"
+            },
+            "1": {
+              "value": 8,
+              "formula": "SUM(B14:B18)"
+            },
+            "2": {
+              "value": 8,
+              "formula": "SUM(C14:C18)"
+            },
+            "3": {
+              "value": 9.5,
+              "formula": "SUM(D14:D18)"
+            },
+            "4": {
+              "value": 5.5,
+              "formula": "SUM(E14:E18)"
+            },
+            "5": {
+              "value": 8,
+              "formula": "SUM(F14:F18)"
+            },
+            "6": {
+              "value": 39,
+              "formula": "SUM(G14:G18)"
+            }
+          },
+          "19": {
+            "4": {
+              "value": "Billing rate (hourly)"
+            },
+            "6": {
+              "value": 40
+            }
+          },
+          "20": {
+            "4": {
+              "value": 1560,
+              "formula": "G19*G20"
+            }
+          }
+        },
+        "columnDataArray": [
+          {
+            "style": {
+              "vAlign": 1,
+              "textIndent": 1
+            }
+          },
+          {
+            "style": {
+              "vAlign": 1,
+              "textIndent": 1
+            }
+          },
+          {
+            "style": {
+              "vAlign": 1,
+              "textIndent": 1
+            }
+          },
+          {
+            "style": {
+              "vAlign": 1,
+              "textIndent": 1
+            }
+          },
+          {
+            "style": {
+              "vAlign": 1,
+              "textIndent": 1
+            }
+          },
+          {
+            "style": {
+              "vAlign": 1,
+              "textIndent": 1
+            }
+          },
+          {
+            "style": {
+              "vAlign": 1,
+              "textIndent": 1
+            }
+          },
+          {
+            "style": {
+              "vAlign": 1,
+              "textIndent": 1
+            }
+          },
+          {
+            "style": {
+              "vAlign": 1,
+              "textIndent": 1
+            }
+          },
+          {
+            "style": {
+              "vAlign": 1,
+              "textIndent": 1
+            }
+          },
+          {
+            "style": {
+              "vAlign": 1,
+              "textIndent": 1
+            }
+          },
+          {
+            "style": {
+              "vAlign": 1,
+              "textIndent": 1
+            }
+          },
+          {
+            "style": {
+              "vAlign": 1,
+              "textIndent": 1
+            }
+          },
+          {
+            "style": {
+              "vAlign": 1,
+              "textIndent": 1
+            }
+          },
+          {
+            "style": {
+              "vAlign": 1,
+              "textIndent": 1
+            }
+          },
+          {
+            "style": {
+              "vAlign": 1,
+              "textIndent": 1
+            }
+          },
+          {
+            "style": {
+              "vAlign": 1,
+              "textIndent": 1
+            }
+          },
+          {
+            "style": {
+              "vAlign": 1,
+              "textIndent": 1
+            }
+          },
+          {
+            "style": {
+              "vAlign": 1,
+              "textIndent": 1
+            }
+          },
+          {
+            "style": {
+              "vAlign": 1,
+              "textIndent": 1
+            }
+          },
+          {
+            "style": {
+              "vAlign": 1,
+              "textIndent": 1
+            }
+          },
+          {
+            "style": {
+              "vAlign": 1,
+              "textIndent": 1
+            }
+          },
+          {
+            "style": {
+              "vAlign": 1,
+              "textIndent": 1
+            }
+          },
+          {
+            "style": {
+              "vAlign": 1,
+              "textIndent": 1
+            }
+          },
+          {
+            "style": {
+              "vAlign": 1,
+              "textIndent": 1
+            }
+          },
+          {
+            "style": {
+              "vAlign": 1,
+              "textIndent": 1
+            }
+          }
+        ],
+        "defaultDataNode": {
+          "style": {
+            "font": "13.3333px Verdana"
+          }
+        }
+      },
+      "tag": {
+        "type": "edit",
+        "mouseOverRow": null
+      },
+      "index": 0
+    }
+  }
+}

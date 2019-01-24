@@ -1,0 +1,29 @@
+{namespace Confluence.Templates.Addteq.WhatsNew}
+
+/******************************************
+ *  Whats New Dialog soy template.
+*******************************************/
+{template .defaultDialog}
+    <div id="whatsNewModal" class="wnm-container wnm-location" tabindex="-1" role="dialog"
+         aria-labelledby="Whats New Modal">
+        <div class="wnm-dialog" role="document">
+            <div class="wnm-content">
+                <div class="wnm-header">
+                    <img class="wnm-logo">
+                </div>
+                <div class="wnm-body">
+                    <button type="button" class="wnm-close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                    <p>
+
+                    </p>
+                </div>
+                <div class="wnm-footer">
+                    <button type="button" class="wnm-button wnm-next wnm-btn wnm-btn-primary hidden">{getText('com.addteq.confluence.plugin.wnm.button.next')}</button>
+                    <button type="button" class="wnm-button wnm-dont wnm-btn wnm-btn-primary hidden">{getText('com.addteq.confluence.plugin.wnm.button.dont')}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{/template}

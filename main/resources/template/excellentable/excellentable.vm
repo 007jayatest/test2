@@ -1,0 +1,46 @@
+#requireResource("confluence.web.resources:ajs")
+#requireResource("com.atlassian.auiplugin:aui-select2")
+#set ($editText = $i18n.getText("com.addteq.confluence.plugin.excellentable.edit"))
+#set ($searchPlaceholderText = $i18n.getText("com.addteq.confluence.plugin.excellentable.search.placeholder"))
+#set ($shareSearchText = $i18n.getText("com.addteq.confluence.plugin.excellentable.search.share"))
+#set ($helpText = $i18n.getText("com.addteq.confluence.plugin.excellentable.help"))
+#set ($exportJsonText = $i18n.getText("com.addteq.confluence.plugin.excellentable.export.json"))
+
+<div id=exc-$excellentable-id class="eui-exc-container" excellentable-id=$excellentable-id content-entity-id=$content-entity-id>
+    <div class="eui-menu-bar" style="padding: 0.4em 0.4em 0;display:none;">
+        #if ($hasEditPermission)
+        <button id="euiEditExcellentable" class="aui-button aui-button-subtle" title="$editText">
+            <span class="aui-icon aui-icon-small aui-iconfont-edit"></span>
+        </button>
+        #end
+        <button id="euiFullscreenExcellentable" class="aui-button aui-button-subtle" title="Fullscreen">
+            <span class="aui-icon aui-icon-small aui-iconfont-focus"></span>
+        </button>
+        $exportBtnHtml
+        <input id="euiFilterString" class="eui-live-search" placeholder="$searchPlaceholderText" type="text">
+        <button class="eui-share-filter aui-button aui-button-subtle" title="$shareSearchText">
+            <span class="aui-icon aui-icon-small aui-iconfont-share"></span>
+        </button>
+        <button name="help" class="aui-button aui-button-subtle eui-help" original-title="$helpText">
+            <span class="aui-icon aui-icon-small aui-iconfont-help"></span>
+        </button>
+        <button name="json" class="aui-button aui-button-subtle eui-export-json hidden" style="margin-left:-11px;" original-title="$exportJsonText">
+            <span></span>
+        </button>
+    </div>
+    <div class="eui-aui-msg-container"></div>
+    <br><br>
+
+    <div class="eui-tool-tip-div"></div>
+    <div class="eui-view-spread-container">
+        <div class="eui-view-spread">
+        </div>
+        #if ($isEvalLicense)
+            <span class="eui-license-eval"> $i18n.getText("com.addteq.confluence.plugin.excellentable.evaluation.license", $settingsManager.getGlobalSettings().getBaseUrl()) </span>
+        #end
+    </div>
+    $body
+</div>
+<span class="confluence-embedded-file-wrapper eui-print-img" excellentable-id=$excellentable-id>
+    
+</span>
